@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nishant Iyer | Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mediaqueries.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Desktop Navigation -->
+    <nav id="desktop-nav">
+        <div class="logo">Nishant Iyer</div>
+        <div>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#experience">Experience</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+        <div class="theme-toggle">
+            <img src="./assets/dark-mode-light.png" alt="Toggle Dark Mode" class="icon theme-icon">
+        </div>
+    </nav>
+
+    <!-- Mobile Navigation -->
+    <nav id="hamburger-nav">
+        <div class="logo">Nishant Iyer</div>
+        <div class="hamburger-menu">
+            <div class="hamburger-icon" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="menu-links">
+                <li><a href="#about" onclick="toggleMenu()">About</a></li>
+                <li><a href="#experience" onclick="toggleMenu()">Experience</a></li>
+                <li><a href="#projects" onclick="toggleMenu()">Projects</a></li>
+                <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
+            </div>
+        </div>
+        <div class="theme-toggle">
+            <img src="./assets/dark-mode-light.png" alt="Toggle Dark Mode" class="icon theme-icon">
+        </div>
+    </nav>
+
+    <!-- Profile Section -->
+    <section id="profile">
+        <div class="section__pic-container">
+            <img src="./assets/profile-pic.png" alt="Nishant Iyer profile picture">
+        </div>
+        <div class="section__text">
+            <p class="section__text__p1">Hello, I'm</p>
+            <h1 class="title">Nishant Iyer</h1>
+            <p class="section__text__p2">Data Analyst & BI Specialist</p>
+            <div class="btn-container">
+                <button class="btn btn-color-2" onclick="window.open('./assets/resume.pdf')">
+                    Download CV
+                </button>
+                <button class="btn btn-color-1" onclick="location.href='./#contact'">
+                    Contact Info
+                </button>
+            </div>
+            <div id="socials-container">
+                <img src="./assets/linkedin-light.png" alt="LinkedIn" class="icon" 
+                     onclick="window.open('https://linkedin.com/in/nishantiyer')">
+                <img src="./assets/github-light.png" alt="GitHub" class="icon" 
+                     onclick="window.open('https://github.com/Nishant-Iyer')">
+                <img src="./assets/kaggle-light.png" alt="Kaggle" class="icon"
+                     onclick="window.open('https://kaggle.com/nustanishant')">
+            </div>
+        </div>
+        <img src="./assets/down-arrow-light.png" alt="Scroll down" class="icon arrow down" 
+             onclick="location.href='./#about'">
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <img src="./assets/up-arrow-light.png" alt="Scroll up" class="icon arrow up" 
+             onclick="location.href='./#profile'">
+        <p class="section__text__p1">Get To Know More</p>
+        <h1 class="title">About Me</h1>
+        <div class="section-container">
+            <div class="about-details-container">
+                <div class="about-containers">
+                    <div class="details-container">
+                        <img src="./assets/experience-light.png" alt="Experience icon" class="icon">
+                        <h3>Experience</h3>
+                        <p>4+ years<br>Data Analytics & BI</p>
+                    </div>
+                    <div class="details-container">
+                        <img src="./assets/education-light.png" alt="Education icon" class="icon">
+                        <h3>Education</h3>
+                        <p>Masters in Science: Business Analytics<br>Temple University</p>
+                    </div>
+                </div>
+                <div class="text-container">
+                    <p>I am a Data Analytics Consultant at Temple University’s Center City Campus, where I lead initiatives to transform complex datasets into actionable insights and scalable solutions. With an MS in Business Analytics and a strong foundation in machine learning, statistical modeling, and strategic decision-making, I specialize in bridging technical innovation and business impact.</p><br>
+                    <p>Previously, as a Product Analytics Consultant at Unilever, I directed cross-functional teams to design proprietary anomaly detection algorithms and predictive financial models, enhancing forecasting accuracy by 30% and empowering data-driven fiscal planning for global stakeholders. This role honed my ability to translate technical complexity into strategic outcomes, aligning C-suite objectives with operational execution.</p><br>
+                    <p>My journey began in biotechnology engineering, where a data-focused dissertation ignited my passion for coding and analytical problem-solving. This unique blend of technical rigor and business acumen has driven my success across Fortune 500 organizations, including Unilever and GroupM (client servicing for Colgate-Palmolive). I excel at architecting automation pipelines, AI-driven tools, and large-scale data ecosystems to optimize supply chains, decode consumer behavior, and unlock financial intelligence.</p><br>
+                    <p>Committed to advancing enterprise innovation, I thrive at the intersection of strategy and technology. My mission: to build adaptive, future-ready solutions that solve today’s challenges while anticipating tomorrow’s opportunities.</p>
+                </div>
+            </div>
+        </div>
+        <img src="./assets/down-arrow-light.png" alt="Scroll down" class="icon arrow down" 
+             onclick="location.href='./#experience'">
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience">
+        <img src="./assets/up-arrow-light.png" alt="Scroll up" class="icon arrow up" 
+             onclick="location.href='./#about'">
+        <p class="section__text__p1">Explore My</p>
+        <h1 class="title">Experience</h1>
+        <div class="experience-details-container">
+            <div class="experience-entry">
+                <div class="logo-container">
+                    <img src="./assets/temple-logo-light.png" alt="Temple University Logo" class="icon">
+                </div>
+                <div class="text-container">
+                    <h3>Data Analytics Consultant at Temple University</h3>
+                    <p>2023 - Present</p>
+                    <ul>
+                        <li>Led initiatives to transform complex datasets into actionable insights.</li>
+                        <li>Developed scalable solutions using machine learning and statistical modeling.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="experience-entry">
+                <div class="logo-container">
+                    <img src="./assets/unilever-logo-light.png" alt="Unilever Logo" class="icon">
+                </div>
+                <div class="text-container">
+                    <h3>Product Analytics Consultant at Unilever</h3>
+                    <p>2020 - 2023</p>
+                    <ul>
+                        <li>Directed cross-functional teams to design anomaly detection algorithms.</li>
+                        <li>Enhanced forecasting accuracy by 30% using predictive financial models.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <img src="./assets/down-arrow-light.png" alt="Scroll down" class="icon arrow down" 
+             onclick="location.href='./#projects'">
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects">
+        <img src="./assets/up-arrow-light.png" alt="Scroll up" class="icon arrow up" 
+             onclick="location.href='./#experience'">
+        <p class="section__text__p1">Browse My Recent</p>
+        <h1 class="title">Projects</h1>
+        <div class="experience-details-container">
+            <div class="about-containers">
+                <div class="details-container color-container">
+                    <div class="article-container">
+                        <img src="./assets/project-1.png" alt="Project 1" class="project-img" />
+                    </div>
+                    <h2 class="experience-sub-title project-title">Project One</h2>
+                    <div class="btn-container">
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">
+                            Github
+                        </button>
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">
+                            Live Demo
+                        </button>
+                    </div>
+                </div>
+                <div class="details-container color-container">
+                    <div class="article-container">
+                        <img src="./assets/project-2.png" alt="Project 2" class="project-img" />
+                    </div>
+                    <h2 class="experience-sub-title project-title">Project Two</h2>
+                    <div class="btn-container">
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">
+                            Github
+                        </button>
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">
+                            Live Demo
+                        </button>
+                    </div>
+                </div>
+                <div class="details-container color-container">
+                    <div class="article-container">
+                        <img src="./assets/project-3.png" alt="Project 3" class="project-img" />
+                    </div>
+                    <h2 class="experience-sub-title project-title">Project Three</h2>
+                    <div class="btn-container">
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">
+                            Github
+                        </button>
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">
+                            Live Demo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <img src="./assets/down-arrow-light.png" alt="Scroll down" class="icon arrow down" 
+             onclick="location.href='./#contact'" aria-label="Arrow icon" style="cursor: pointer;">
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <img src="./assets/up-arrow-light.png" alt="Scroll up" class="icon arrow up" 
+             onclick="location.href='./#projects'">
+        <p class="section__text__p1">Get in Touch</p>
+        <h1 class="title">Contact Me</h1>
+        <div class="contact-info-upper-container">
+            <div class="contact-info-container">
+                <img src="./assets/email-light.png" alt="Email icon" class="icon contact-icon">
+                <p><a href="/cdn-cgi/l/email-protection#aec7daddc0c7ddc6cfc0dac7d7cbdceec9c3cfc7c280cdc1c3"><span class="__cf_email__" data-cfemail="ba938e89949389929b948e93839f88ba9d979b9396d4999597">[email&#160;protected]</span></a></p>
+            </div>
+            <div class="contact-info-container">
+                <a href="https://linkedin.com/in/nishantiyer" target="_blank">
+                    <img src="./assets/linkedin-light.png" alt="LinkedIn" class="icon contact-icon">
+                </a>
+            </div>
+        </div>
+        <img src="./assets/top-light.png" alt="Scroll down" class="icon arrow down" 
+             onclick="location.href='./#profile'">
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <nav>
+            <div class="nav-links-container">
+                <ul class="nav-links">
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#experience">Experience</a></li>
+                    <li><a href="#projects">Projects</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+        <p>Copyright © 2024 Nishant Iyer. All rights reserved.</p>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
