@@ -378,15 +378,18 @@ section {
 }
 
 .logo-container img {
-  height: 75px;
+  height: 200px;
   width: auto;
   object-fit: contain;
+  border-radius: 10px;
 }
 
-/* Glow effect for Unilever and GroupM in dark mode */
+/* Glow effect for company in dark mode */
+.dark .temple .logo-container img,
+.dark .first-economy .logo-container img,
 .dark .unilever .logo-container img,
 .dark .groupm .logo-container img {
-  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+  filter: drop-shadow(0 0 5px var(--primary-color));
 }
 
 .text-container {
