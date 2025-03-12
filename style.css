@@ -1,5 +1,5 @@
 /* GENERAL */
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap");
 
 * {
   margin: 0;
@@ -8,7 +8,7 @@
 }
 
 body {
-  font-family: "Poppins", sans-serif;
+  font-family: "Fira Code", monospace;
 }
 
 /* Theme Variables */
@@ -83,6 +83,9 @@ a:hover {
 
 .logo {
   font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logo:hover {
@@ -91,6 +94,12 @@ a:hover {
 
 .theme-toggle {
   cursor: pointer;
+}
+
+.logo-svg {
+  width: 100%;
+  max-width: 200px; /* Adjust this value to fit your navigation design */
+  height: auto;
 }
 
 /* HAMBURGER MENU */
