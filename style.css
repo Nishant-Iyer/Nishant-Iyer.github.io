@@ -172,16 +172,10 @@ a:hover {
   transform: rotate(-45deg) translate(10px, -5px);
 }
 
+/* Reset first span when hamburger is closed */
 .hamburger-icon span:first-child {
   transform: none;
-}
-
-.hamburger-icon span:first-child {
   opacity: 1;
-}
-
-.hamburger-icon span:first-child {
-  transform: none;
 }
 
 /* SECTIONS */
