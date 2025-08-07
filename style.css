@@ -35,6 +35,22 @@ body {
   color: var(--text-color);
 }
 
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateY(-100%);
+  background: var(--primary-color);
+  color: var(--background-color);
+  padding: 0.5rem 1rem;
+  transition: transform 0.3s;
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 html {
   scroll-behavior: smooth;
 }
