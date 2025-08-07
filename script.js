@@ -35,3 +35,9 @@ document.querySelectorAll('.theme-icon').forEach(icon => {
         });
     });
 });
+
+// Initialize AOS animations
+AOS.init({
+    duration: 600,
+    once: true,
+});
