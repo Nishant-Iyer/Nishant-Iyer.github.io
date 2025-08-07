@@ -288,20 +288,17 @@ section {
   position: relative;
 }
 
-.about-containers {
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
-  margin-bottom: 2rem;
-  margin-top: 2rem;
+  margin: 2rem 0;
 }
 
-.about-details-container {
-  justify-content: center;
-  flex-direction: column;
-}
-
-.about-containers,
 .about-details-container {
   display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .about-pic {
@@ -342,10 +339,11 @@ section {
   position: relative;
 }
 
-.experience-details-container {
-  display: flex;
+.experience-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
   justify-content: center;
-  flex-direction: column;
 }
 
 .experience-entry {
@@ -411,6 +409,12 @@ section {
 /* PROJECTS SECTION */
 #projects {
   position: relative;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
 }
 
 .color-container {
