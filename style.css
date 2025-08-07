@@ -437,6 +437,12 @@ section {
   color: var(--text-color);
 }
 
+.project-description {
+  margin: 0 1rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
 .project-btn {
   color: var(--text-color);
   border: 0.1rem solid var(--text-color);
