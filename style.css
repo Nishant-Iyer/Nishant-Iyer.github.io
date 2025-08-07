@@ -17,6 +17,8 @@ body {
     --text-color: #000000;
     --surface-color: #f5f5f5;
     --primary-color: #6200ee;
+    --accent-color: #ff4081;
+    --background-gradient: linear-gradient(135deg, #ffffff, #e0e0e0);
     --border-color: #ddd;
     --shadow-color: rgba(0, 0, 0, 0.1);
 }
@@ -26,6 +28,8 @@ body {
     --text-color: #ffffff;
     --surface-color: #1e1e1e;
     --primary-color: #bb86fc;
+    --accent-color: #ff80ab;
+    --background-gradient: linear-gradient(135deg, #121212, #1e1e1e);
     --border-color: #444;
     --shadow-color: rgba(255, 255, 255, 0.1);
 }
@@ -76,7 +80,7 @@ a {
 }
 
 a:hover {
-  color: var(--primary-color);
+  color: var(--accent-color);
   text-decoration: underline;
   text-underline-offset: 1rem;
 }
@@ -128,7 +132,7 @@ a:hover {
 }
 
 .hamburger-icon:hover span {
-  background-color: var(--primary-color); /* Hover effect for hamburger menu */
+  background-color: var(--accent-color); /* Hover effect for hamburger menu */
 }
 
 .menu-links {
@@ -214,6 +218,7 @@ section {
   justify-content: center;
   gap: 5rem;
   height: 80vh;
+  background: var(--background-gradient);
 }
 
 .section__pic-container {
@@ -278,9 +283,10 @@ section {
 }
 
 .btn:hover {
-  background: var(--text-color);
+  background: var(--accent-color);
   color: var(--background-color);
-  box-shadow: 0 0 10px var(--primary-color);
+  border: 0.1rem solid var(--accent-color);
+  box-shadow: 0 0 10px var(--accent-color);
 }
 
 /* ABOUT SECTION */
@@ -319,7 +325,7 @@ section {
 }
 
 .details-container:hover {
-  box-shadow: 0 0 10px var(--primary-color);
+  box-shadow: 0 0 10px var(--accent-color);
 }
 
 .section-container {
@@ -359,7 +365,7 @@ section {
 }
 
 .experience-entry:hover {
-  box-shadow: 0 0 10px var(--primary-color);
+  box-shadow: 0 0 10px var(--accent-color);
 }
 
 .logo-container {
@@ -411,6 +417,7 @@ section {
 /* PROJECTS SECTION */
 #projects {
   position: relative;
+  background: var(--background-gradient);
 }
 
 .color-container {
@@ -423,7 +430,7 @@ section {
 }
 
 .color-container:hover {
-  box-shadow: 0 0 10px var(--primary-color);
+  box-shadow: 0 0 10px var(--accent-color);
 }
 
 .project-img {
@@ -444,9 +451,10 @@ section {
 }
 
 .project-btn:hover {
-  background: var(--text-color);
+  background: var(--accent-color);
   color: var(--background-color);
-  box-shadow: 0 0 10px var(--primary-color);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 10px var(--accent-color);
 }
 
 /* CONTACT */
@@ -478,7 +486,7 @@ section {
 
 .contact-info-container:hover .icon {
   transform: scale(1.1);
-  box-shadow: 0 0 10px var(--primary-color);
+  box-shadow: 0 0 10px var(--accent-color);
 }
 
 .contact-info-container p {
@@ -496,7 +504,7 @@ footer {
 }
 
 footer a:hover {
-  color: var(--primary-color);
+  color: var(--accent-color);
   text-decoration: underline;
 }
 
