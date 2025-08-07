@@ -3,8 +3,8 @@
     height: 83vh;
     margin-bottom: 6rem;
   }
-  .about-containers {
-    flex-wrap: wrap;
+  .about-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
   #contact,
   #projects {
@@ -20,7 +20,7 @@
     display: flex;
   }
   #experience,
-  .experience-details-container {
+  .experience-grid {
     margin-top: 2rem;
   }
   #profile,
@@ -42,7 +42,7 @@
     height: 275px;
     margin: 0 auto 2rem;
   }
-  .about-containers {
+  .about-grid {
     margin-top: 0;
   }
   .experience-entry {
@@ -56,6 +56,16 @@
   }
   .text-container {
     padding-left: 0;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .about-grid,
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+  .experience-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -75,7 +85,9 @@
     height: fit-content;
     margin-bottom: 2rem;
   }
-  .about-containers,
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
   .contact-info-upper-container,
   .btn-container {
     flex-wrap: wrap;
@@ -111,5 +123,17 @@
   }
   .text-container {
     text-align: justify;
+  }
+}
+
+@media screen and (min-width: 1800px) {
+  .about-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .projects-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .experience-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
