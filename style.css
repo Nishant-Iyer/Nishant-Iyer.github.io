@@ -33,6 +33,7 @@ body {
 body {
   background-color: var(--background-color);
   color: var(--text-color);
+  transition: background-color 0.5s, color 0.5s;
 }
 
 html {
@@ -41,15 +42,16 @@ html {
 
 p {
   color: var(--text-color);
+  transition: color 0.5s;
 }
 
 /* TRANSITION */
 a,
 .btn,
+.project-btn,
 .arrow,
-.hamburger-icon,
-.icon {
-  transition: all 300ms ease;
+.hamburger-icon {
+  transition: all 300ms ease, background-color 0.5s, color 0.5s;
 }
 
 /* DESKTOP NAV */
@@ -100,6 +102,7 @@ a:hover {
   width: 100%;
   max-width: 200px; /* Adjust this value to fit your navigation design */
   height: auto;
+  transition: opacity 0.5s;
 }
 
 /* HAMBURGER MENU */
@@ -125,6 +128,7 @@ a:hover {
   width: 100%;
   height: 2px;
   background-color: var(--text-color);
+  transition: background-color 0.5s;
 }
 
 .hamburger-icon:hover span {
@@ -139,7 +143,7 @@ a:hover {
   width: fit-content;
   max-height: 0;
   overflow: hidden;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out, background-color 0.5s, color 0.5s;
 }
 
 .menu-links a {
@@ -149,7 +153,7 @@ a:hover {
   font-size: 1.5rem;
   color: var(--text-color);
   text-decoration: none;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out, background-color 0.5s, color 0.5s;
 }
 
 .menu-links li {
@@ -257,6 +261,11 @@ section {
 .icon {
   cursor: pointer;
   height: 2rem;
+  transition: filter 0.5s, opacity 0.5s;
+}
+
+.fade {
+  opacity: 0;
 }
 
 /* BUTTONS */
@@ -315,7 +324,7 @@ section {
   border-radius: 2rem;
   border: 0.1rem solid var(--border-color);
   text-align: center;
-  transition: all 300ms ease;
+  transition: all 300ms ease, background-color 0.5s, color 0.5s, border-color 0.5s;
 }
 
 .details-container:hover {
@@ -355,7 +364,7 @@ section {
   padding: 0.5rem;
   border-radius: 10px;
   background: var(--surface-color);
-  transition: all 300ms ease;
+  transition: all 300ms ease, background-color 0.5s, color 0.5s;
 }
 
 .experience-entry:hover {
@@ -395,12 +404,14 @@ section {
   color: var(--text-color);
   font-size: 1.25rem;
   margin-bottom: 0.5rem;
+  transition: color 0.5s;
 }
 
 .text-container p, .text-container li {
   color: var(--text-color);
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
+  transition: color 0.5s;
 }
 
 .text-container ul {
@@ -419,7 +430,7 @@ section {
   border-radius: 2rem;
   padding: 1.5rem;
   text-align: center;
-  transition: all 300ms ease;
+  transition: all 300ms ease, background-color 0.5s, color 0.5s, border-color 0.5s;
 }
 
 .color-container:hover {
@@ -435,12 +446,14 @@ section {
 .project-title {
   margin: 1rem;
   color: var(--text-color);
+  transition: color 0.5s;
 }
 
 .project-btn {
   color: var(--text-color);
   border: 0.1rem solid var(--text-color);
   background: var(--background-color);
+  transition: background-color 0.5s, color 0.5s, border-color 0.5s;
 }
 
 .project-btn:hover {
@@ -465,6 +478,7 @@ section {
   background: var(--surface-color);
   margin: 2rem auto;
   padding: 0.5rem;
+  transition: background-color 0.5s, color 0.5s, border-color 0.5s;
 }
 
 .contact-info-container {
@@ -473,7 +487,7 @@ section {
   justify-content: center;
   gap: 0.5rem;
   margin: 1rem;
-  transition: all 300ms ease;
+  transition: all 300ms ease, background-color 0.5s, color 0.5s, border-color 0.5s;
 }
 
 .contact-info-container:hover .icon {
