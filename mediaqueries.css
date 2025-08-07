@@ -112,4 +112,10 @@
   .text-container {
     text-align: justify;
   }
+  .project-description {
+    font-size: 0.8rem;
+  }
+  #projects .details-container {
+    padding-bottom: 1rem;
+  }
 }
