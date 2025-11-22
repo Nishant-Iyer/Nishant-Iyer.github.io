@@ -1,0 +1,79 @@
+{
+  "experience": [
+    {
+      "logo_light": "./assets/temple-light.png",
+      "logo_dark": "./assets/temple-dark.png",
+      "alt": "Temple University Logo",
+      "title": "Data Analyst",
+      "dates": "Jan 2024 - May 2025",
+      "duties": [
+        "Automated weekly lead reports using Excel VBA, saving 8+ hours/month and enhancing responsiveness to data issues.",
+        "Created Tableau dashboards for enrollment funnel and campaign performance, delivering student engagement insights that improved conversion by 12%.",
+        "Conducted Python-based EDA and A/B testing, increasing conversion by 12% and engagement by 20%.",
+        "Structured data with SQL and pandas, enabling root cause analysis and metric development for internal dashboards.",
+        "Delivered insight decks to university leadership, improving planning decisions with clear visualizations."
+      ]
+    },
+    {
+      "logo_light": "./assets/unilever-light.png",
+      "logo_dark": "./assets/unilever-dark.png",
+      "alt": "Unilever Logo",
+      "title": "Product Analytics Consultant",
+      "dates": "Jul 2024 - Dec 2024",
+      "duties": [
+        "Built Power BI dashboards for pacing and inventory risk, enabling $3M+ in savings across product lines.",
+        "Automated ingestion of 15M+ records using Databricks pipelines for anomaly detection and real-time reporting.",
+        "Built forecasting models using regression/trend methods, boosting demand accuracy to 96% and reducing stockouts.",
+        "Defined cross-functional KPIs with product, finance, and supply teams, standardizing P&L and POS data tracking.",
+        "Delivered weekly metrics decks and executive dashboards to guide decision-making on replenishment and performance."
+      ]
+    },
+    {
+      "logo_light": "./assets/groupM-light.png",
+      "logo_dark": "./assets/groupM-dark.png",
+      "alt": "GroupM Logo",
+      "title": "Marketing Data Analyst",
+      "dates": "Jan 2022 - Jun 2023",
+      "duties": [
+        "Managed SQL-driven performance marketing attribution models for $3M+ media spend, improving ROAS by 22% and informing cross-channel strategy.",
+        "Designed CLV segmentation models and pacing dashboards to reduce churn by 18% and increasing recurring purchases.",
+        "Created forecasting tools and automated Excel dashboards for client media planning and spend strategy.",
+        "Uncovered 15% untapped markets via stakeholder interviews/demographics, guiding a $1.2M campaign for Colgate-Palmolive."
+      ]
+    },
+    {
+      "logo_light": "./assets/first-economy-light.png",
+      "logo_dark": "./assets/first-economy-dark.png",
+      "alt": "First Economy Logo",
+      "title": "Media Operations Analyst",
+      "dates": "Mar 2021 - Jan 2022",
+      "duties": [
+        "Streamlined reporting automation using Excel macros and Google Data Studio, reducing reporting lag by 70%.",
+        "Led weekly QA checks, discrepancy resolution, and report refresh processes for campaign operations.",
+        "Delivered dashboards and insights to internal teams and clients, informing logistics of media delivery."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "image": "./assets/credit-card-fraud.png",
+      "title": "Credit Card Fraud Detection",
+      "description": "Developed a machine learning model to detect fraudulent credit card transactions. This project involved extensive data cleaning, feature engineering using PCA, and building multiple classification models (like Logistic Regression and XGBoost) to achieve high precision and recall in identifying fraudulent activities from a highly imbalanced dataset.",
+      "github": "https://github.com/Nishant-Iyer/Credit-Card-Fraud-Detection.git",
+      "liveDemo": "https://github.com/Nishant-Iyer/Credit-Card-Fraud-Detection/blob/main/Credit%20Card%20Fraud%20Detection%20Analysis.ipynb"
+    },
+    {
+      "image": "./assets/distribution-optimization.png",
+      "title": "Global Distribution Centers Optimization",
+      "description": "Built a comprehensive optimization model for a global distribution center network. This project utilized linear programming techniques in Python to minimize transportation and operational costs while satisfying demand across multiple regions, leading to a potential 15% reduction in logistics expenses.",
+      "github": "https://github.com/Nishant-Iyer/Global-Distribution-Optimization-Center.git",
+      "liveDemo": "https://github.com/Nishant-Iyer/Global-Distribution-Optimization-Center/blob/main/Global%20Distribution%20Center%20Optimization.ipynb"
+    },
+    {
+      "image": "./assets/nfl-analysis.png",
+      "title": "NFL Gambling Market Analysis",
+      "description": "Conducted an in-depth analysis of the NFL gambling market to identify betting inefficiencies and opportunities. This project involved web scraping for historical odds and game data, performing statistical analysis to find market biases, and creating visualizations to present actionable insights for betting strategies.",
+      "github": "https://github.com/Nishant-Iyer/NFL-Gambling-Market-Analysis.git"
+    }
+  ]
+}
