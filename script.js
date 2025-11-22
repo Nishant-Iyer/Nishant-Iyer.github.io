@@ -6,35 +6,22 @@ function toggleMenu() {
     icon.classList.toggle("open");
 }
 
-// Theme toggle functionality
-document.querySelectorAll('.theme-icon').forEach(icon => {
-    icon.addEventListener('click', function() {
-        document.body.classList.toggle('dark');
+// Contact form mailto handler
+const contactForm = document.querySelector('#contact-form');
 
-        // Update all icons based on theme
-        document.querySelectorAll('.icon').forEach(img => {
-            if (document.body.classList.contains('dark')) {
-                img.src = img.src.replace('-light.png', '-dark.png');
-            } else {
-                img.src = img.src.replace('-dark.png', '-light.png');
-            }
-        });
+if (contactForm) {
+    contactForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = contactForm.name.value.trim();
+        const email = contactForm.email.value.trim();
+        const message = contactForm.message.value.trim();
 
-        // Update logo SVGs based on theme
-        document.querySelectorAll('.logo-svg').forEach(logo => {
-            if (document.body.classList.contains('dark')) {
-                logo.src = 'https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=900&size=36&pause=1000&color=FFFFFF&center=true&vCenter=true&width=250&lines=Nishant+Iyer';
-            } else {
-                logo.src = 'https://readme-typing-svg.demolab.com/?font=Fira+Code&weight=900&size=36&pause=1000&color=000000&center=true&vCenter=true&width=250&lines=Nishant+Iyer';
-            }
+        const subject = encodeURIComponent(`Portfolio contact from ${name || 'a collaborator'}`);
+        const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
 
-            // Ensure SVG loads correctly, log error if it fails
-            logo.onerror = () => {
-                console.error('Failed to load SVG:', logo.src);
-            };
-        });
+        window.location.href = `mailto:itsnishantiyer@gmail.com?subject=${subject}&body=${body}`;
     });
-});
+}
 
 // Initialize AOS animations
 AOS.init({
