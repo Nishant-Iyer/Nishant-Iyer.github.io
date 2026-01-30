@@ -1,20 +1,36 @@
-@media screen and (max-width: 1400px) {
+/* ===================================================================
+   RESPONSIVE DESIGN - PREMIUM BREAKPOINTS
+   =================================================================== */
+
+/* Large Desktops (1400px+) */
+@media screen and (min-width: 1400px) {
+  section {
+    padding: 120px 15%;
+  }
+
   #profile {
-    height: 83vh;
-    margin-bottom: 6rem;
+    gap: 8rem;
   }
 
-  .about-containers {
-    flex-wrap: wrap;
-  }
-
-  #contact,
-  #projects {
-    height: fit-content;
+  .section__pic-container {
+    width: 420px;
   }
 }
 
-@media screen and (max-width: 1200px) {
+/* Standard Laptops (1200px - 1399px) */
+@media screen and (max-width: 1399px) {
+  section {
+    padding: 100px 8%;
+  }
+
+  #profile {
+    gap: 4rem;
+  }
+}
+
+/* Tablets Landscape / Small Laptops (992px - 1199px) */
+@media screen and (max-width: 1199px) {
+  /* Navigation */
   #main-nav .nav-links {
     display: none;
   }
@@ -23,99 +39,478 @@
     display: flex;
   }
 
-  #experience,
-  .experience-details-container {
-    margin-top: 2rem;
+  .nav-links.open {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 72px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-primary);
+    padding: 2rem;
+    gap: 0.5rem;
+    z-index: 999;
+    animation: menuSlide 0.3s var(--ease-out-expo);
   }
 
-  #profile,
-  .section-container {
+  @keyframes menuSlide {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .nav-links.open li {
+    text-align: center;
+  }
+
+  .nav-links.open a {
     display: block;
+    padding: 1rem 2rem;
+    font-size: 1.25rem;
   }
 
+  /* Profile */
+  #profile {
+    flex-direction: column;
+    text-align: center;
+    padding-top: 100px;
+    gap: 2rem;
+  }
+
+  .section__pic-container {
+    width: 280px;
+    margin: 0 auto;
+  }
+
+  .section__text {
+    max-width: 100%;
+  }
+
+  .section__text__p1,
+  .title,
+  .section__text__p2 {
+    text-align: center;
+  }
+
+  .btn-container {
+    justify-content: center;
+  }
+
+  #socials-container {
+    justify-content: center;
+  }
+
+  /* Hide scroll arrows */
   .arrow {
     display: none;
   }
 
-  section,
-  .section-container {
-    height: fit-content;
-  }
-
-  section {
-    margin: 0 5%;
-  }
-
-  .section__pic-container {
-    width: 275px;
-    height: 275px;
-    margin: 0 auto 2rem;
-  }
-
-  .about-containers {
-    margin-top: 0;
-  }
-
+  /* Experience */
   .experience-entry {
     flex-direction: column;
-    align-items: flex-start;
+    gap: 1.5rem;
   }
 
   .logo-container {
-    flex: none;
     width: 100%;
-    margin-bottom: 1rem;
-  }
-
-  .text-container {
-    padding-left: 0;
-  }
-
-  .skills-container {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media screen and (max-width: 600px) {
-  #contact,
-  footer {
-    height: auto;
-  }
-
-  #profile {
-    height: 83vh;
-    margin-bottom: 0;
-  }
-
-  article {
-    font-size: 1rem;
-  }
-
-  footer nav {
-    height: fit-content;
-    margin-bottom: 2rem;
-  }
-
-  .about-containers,
-  .btn-container {
-    flex-wrap: wrap;
-  }
-
-  .contact-info-container {
-    margin: 0;
-  }
-
-  .contact-info-container p,
-  .nav-links li a {
-    font-size: 1rem;
-  }
-
-  .text-container {
-    text-align: left;
+    justify-content: flex-start;
   }
 
   .logo-container img {
-    height: 80px;
-    width: auto;
+    width: 60px;
+  }
+
+  /* Projects */
+  .projects-container {
+    gap: 1.5rem;
+  }
+
+  .details-container.color-container {
+    flex: 0 0 300px;
+    min-width: 280px;
+  }
+}
+
+/* Tablets Portrait (768px - 991px) */
+@media screen and (max-width: 991px) {
+  section {
+    padding: 80px 6%;
+    min-height: auto;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+  }
+
+  /* Profile */
+  .section__pic-container {
+    width: 250px;
+  }
+
+  /* About */
+  .about-containers {
+    flex-direction: column;
+  }
+
+  .details-container {
+    min-width: 100%;
+  }
+
+  .text-container p {
+    text-align: left;
+  }
+
+  /* Experience */
+  .experience-entry .text-container li {
+    font-size: 0.85rem;
+  }
+
+  /* Projects */
+  .projects-container {
+    padding: 1rem;
+  }
+
+  .details-container.color-container {
+    flex: 0 0 280px;
+    min-width: 260px;
+  }
+
+  .project-img {
+    height: 180px;
+  }
+
+  /* Contact */
+  .contact-form-container {
+    padding: 2rem;
+    margin: 1.5rem auto;
+  }
+}
+
+/* Large Phones (576px - 767px) */
+@media screen and (max-width: 767px) {
+  section {
+    padding: 60px 5%;
+  }
+
+  /* Profile */
+  #profile {
+    padding-top: 90px;
+    min-height: calc(100vh - 72px);
+  }
+
+  .section__pic-container {
+    width: 220px;
+  }
+
+  .btn-container {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto 2rem;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Experience */
+  .experience-entry {
+    padding: 1.5rem;
+  }
+
+  .logo-container img {
+    width: 50px;
+  }
+
+  /* Projects */
+  .projects-scroll-container {
+    margin: 0 -5%;
+  }
+
+  .projects-container {
+    padding: 1rem 5%;
+    gap: 1rem;
+  }
+
+  .details-container.color-container {
+    flex: 0 0 260px;
+    min-width: 240px;
+  }
+
+  .project-title {
+    font-size: 1.1rem;
+    padding: 1rem 1rem 0.5rem;
+  }
+
+  .project-description {
+    font-size: 0.85rem;
+    padding: 0 1rem;
+  }
+
+  .details-container.color-container .btn-container {
+    padding: 1rem;
+    flex-direction: column;
+  }
+
+  /* Contact */
+  .contact-form-container {
+    padding: 1.5rem;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    padding: 0.875rem 1rem;
+  }
+
+  /* Footer */
+  footer {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem 5%;
+  }
+
+  footer .nav-links {
+    order: 1;
+    margin-bottom: 1rem;
+  }
+
+  footer p {
+    order: 2;
+  }
+}
+
+/* Small Phones (under 576px) */
+@media screen and (max-width: 575px) {
+  html {
+    font-size: 14px;
+  }
+
+  section {
+    padding: 50px 4%;
+  }
+
+  /* Navigation */
+  #main-nav {
+    padding: 0 4%;
+    height: 64px;
+  }
+
+  .logo-svg {
+    height: 28px;
+  }
+
+  .nav-links.open {
+    top: 64px;
+  }
+
+  .nav-links.open a {
+    font-size: 1.1rem;
+    padding: 0.875rem 1.5rem;
+  }
+
+  /* Profile */
+  #profile {
+    padding-top: 80px;
+  }
+
+  .section__pic-container {
+    width: 180px;
+  }
+
+  .section__pic-container::before,
+  .section__pic-container::after {
+    inset: -2px;
+  }
+
+  .section__pic-container img {
+    border-width: 3px;
+  }
+
+  #socials-container {
+    gap: 0.75rem;
+  }
+
+  #socials-container .icon {
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+  }
+
+  /* Experience */
+  .experience-entry {
+    padding: 1.25rem;
+  }
+
+  .experience-entry .text-container h3 {
+    font-size: 1.1rem;
+  }
+
+  .experience-entry .text-container li {
+    font-size: 0.8rem;
+    padding-left: 1.25rem;
+  }
+
+  .experience-entry .text-container li::before {
+    width: 5px;
+    height: 5px;
+    top: 0.5rem;
+  }
+
+  /* Projects */
+  .details-container.color-container {
+    flex: 0 0 240px;
+    min-width: 220px;
+  }
+
+  .project-img {
+    height: 160px;
+  }
+
+  /* Contact */
+  .contact-form-container {
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+  }
+
+  /* Scroll to top */
+  .scroll-top-btn {
+    width: 44px;
+    height: 44px;
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  .scroll-top-btn i {
+    font-size: 1rem;
+  }
+}
+
+/* Extra Small Phones (under 400px) */
+@media screen and (max-width: 399px) {
+  section {
+    padding: 40px 3%;
+  }
+
+  .section__pic-container {
+    width: 160px;
+  }
+
+  .btn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.85rem;
+  }
+
+  .details-container.color-container {
+    flex: 0 0 220px;
+    min-width: 200px;
+  }
+
+  .experience-entry {
+    padding: 1rem;
+  }
+
+  .logo-container img {
+    width: 40px;
+  }
+}
+
+/* Height-based adjustments for landscape phones */
+@media screen and (max-height: 600px) and (orientation: landscape) {
+  #profile {
+    flex-direction: row;
+    min-height: auto;
+    padding: 80px 5% 40px;
+    gap: 2rem;
+  }
+
+  .section__pic-container {
+    width: 200px;
+  }
+
+  .section__text {
+    text-align: left;
+  }
+
+  .section__text__p1,
+  .title,
+  .section__text__p2 {
+    text-align: left;
+  }
+
+  .btn-container {
+    justify-content: flex-start;
+    flex-direction: row;
+  }
+
+  #socials-container {
+    justify-content: flex-start;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  .orb,
+  .loader-name::after,
+  .section__pic-container::before {
+    animation: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border-subtle: rgba(255, 255, 255, 0.2);
+    --border-default: rgba(255, 255, 255, 0.3);
+    --text-secondary: #d4d4d4;
+    --text-tertiary: #a3a3a3;
+  }
+}
+
+/* Print styles */
+@media print {
+  .cursor,
+  .cursor-follower,
+  .scroll-progress,
+  .gradient-orbs,
+  .noise-overlay,
+  #loader,
+  .scroll-top-btn,
+  #main-nav,
+  .arrow {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+
+  section {
+    page-break-inside: avoid;
+    padding: 20px;
   }
 }
