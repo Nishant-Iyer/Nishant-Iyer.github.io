@@ -414,9 +414,9 @@ document.addEventListener("DOMContentLoaded", () => {
         hamburgerIcon.classList.toggle("open");
     }
 
-    const hamburgerIcon = document.querySelector('.hamburger-icon');
+    const hamburgerMenu = document.querySelector('.hamburger-menu');
     if (hamburgerIcon) {
-        hamburgerIcon.addEventListener('click', toggleMenu);
+        hamburgerMenu.addEventListener('click', toggleMenu);
     }
 
     document.querySelectorAll('.nav-links a').forEach(link => {
