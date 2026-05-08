@@ -147,10 +147,14 @@
     <section id="projects">
         <p class="section__text__p1">Explore My Creations</p>
         <h1 class="title">Featured Projects</h1>
-            <div class="projects-scroll-container">
-                <div class="projects-container">
-                    <!-- Projects will be dynamically inserted here -->
+            <div class="projects-wrapper">
+                <button class="project-nav-btn prev" aria-label="Previous Projects"><i class="fas fa-chevron-left"></i></button>
+                <div class="projects-scroll-container">
+                    <div class="projects-container">
+                        <!-- Projects will be dynamically inserted here -->
+                    </div>
                 </div>
+                <button class="project-nav-btn next" aria-label="Next Projects"><i class="fas fa-chevron-right"></i></button>
             </div>        <img src="./assets/down-arrow-light.png" alt="Scroll down to Contact section" class="icon arrow down" 
              onclick="location.href='./#contact'" aria-label="Scroll to Contact section" style="cursor: pointer;">
     </section>
