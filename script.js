@@ -41,7 +41,45 @@ document.addEventListener("DOMContentLoaded", () => {
             el.addEventListener('mouseenter', () => {
                 cursor.classList.add('hover');
                 cursorFollower.classList.add('hover');
-            });
+            
+    // ===================================================================
+    // PROJECTS HORIZONTAL SCROLLING (DESKTOP)
+    // ===================================================================
+    const scrollContainer = document.querySelector('.projects-scroll-container');
+    const prevBtn = document.querySelector('.project-nav-btn.prev');
+    const nextBtn = document.querySelector('.project-nav-btn.next');
+
+    if (scrollContainer && prevBtn && nextBtn) {
+        prevBtn.addEventListener('click', () => {
+            scrollContainer.scrollBy({ left: -360, behavior: 'smooth' });
+        });
+        nextBtn.addEventListener('click', () => {
+            scrollContainer.scrollBy({ left: 360, behavior: 'smooth' });
+        });
+        
+        // Initial state check
+        prevBtn.style.opacity = '0.5';
+        prevBtn.style.pointerEvents = 'none';
+
+        scrollContainer.addEventListener('scroll', () => {
+            if (scrollContainer.scrollLeft <= 5) {
+                prevBtn.style.opacity = '0.5';
+                prevBtn.style.pointerEvents = 'none';
+            } else {
+                prevBtn.style.opacity = '';
+                prevBtn.style.pointerEvents = '';
+            }
+            
+            if (scrollContainer.scrollLeft + scrollContainer.clientWidth >= scrollContainer.scrollWidth - 5) {
+                nextBtn.style.opacity = '0.5';
+                nextBtn.style.pointerEvents = 'none';
+            } else {
+                nextBtn.style.opacity = '';
+                nextBtn.style.pointerEvents = '';
+            }
+        });
+    }
+});
             el.addEventListener('mouseleave', () => {
                 cursor.classList.remove('hover');
                 cursorFollower.classList.remove('hover');
@@ -471,6 +509,15 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 scrollTopBtn.classList.remove('visible');
             }
+        }
+
+        // Fade out background noise and orbs on scroll to improve readability
+        const noise = document.querySelector('.noise-overlay');
+        const orbs = document.querySelector('.gradient-orbs');
+        if (noise && orbs) {
+            const scrollFade = Math.max(0.1, 1 - (currentScrollY / (window.innerHeight * 1.5)));
+            noise.style.opacity = (scrollFade * 0.03).toString();
+            orbs.style.opacity = scrollFade.toString();
         }
 
         // Update active nav link

@@ -1232,3 +1232,46 @@ section:not(#profile) .section__text__p1 {
   cursor: pointer;
   transition: all var(--transition-normal);
 }
+
+.projects-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.project-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  visibility: hidden;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .projects-wrapper:hover .project-nav-btn {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.project-nav-btn:hover {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  border-color: var(--accent-primary);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.project-nav-btn.prev { left: -22px; }
+.project-nav-btn.next { right: -22px; }
