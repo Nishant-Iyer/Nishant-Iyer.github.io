@@ -695,52 +695,27 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ===================================================================
-    // CONTACT FORM SUBMISSION
+    // CONTACT FORM SUBMISSION (NATIVE MAILTO)
     // ===================================================================
     const contactForm = document.getElementById('contact-form');
     if(contactForm) {
         contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            const form = e.target;
-            const data = new FormData(form);
-            const action = form.action;
-            const submitButton = form.querySelector('button');
-
-            submitButton.disabled = true;
-            submitButton.textContent = 'Sending...';
-
-            fetch(action, {
-                method: 'POST',
-                body: data,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            }).then(response => {
-                if (response.ok) {
-                    submitButton.textContent = 'Message Sent!';
-                    submitButton.style.backgroundColor = '#10B981'; // Green for success
-                    form.reset();
-                } else {
-                    response.json().then(data => {
-                        if (Object.hasOwn(data, 'errors')) {
-                            alert(data["errors"].map(error => error["message"]).join(", "));
-                        } else {
-                            submitButton.textContent = 'Send Message';
-                            alert('Oops! There was a problem submitting your form');
-                        }
-                    })
-                }
-            }).catch(error => {
-                submitButton.textContent = 'Send Message';
-                alert('Oops! There was a problem submitting your form');
-            }).finally(() => {
-                setTimeout(() => {
-                    submitButton.disabled = false;
-                    submitButton.textContent = 'Send Message';
-                    submitButton.style.backgroundColor = ''; // Revert to original color
-                }, 3000);
-            });
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+            
+            const subject = encodeURIComponent(`Portfolio Contact from ${name}`);
+            const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+            
+            // Open default email client
+            window.location.href = `mailto:contact@konnectingnots.com?subject=${subject}&body=${body}`;
+            
+            // Reset form after a brief delay
+            setTimeout(() => {
+                contactForm.reset();
+            }, 1000);
         });
     }
 
