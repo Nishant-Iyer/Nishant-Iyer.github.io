@@ -716,7 +716,7 @@ section {
 }
 
 .about-details-container {
-  max-width: 100%;
+  max-width: 900px;
   margin: 0 auto;
 }
 
@@ -764,7 +764,7 @@ section {
 }
 
 .text-container {
-  max-width: 900px;
+  max-width: 100%;
   margin: 0 auto;
   text-align: left;
 }
