@@ -56,6 +56,12 @@
   ],
   "projects": [
     {
+      "image": "./assets/bellion.png",
+      "title": "Bellion: Zero-Trust Financial AI Agent",
+      "description": "Everyone talks about using AI or Agentic AI, but nobody explains how to apply it to real-world problems. This project bridges that gap. Bellion is a headless, zero-trust financial architecture built on OpenClaw, orchestrating automated daily briefings, proactive budget auditing, and secure WhatsApp integrations\u2014all running locally to ensure absolute data privacy.",
+      "github": "https://github.com/Nishant-Iyer/OpenClaw-Bellion"
+    },
+    {
       "image": "./assets/credit-card-fraud.png",
       "title": "Credit Card Fraud Detection",
       "description": "Developed a machine learning model to detect fraudulent credit card transactions. This project involved extensive data cleaning, feature engineering using PCA, and building multiple classification models (like Logistic Regression and XGBoost) to achieve high precision and recall in identifying fraudulent activities from a highly imbalanced dataset.",
