@@ -90,8 +90,9 @@
     {
       "image": "./assets/nfl-analysis.png",
       "title": "NFL Gambling Market Analysis",
-      "description": "Conducted an in-depth analysis of the NFL gambling market to identify betting inefficiencies and opportunities. This project involved web scraping for historical odds and game data, performing statistical analysis to find market biases, and creating visualizations to present actionable insights for betting strategies.",
-      "github": "https://github.com/Nishant-Iyer/NFL-Gambling-Market-Analysis.git"
+      "description": "Built an end-to-end MLOps pipeline and interactive Streamlit dashboard to predict NFL Over/Under betting market inefficiencies. Features custom feature engineering (Elo ratings, travel distances, weather impact), walk-forward chronological backtesting, and live Kelly Criterion sizing with dynamic SHAP local prediction explanations.",
+      "github": "https://github.com/Nishant-Iyer/NFL-Gambling-Market-Analysis.git",
+      "liveDemo": "https://nfl-gambling-market-analysis-nrtofnwx4xqxvpqj7mcvlj.streamlit.app"
     }
   ]
 }
