@@ -1,8 +1,8 @@
 {
   "experience": [
     {
-      "logo_light": "./assets/capital-one-light.png",
-      "logo_dark": "./assets/capital-one-dark.png",
+      "logo_light": "./assets/capital-one-light.svg",
+      "logo_dark": "./assets/capital-one-dark.svg",
       "alt": "Capital One Logo",
       "company": "Capital One",
       "company_abbreviation": "CO",

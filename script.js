@@ -57,6 +57,36 @@ document.addEventListener("DOMContentLoaded", () => {
     const prevBtn = document.querySelector('.project-nav-btn.prev');
     const nextBtn = document.querySelector('.project-nav-btn.next');
 
+    function updateScrollButtonsState() {
+        if (!scrollContainer || !prevBtn || !nextBtn) return;
+        
+        const hasScrollableContent = scrollContainer.scrollWidth > scrollContainer.clientWidth;
+        
+        if (!hasScrollableContent) {
+            prevBtn.style.opacity = '0.5';
+            prevBtn.style.pointerEvents = 'none';
+            nextBtn.style.opacity = '0.5';
+            nextBtn.style.pointerEvents = 'none';
+            return;
+        }
+
+        if (scrollContainer.scrollLeft <= 5) {
+            prevBtn.style.opacity = '0.5';
+            prevBtn.style.pointerEvents = 'none';
+        } else {
+            prevBtn.style.opacity = '';
+            prevBtn.style.pointerEvents = '';
+        }
+        
+        if (scrollContainer.scrollLeft + scrollContainer.clientWidth >= scrollContainer.scrollWidth - 5) {
+            nextBtn.style.opacity = '0.5';
+            nextBtn.style.pointerEvents = 'none';
+        } else {
+            nextBtn.style.opacity = '';
+            nextBtn.style.pointerEvents = '';
+        }
+    }
+
     if (scrollContainer && prevBtn && nextBtn) {
         prevBtn.addEventListener('click', () => {
             scrollContainer.scrollBy({ left: -360, behavior: 'smooth' });
@@ -65,27 +95,14 @@ document.addEventListener("DOMContentLoaded", () => {
             scrollContainer.scrollBy({ left: 360, behavior: 'smooth' });
         });
         
-        // Initial state check
-        prevBtn.style.opacity = '0.5';
-        prevBtn.style.pointerEvents = 'none';
-
-        scrollContainer.addEventListener('scroll', () => {
-            if (scrollContainer.scrollLeft <= 5) {
-                prevBtn.style.opacity = '0.5';
-                prevBtn.style.pointerEvents = 'none';
-            } else {
-                prevBtn.style.opacity = '';
-                prevBtn.style.pointerEvents = '';
-            }
-            
-            if (scrollContainer.scrollLeft + scrollContainer.clientWidth >= scrollContainer.scrollWidth - 5) {
-                nextBtn.style.opacity = '0.5';
-                nextBtn.style.pointerEvents = 'none';
-            } else {
-                nextBtn.style.opacity = '';
-                nextBtn.style.pointerEvents = '';
-            }
-        });
+        scrollContainer.addEventListener('scroll', updateScrollButtonsState);
+        window.addEventListener('resize', updateScrollButtonsState);
+        
+        // Expose to window so we can call it after loading data
+        window.updateScrollButtonsState = updateScrollButtonsState;
+        
+        // Run initial check
+        updateScrollButtonsState();
     }
 
     if (cursor && cursorFollower && window.matchMedia('(hover: hover)').matches) {
@@ -319,7 +336,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         navLinks.forEach(link => {
             link.classList.remove('active');
-            if (link.getAttribute('href').includes(current)) {
+            const href = link.getAttribute('href');
+            if (current && href.includes(current)) {
                 link.classList.add('active');
             }
         });
@@ -338,6 +356,11 @@ document.addEventListener("DOMContentLoaded", () => {
             initializeScrollAnimations();
             initTiltCards();
             initMagneticButtons();
+
+            // Update projects scroll buttons state now that content is loaded
+            if (window.updateScrollButtonsState) {
+                window.updateScrollButtonsState();
+            }
 
             // Attach cursor hover to dynamically loaded content
             if (window.attachCursorHover) {
@@ -427,7 +450,7 @@ document.addEventListener("DOMContentLoaded", () => {
             githubBtn.className = 'btn btn-color-2 project-btn';
             githubBtn.textContent = 'Github';
             githubBtn.addEventListener('click', () => {
-                window.location.href = project.github;
+                window.open(project.github, '_blank');
             });
             btnContainer.appendChild(githubBtn);
 
@@ -437,7 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const demoText = project.liveDemo.includes('github.com') ? 'View Notebook' : 'Live Demo';
                 demoBtn.textContent = demoText;
                 demoBtn.addEventListener('click', () => {
-                    window.location.href = project.liveDemo;
+                    window.open(project.liveDemo, '_blank');
                 });
                 btnContainer.appendChild(demoBtn);
             }
