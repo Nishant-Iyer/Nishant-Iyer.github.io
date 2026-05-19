@@ -41,7 +41,15 @@ document.addEventListener("DOMContentLoaded", () => {
             el.addEventListener('mouseenter', () => {
                 cursor.classList.add('hover');
                 cursorFollower.classList.add('hover');
+            });
             
+            el.addEventListener('mouseleave', () => {
+                cursor.classList.remove('hover');
+                cursorFollower.classList.remove('hover');
+            });
+        });
+    }
+
     // ===================================================================
     // PROJECTS HORIZONTAL SCROLLING (DESKTOP)
     // ===================================================================
@@ -77,13 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 nextBtn.style.opacity = '';
                 nextBtn.style.pointerEvents = '';
             }
-        });
-    }
-});
-            el.addEventListener('mouseleave', () => {
-                cursor.classList.remove('hover');
-                cursorFollower.classList.remove('hover');
-            });
         });
     }
 
@@ -140,10 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Make attachCursorHover available globally for dynamic content
     window.attachCursorHover = attachCursorHover;
 
-    // ===================================================================
-    // SCROLL PROGRESS INDICATOR
-    // ===================================================================
-    const scrollProgress = document.querySelector('.scroll-progress');
+
 
     // ===================================================================
     // PARTICLES BACKGROUND - PREMIUM COLORS
@@ -351,6 +349,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function populateExperience(experience) {
         const container = document.querySelector('#experience .experience-details-container');
+        if (!container) return;
         container.innerHTML = ''; // Clear existing
         experience.forEach(job => {
             const entry = document.createElement('div');
@@ -361,6 +360,17 @@ document.addEventListener("DOMContentLoaded", () => {
             const logo = document.createElement('img');
             logo.src = job.logo_light;
             logo.alt = job.alt;
+            
+            logo.onerror = () => {
+                const companyName = job.company || job.alt.replace(" Logo", "");
+                const companyAbbrev = job.company_abbreviation || companyName.charAt(0);
+                const placeholder = document.createElement('div');
+                placeholder.className = 'logo-placeholder ' + companyName.toLowerCase().replace(/\s+/g, '-');
+                placeholder.textContent = companyAbbrev;
+                logoContainer.innerHTML = '';
+                logoContainer.appendChild(placeholder);
+            };
+            
             logoContainer.appendChild(logo);
 
             const textContainer = document.createElement('div');
@@ -453,7 +463,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const hamburgerMenu = document.querySelector('.hamburger-menu');
-    if (hamburgerIcon) {
+    if (hamburgerMenu) {
         hamburgerMenu.addEventListener('click', toggleMenu);
     }
 
@@ -481,11 +491,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const scrollTop = document.documentElement.scrollTop;
         const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
 
-        // Scroll progress indicator
-        if (scrollProgress) {
-            const progress = (scrollTop / scrollHeight) * 100;
-            scrollProgress.style.width = progress + '%';
-        }
+
 
         // Navigation hide/show on scroll
         if (mainNav) {

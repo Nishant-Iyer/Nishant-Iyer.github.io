@@ -246,9 +246,19 @@ body {
   left: 0;
   height: 3px;
   background: var(--gradient-primary);
-  width: 0%;
+  width: 100%;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
   z-index: 10001;
   box-shadow: 0 0 10px var(--accent-primary-glow);
+  animation: grow-progress auto linear;
+  animation-timeline: scroll(root);
+}
+
+@keyframes grow-progress {
+  to {
+    transform: scaleX(1);
+  }
 }
 
 /* ===================================================================
@@ -1275,3 +1285,70 @@ section:not(#profile) .section__text__p1 {
 
 .project-nav-btn.prev { left: -22px; }
 .project-nav-btn.next { right: -22px; }
+
+/* ===================================================================
+   PERFORMANCE SYSTEM - RENDER OPTIMIZATIONS
+   =================================================================== */
+section:not(#profile) {
+  content-visibility: auto;
+}
+
+#about {
+  contain-intrinsic-size: auto 800px;
+}
+
+#experience {
+  contain-intrinsic-size: auto 1000px;
+}
+
+#projects {
+  contain-intrinsic-size: auto 700px;
+}
+
+#contact {
+  contain-intrinsic-size: auto 600px;
+}
+
+footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 150px;
+}
+
+/* ===================================================================
+   TYPOGRAPHY ENHANCEMENTS
+   =================================================================== */
+h1, h2, h3, .title, .experience-sub-title {
+  text-wrap: balance;
+}
+
+p, li {
+  text-wrap: pretty;
+}
+
+/* ===================================================================
+   FALLBACK LOGO PLACEHOLDERS
+   =================================================================== */
+.logo-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Sora", sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: 0.05em;
+  transition: transform var(--transition-normal);
+}
+
+.logo-placeholder.capital-one {
+  background: linear-gradient(135deg, #004b87 0%, #1a365d 100%);
+  color: #d4af37;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 0 15px rgba(0, 75, 135, 0.4);
+}
+
+.experience-entry:hover .logo-placeholder {
+  transform: scale(1.1);
+}
