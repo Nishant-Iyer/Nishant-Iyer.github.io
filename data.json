@@ -1,6 +1,18 @@
 {
   "experience": [
     {
+      "logo_light": "./assets/capital-one-light.png",
+      "logo_dark": "./assets/capital-one-dark.png",
+      "alt": "Capital One Logo",
+      "company": "Capital One",
+      "company_abbreviation": "CO",
+      "title": "Senior Data Analyst",
+      "dates": "May 2025 - Present",
+      "duties": [
+        "Senior Data Analyst within the Refinance Line of Business (ReFi LOB)."
+      ]
+    },
+    {
       "logo_light": "./assets/temple-light.png",
       "logo_dark": "./assets/temple-dark.png",
       "alt": "Temple University Logo",
