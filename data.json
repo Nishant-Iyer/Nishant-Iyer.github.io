@@ -76,9 +76,9 @@
     {
       "image": "./assets/credit-card-fraud.png",
       "title": "Credit Card Fraud Detection",
-      "description": "Developed a machine learning model to detect fraudulent credit card transactions. This project involved extensive data cleaning, feature engineering using PCA, and building multiple classification models (like Logistic Regression and XGBoost) to achieve high precision and recall in identifying fraudulent activities from a highly imbalanced dataset.",
+      "description": "Built an end-to-end production-grade MLOps pipeline and interactive Streamlit explainability dashboard to detect credit card fraud under extreme class imbalance (0.17% positive rate). Features robust preprocessing, a PyTorch-based Autoencoder for unsupervised anomaly feature representation, and a Stacking Ensemble (XGBoost + LightGBM + Logistic Regression) calibrated against a financial business utility function (reducing total fraud loss overhead by 75.8%). Integrates local SHAP explanation waterfalls and Autoencoder reconstruction breakdown tools.",
       "github": "https://github.com/Nishant-Iyer/Credit-Card-Fraud-Detection.git",
-      "liveDemo": "https://github.com/Nishant-Iyer/Credit-Card-Fraud-Detection/blob/main/Credit%20Card%20Fraud%20Detection%20Analysis.ipynb"
+      "liveDemo": "https://credit-card-fraud-detection-rvtygaztzdva8ecohigihs.streamlit.app"
     },
     {
       "image": "./assets/distribution-optimization.png",
