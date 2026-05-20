@@ -83,9 +83,9 @@
     {
       "image": "./assets/distribution-optimization.png",
       "title": "Global Distribution Centers Optimization",
-      "description": "Built a comprehensive optimization model for a global distribution center network. This project utilized linear programming techniques in Python to minimize transportation and operational costs while satisfying demand across multiple regions, leading to a potential 15% reduction in logistics expenses.",
+      "description": "Architected an enterprise-grade spatial optimization platform using K-Medoids (geodesic PAM), K-Means (Euclidean 3D), MILP (capacitated PuLP/CBC), and PyTorch Spherical Gradient Descent on the S^2 unit sphere. Incorporates World Bank Logistics Performance Index (LPI) infrastructure readiness penalties, dynamic purchasing power demand weighting, and scenario-based forced-DC placements, visualized on an interactive 3D Web Globe.",
       "github": "https://github.com/Nishant-Iyer/Global-Distribution-Optimization-Center.git",
-      "liveDemo": "https://github.com/Nishant-Iyer/Global-Distribution-Optimization-Center/blob/main/Global%20Distribution%20Center%20Optimization.ipynb"
+      "liveDemo": "https://global-distribution-optimization-center-wudamnacmixpl2i56vb36j.streamlit.app"
     },
     {
       "image": "./assets/nfl-analysis.png",
