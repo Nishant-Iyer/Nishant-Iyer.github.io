@@ -311,32 +311,6 @@ h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.15; margin: 0;
 
 .project-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
 
-/* Contact */
-.contact-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(32px, 6vw, 80px); align-items: start; }
-.contact-text p { color: var(--text-soft); max-width: 46ch; }
-
-.contact-form {
-  position: relative;
-  display: grid; gap: 6px;
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
-  padding: clamp(20px, 3vw, 32px);
-}
-.contact-form label { font-weight: 500; font-size: 0.95rem; margin-top: 10px; }
-.contact-form label:first-of-type { margin-top: 0; }
-.contact-form input, .contact-form textarea {
-  width: 100%; font: inherit; color: var(--text);
-  background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-sm);
-  padding: 11px 14px;
-}
-.contact-form textarea { resize: vertical; min-height: 130px; }
-.contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px color-mix(in srgb, var(--cyan) 25%, transparent); }
-.contact-form [aria-invalid="true"] { border-color: #e5484d; }
-.contact-form .btn { margin-top: 16px; justify-self: start; }
-.contact-form button[disabled] { opacity: 0.6; cursor: progress; }
-.form-status { margin: 6px 0 0; min-height: 1.5em; font-size: 0.95rem; color: var(--text-soft); }
-.form-status.ok { color: #2fbf71; }
-.form-status.err { color: #e5484d; }
-
 /* Footer */
 .site-footer { border-top: 1px solid var(--line); padding-block: 28px; color: var(--text-faint); font-size: 0.95rem; }
 .footer-inner { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
@@ -369,7 +343,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.15; margin: 0;
 
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
-  .about-grid, .contact-grid { grid-template-columns: 1fr; }
+  .about-grid { grid-template-columns: 1fr; }
   .skills { grid-template-columns: repeat(2, 1fr); }
   .project-featured { grid-template-columns: 1fr; }
   .project-featured .project-media { aspect-ratio: 16 / 10; min-height: 0; }
