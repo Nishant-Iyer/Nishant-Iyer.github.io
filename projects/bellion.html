@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bellion: a private AI finance agent | Nishant Iyer</title>
+  <meta name="description" content="Case study: Bellion, a personal finance agent that runs its model and encrypted memory on my own machine and reaches me on Telegram. Architecture, what works, and three security fixes.">
+  <link rel="canonical" href="https://www.konnectingnots.com/projects/bellion.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.konnectingnots.com/projects/bellion.html">
+  <meta property="og:title" content="Bellion: a private AI finance agent | Nishant Iyer">
+  <meta property="og:description" content="Agentic AI applied to a real problem: my own money. What runs where, and what I fixed."exact" solver, and what it took to get honest numbers.">
+  <meta property="og:image" content="https://www.konnectingnots.com/assets/og-image-v2.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <script>
+    (function () { var t = null; try { t = localStorage.getItem('theme'); } catch (e) {}
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
+  <link rel="stylesheet" href="../style.css?v=4">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main">
+      <a class="brand" href="../" aria-label="Nishant Iyer, home">NI</a>
+      <ul class="nav-links nav-links-static">
+        <li><a href="../#projects">All projects</a></li>
+        <li><a href="mailto:contact@konnectingnots.com">Email</a></li>
+      </ul>
+      <button class="theme-toggle" type="button" aria-label="Switch to light theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <main id="main" class="wrap case">
+    <a class="case-back" href="../#projects">Back to projects</a>
+    <h1>Bellion: a private AI finance agent</h1>
+    <p class="case-lede">Everyone talks about agentic AI; fewer people show it doing a real job. Bellion is my attempt: an assistant that watches my own finances, briefs me every morning and answers questions over Telegram, with the model and my financial history kept on my own machine.</p>
+
+    <dl class="case-stats">
+      <div><dt>Language model</dt><dd>Local</dd></div>
+      <div><dt>Memory</dt><dd>AES-256</dd></div>
+      <div><dt>Daily briefing</dt><dd>7:00 am</dd></div>
+      <div><dt>Security fixes</dt><dd>3</dd></div>
+    </dl>
+
+    <h2>The problem</h2>
+    <p>Budgeting apps show you charts after the fact. I wanted something closer to a sharp analyst who checks my accounts every morning, flags anything odd, remembers my goals, and can answer a question like "how did my Uber spending compare to February?" in plain language. I also didn't want my bank history sitting in someone else's cloud.</p>
+
+    <h2>How it works</h2>
+    <ol>
+      <li><strong>The agent:</strong> OpenClaw runs a Gemma model locally and decides which tools to use.</li>
+      <li><strong>Data:</strong> Plaid provides read-only bank and card transactions, stored in a local SQLite database the agent can query with SQL.</li>
+      <li><strong>Memory:</strong> a local vector store lets it recall past conversations and goals ("save an extra $500 next month for a trip").</li>
+      <li><strong>Interface:</strong> Telegram, restricted to my account only. A scheduled job sends a formatted morning briefing covering debt progress, savings goals, yesterday's spending and a "Daily Zero" check.</li>
+      <li><strong>Alerts:</strong> small background scripts message me about transactions over $500, or if the laptop running the agent is about to die.</li>
+    </ol>
+
+    <h2>What runs where</h2>
+    <table>
+      <thead><tr><th scope="col">Part</th><th scope="col">Runs on</th></tr></thead>
+      <tbody>
+        <tr><td>Language model and agent</td><td>My machine</td></tr>
+        <tr><td>Chat history and memory (encrypted)</td><td>My machine</td></tr>
+        <tr><td>Bank data</td><td>Fetched from Plaid, stored locally</td></tr>
+        <tr><td>Messages</td><td>Telegram</td></tr>
+        <tr><td>Web search, image model</td><td>Cloud, only when used</td></tr>
+      </tbody>
+    </table>
+    <p>"Private" here means my records and history live on my machine, encrypted. It doesn't mean nothing ever touches the internet, and I think it's worth being precise about that.</p>
+
+    <h2>Three security fixes</h2>
+    <p>Reviewing the encrypted message gateway turned up three real problems, now fixed:</p>
+    <ul>
+      <li><strong>Forged messages.</strong> The gateway trusted any request that included my Telegram chat ID, which isn't a secret. It now requires Telegram's signed secret token on every request and rejects everything else.</li>
+      <li><strong>Plaintext in logs.</strong> It printed my decrypted chat history to the server log, which quietly undid the encryption. It now logs only counts.</li>
+      <li><strong>Command injection.</strong> The large-transaction alert built a shell command from merchant names, so a name with a quote in it could run commands on my laptop. It now passes arguments directly without a shell.</li>
+    </ul>
+
+    <div class="callout">
+      <p><strong>Honest status.</strong> The agent and its Telegram channel work today. The separate encrypted gateway stores every message correctly but still sends a placeholder reply; wiring the agent through it, so every message is encrypted end to end on my side, is the next step.</p>
+    </div>
+
+    <h2>What I'd do next</h2>
+    <ul>
+      <li><strong>Route the agent through the encrypted gateway,</strong> so there's one audited path in and out.</li>
+      <li><strong>Add a human-approval step</strong> for any action that changes money or accounts, enforced in code rather than in the prompt.</li>
+      <li><strong>Write tests for the gateway</strong> covering signature checks, encryption and the alert scripts.</li>
+    </ul>
+
+    <div class="case-links">
+      <a class="btn btn-primary" href="https://github.com/Nishant-Iyer/OpenClaw-Bellion" target="_blank" rel="noopener">View the code</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; <span id="year">2026</span> Nishant Iyer</p>
+      <p><a href="../">Back to home</a></p>
+    </div>
+  </footer>
+  <script src="../script.js?v=4" defer></script>
+</body>
+</html>
