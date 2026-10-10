@@ -35,3 +35,7 @@ python3 -m http.server 8000
 ## Deploy
 
 Hosted on Cloudflare Workers (static assets). Every push to `main` deploys automatically to `konnectingnots.com` and `www.konnectingnots.com`. The repository is private; Cloudflare reads it through its GitHub app.
+
+## License
+
+The site's code (HTML, CSS, JavaScript) is MIT licensed. Personal content such as the photo, résumé and writing is not, and company logos belong to their owners. See [LICENSE](LICENSE) for the details.
