@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Airline satisfaction prediction | Nishant Iyer</title>
+  <meta name="description" content="Case study: Kaggle Playground S6E10, predicting airline passenger satisfaction. Treating flight distance as a route ID, fold-safe target encoding and an original-data teacher lifted a LightGBM, XGBoost and CatBoost blend from 0.9583 to 0.9604 AUC.">
+  <link rel="canonical" href="https://www.konnectingnots.com/projects/airline-satisfaction.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.konnectingnots.com/projects/airline-satisfaction.html">
+  <meta property="og:title" content="Airline satisfaction prediction | Nishant Iyer">
+  <meta property="og:description" content="Flight distance turned out to be a route ID. Feature engineering took a GBDT blend from 0.9583 to 0.9604 AUC on a 700k-row Kaggle competition.">
+  <meta property="og:image" content="https://www.konnectingnots.com/assets/og-image-v2.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <script>
+    (function () { var t = null; try { t = localStorage.getItem('theme'); } catch (e) {}
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
+  <link rel="stylesheet" href="../style.css?v=6">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main">
+      <a class="brand" href="../" aria-label="Nishant Iyer, home">NI</a>
+      <ul class="nav-links nav-links-static">
+        <li><a href="../#projects">All projects</a></li>
+        <li><a href="mailto:contact@konnectingnots.com">Email</a></li>
+      </ul>
+      <button class="theme-toggle" type="button" aria-label="Switch to light theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <main id="main" class="wrap case">
+    <a class="case-back" href="../#projects">Back to projects</a>
+    <h1>Airline satisfaction prediction</h1>
+    <p class="case-lede">A Kaggle competition with 700,000 airline passengers: predict who comes away satisfied. The leaderboard is crowded and the margins are tiny, so the work was less about picking a model and more about finding structure in the data that the models couldn't see on their own.</p>
+
+    <dl class="case-stats">
+      <div><dt>Public AUC</dt><dd>0.9604</dd></div>
+      <div><dt>Gain from features</dt><dd>+0.0021</dd></div>
+      <div><dt>Leaderboard</dt><dd>#577</dd></div>
+      <div><dt>Training rows</dt><dd>700k</dd></div>
+    </dl>
+
+    <h2>The problem</h2>
+    <p>Each row is a passenger: age, customer type, class, purpose of travel, flight distance, delays, and 13 service ratings from wifi to cleanliness. The target is whether they were satisfied, and entries are scored by ROC AUC, so what matters is ranking passengers correctly rather than the exact probabilities.</p>
+    <p>The data is synthetic, generated from a public airline survey dataset of about 130,000 passengers. That detail turned out to matter.</p>
+
+    <h2>Baseline</h2>
+    <p>I started with LightGBM, XGBoost and CatBoost on the same five cross-validation folds, plus a few row-level summaries such as the average rating and total delay, and blended the three by ranking their predictions. That scored 0.9589 in cross-validation and 0.9583 on the public leaderboard. The two numbers agreeing so closely was the most useful result: it meant I could trust cross-validation and stop spending submissions to test ideas.</p>
+
+    <h2>What actually moved the score</h2>
+    <ol>
+      <li><strong>Flight distance is a route.</strong> It has only about 3,500 distinct values, each shared by hundreds of passengers. That makes it behave like a route identifier, not a number. For every route I added its size, its average ratings and delays, its mix of business and economy travellers, and how far each passenger's ratings sit from their route's average. A passenger rating the seats 3 on a route where everyone gives 4 tells you something a raw 3 doesn't.</li>
+      <li><strong>Target encoding without leakage.</strong> Satisfaction rates per route, per age, and per route combined with class and travel type. The trap is that these use the labels, so I computed them inside each cross-validation fold, with a further split for the training rows, so the validation score never gets to see its own answers.</li>
+      <li><strong>The original survey as a teacher.</strong> Other competitors had measured that adding the 130,000 original passengers as extra training rows hurts the score. Instead I trained a separate model on the original data alone and gave its prediction to the main models as a feature. That kept the original survey's signal without distorting the training set.</li>
+    </ol>
+
+    <h2>Results</h2>
+    <table>
+      <thead><tr><th scope="col">Version</th><th scope="col">Cross-validation AUC</th><th scope="col">Public leaderboard</th></tr></thead>
+      <tbody>
+        <tr><td>Baseline blend</td><td>0.95885</td><td>0.95834 (#925)</td></tr>
+        <tr><td>+ route profile and target encoding</td><td>0.96043</td><td>not submitted</td></tr>
+        <tr><td><strong>+ original-data teacher</strong></td><td><strong>0.96093</strong></td><td><strong>0.96042 (#577)</strong></td></tr>
+      </tbody>
+    </table>
+    <p>Cross-validation and the leaderboard both moved by the same 0.0021, so the gain is real rather than tuned to the public test set. Ranks are from 10 October 2026, out of roughly 1,450 teams. The route and target-encoding ideas came from the competition's discussion forum, and the code is my own implementation.</p>
+    <p>One thing I chose not to do: many of the top public notebooks blend dozens of other people's published predictions. It moves you up the public leaderboard, but it teaches nothing and tends to fall apart when the private leaderboard is revealed.</p>
+
+    <h2>What I'd do next</h2>
+    <ul>
+      <li><strong>Add a different kind of model.</strong> The three boosted models now score within 0.0001 of each other, so blending them adds almost nothing. A neural network or a tabular foundation model would make different mistakes, which is what a blend needs.</li>
+      <li><strong>Measure each feature block on its own</strong>, switching it off to see what it is really worth on the full data.</li>
+      <li><strong>Tune</strong> the boosted models once the feature set stops changing.</li>
+    </ul>
+
+    <div class="case-links">
+      <a class="btn btn-primary" href="https://github.com/Nishant-Iyer/Airline-Satisfaction-Prediction" target="_blank" rel="noopener">View the code</a>
+      <a class="btn btn-ghost" href="https://www.kaggle.com/competitions/playground-series-s6e10" target="_blank" rel="noopener">The competition</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; <span id="year">2026</span> Nishant Iyer</p>
+      <p><a href="../">Back to home</a></p>
+    </div>
+  </footer>
+  <script src="../script.js?v=4" defer></script>
+</body>
+</html>

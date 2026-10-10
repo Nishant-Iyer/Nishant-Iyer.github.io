@@ -9,7 +9,7 @@ Personal portfolio of **Nishant Iyer**, Senior Data Analyst at Capital One.
 ## What's here
 
 - **Home** (`index.html`): about, tools, experience timeline and projects.
-- **Case studies** (`projects/`): long-form write-ups of the credit card fraud and wellbore geology projects.
+- **Case studies** (`projects/`): long-form write-ups of each project (fraud detection, wellbore geology, distribution centers, NFL betting, Bellion and airline satisfaction).
 
 Plain HTML, CSS and a little JavaScript. No build step, no framework, no dependencies beyond Google Fonts. Light and dark themes follow the visitor's system setting and can be toggled.
 

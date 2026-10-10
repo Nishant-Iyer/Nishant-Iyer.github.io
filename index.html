@@ -36,7 +36,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=6">
 
   <script type="application/ld+json">
   {
@@ -235,6 +235,22 @@
       </article>
 
       <div class="project-grid">
+        <article class="project">
+          <a class="project-media" href="projects/airline-satisfaction.html" tabindex="-1" aria-hidden="true">
+            <img src="assets/img/airline-satisfaction.webp" alt="" width="800" height="500" loading="lazy">
+          </a>
+          <div class="project-body">
+            <p class="project-metric"><strong>0.9604</strong> AUC, up from 0.9583</p>
+            <h3 class="project-title"><a href="projects/airline-satisfaction.html">Airline satisfaction prediction</a></h3>
+            <p>Kaggle competition with 700k passengers. Treating flight distance as a route ID, leak-free target encoding and a model trained on the original survey lifted a gradient-boosting blend by 348 leaderboard places.</p>
+            <ul class="tags"><li>LightGBM</li><li>XGBoost</li><li>CatBoost</li><li>Target encoding</li></ul>
+            <p class="project-links">
+              <a href="projects/airline-satisfaction.html">Read the case study</a>
+              <a href="https://github.com/Nishant-Iyer/Airline-Satisfaction-Prediction" target="_blank" rel="noopener">Code</a>
+            </p>
+          </div>
+        </article>
+
         <article class="project">
           <a class="project-media" href="projects/wellbore-geology.html" tabindex="-1" aria-hidden="true">
             <img src="assets/img/wellbore-prediction.webp" alt="" width="800" height="500" loading="lazy">

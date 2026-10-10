@@ -307,6 +307,11 @@ h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.15; margin: 0;
 .project-featured .project-metric strong { font-size: 2rem; }
 
 .project-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+/* An odd card out at the end spans the row, laid out side by side */
+@media (min-width: 761px) {
+  .project-grid > .project:last-child:nth-child(odd) { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; }
+  .project-grid > .project:last-child:nth-child(odd) .project-media { aspect-ratio: auto; height: 100%; min-height: 260px; }
+}
 
 /* Footer */
 .site-footer { border-top: 1px solid var(--line); padding-block: 28px; color: var(--text-faint); font-size: 0.95rem; }
