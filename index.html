@@ -1,197 +1,339 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nishant Iyer | Portfolio</title>
-    
-    <!-- Open Graph SEO Tags -->
-    <meta property="og:title" content="Nishant Iyer | Portfolio">
-    <meta property="og:description" content="Senior Data Analyst bridging the gap between business and technology. Explore my experience and projects.">
-    <meta property="og:image" content="https://www.konnectingnots.com/assets/profile-pic.png">
-    <meta property="og:url" content="https://www.konnectingnots.com">
-    <meta property="og:type" content="website">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2300d4ff'/%3E%3Cstop offset='100%25' style='stop-color:%23a855f7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='20' fill='%23050505'/%3E%3Ctext x='50' y='68' font-family='Arial Black, sans-serif' font-size='48' font-weight='900' fill='url(%23grad)' text-anchor='middle'%3ENI%3C/text%3E%3C/svg%3E">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="mediaqueries.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nishant Iyer | Senior Data Analyst</title>
+  <meta name="description" content="Nishant Iyer is a Senior Data Analyst at Capital One with 5+ years in analytics, BI and machine learning across finance, CPG and media. Projects, experience and contact.">
+  <link rel="canonical" href="https://www.konnectingnots.com/">
+  <meta name="theme-color" content="#0a0e14" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f6f8fa" media="(prefers-color-scheme: light)">
+
+  <!-- Social previews -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.konnectingnots.com/">
+  <meta property="og:title" content="Nishant Iyer | Senior Data Analyst">
+  <meta property="og:description" content="Senior Data Analyst at Capital One. I used to engineer biology; now I engineer insights.">
+  <meta property="og:image" content="https://www.konnectingnots.com/assets/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Nishant Iyer | Senior Data Analyst">
+  <meta name="twitter:description" content="Senior Data Analyst at Capital One. I used to engineer biology; now I engineer insights.">
+  <meta name="twitter:image" content="https://www.konnectingnots.com/assets/og-image.jpg">
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+  <!-- Set the theme before paint so there's no flash -->
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('theme'); } catch (e) {}
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Nishant Iyer",
+    "url": "https://www.konnectingnots.com/",
+    "image": "https://www.konnectingnots.com/assets/img/profile.webp",
+    "jobTitle": "Senior Data Analyst",
+    "worksFor": { "@type": "Organization", "name": "Capital One" },
+    "alumniOf": { "@type": "CollegeOrUniversity", "name": "Temple University" },
+    "knowsAbout": ["Data analytics", "Business intelligence", "Machine learning", "SQL", "Python", "Tableau", "Power BI", "Forecasting", "A/B testing"],
+    "sameAs": [
+      "https://linkedin.com/in/nishantiyer",
+      "https://github.com/Nishant-Iyer",
+      "https://kaggle.com/nustanishant"
+    ]
+  }
+  </script>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loader">
-        <div class="loader-content">
-            <div class="loader-text">Loading</div>
-            <div class="loader-dots">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-    </div>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-    <!-- Custom Cursor -->
-    <div class="cursor"></div>
-    <div class="cursor-follower"></div>
-
-    <!-- Scroll Progress -->
-    <div class="scroll-progress"></div>
-
-    <!-- Noise Overlay -->
-    <div class="noise-overlay"></div>
-
-    <!-- Floating Gradient Orbs -->
-    <div class="gradient-orbs">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-    </div>
-
-<nav id="main-nav">
-        <div class="logo">
-            <img class="logo-svg" src="https://readme-typing-svg.demolab.com/?font=Poppins&weight=600&size=36&pause=1000&color=00D4FF&center=true&vCenter=true&width=250&lines=Nishant+Iyer" alt="Nishant Iyer Typing SVG">
-        </div>
-        <ul class="nav-links">
-            <li><a href="#about">About</a></li>
-            <li><a href="#experience">Experience</a></li>
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-        <div class="hamburger-menu">
-            <div class="hamburger-icon" aria-label="Toggle navigation menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main">
+      <a class="brand" href="#top" aria-label="Nishant Iyer, back to top">NI</a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links">
+        <span class="sr-only">Menu</span>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <button class="theme-toggle" type="button" aria-label="Switch to light theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
     </nav>
+  </header>
 
-    <!-- Profile Section -->
-    <section id="profile">
-        <div class="section__pic-container">
-            <img src="./assets/profile-pic.png" alt="Nishant Iyer profile picture">
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero wrap" id="top">
+      <div class="hero-text">
+        <p class="hero-hello">Hello, I'm</p>
+        <h1 class="hero-name">Nishant Iyer</h1>
+        <p class="hero-role">Senior Data Analyst at Capital One, in the Refinance line of business.</p>
+        <p class="hero-pitch">I used to engineer biology; now I engineer insights. Five years of turning messy data into dashboards, forecasts and models that people actually use to decide things.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#contact">Get in touch</a>
+          <a class="btn btn-ghost" href="assets/Resume.pdf" target="_blank" rel="noopener">View resume (PDF)</a>
         </div>
-        <div class="section__text">
-            <p class="section__text__p1">Hello, I'm</p>
-            <h1 class="title">Nishant Iyer</h1>
-            <p class="section__text__p2">Senior Data Analyst @ Capital One</p>
-            <div class="btn-container">
-                <button class="btn btn-color-2" onclick="window.open('./assets/Resume.pdf')">
-                    Download CV
-                </button>
-                <button class="btn btn-color-1" onclick="location.href='./#contact'">
-                    Contact Info
-                </button>
-            </div>
-            <div id="socials-container">
-                <img src="./assets/linkedin-light.png" alt="My LinkedIn profile" class="icon" 
-                     onclick="window.open('https://linkedin.com/in/nishantiyer')">
-                <img src="./assets/github-light.png" alt="My Github profile" class="icon" 
-                     onclick="window.open('https://github.com/Nishant-Iyer')">
-                <img src="./assets/kaggle-light.png" alt="My Kaggle profile" class="icon"
-                     onclick="window.open('https://kaggle.com/nustanishant')">
-            </div>
-        </div>
-        <img src="./assets/down-arrow-light.png" alt="Scroll down to About section" class="icon arrow down" 
-             onclick="location.href='./#about'">
-    </section>
-
-    <!-- About Section -->
-    <section id="about">
-        <p class="section__text__p1">Get To Know More</p>
-        <h1 class="title">About Me</h1>
-        <div class="section-container">
-            <div class="about-details-container">
-                <div class="about-containers">
-                    <div class="details-container">
-                        <img src="./assets/experience-light.png" alt="Experience icon" class="icon">
-                        <h3>Experience</h3>
-                        <p>4+ years<br>Data Analytics & BI</p>
-                    </div>
-                    <div class="details-container">
-                        <img src="./assets/education-light.png" alt="Education icon" class="icon">
-                        <h3>Education</h3>
-                        <p>Masters in Science: Business Analytics<br>Temple University</p>
-                    </div>
-                </div>
-                <div class="text-container">
-                    <div class="about-tldr">
-                        <h3>TL;DR</h3>
-                        <p>I used to engineer biology; now I engineer insights. Currently a Senior Data Analyst at Capital One (ReFi LOB).</p>
-                    </div>
-                    <div class="about-long">
-                        <h3>The Long Version</h3>
-                        <p>I am a simple, nerdy guy who accidentally discovered that data is the world's most interesting puzzle. My background is a bit of a remix: I started in Biotechnology, wrote a dissertation that was 10% biology and 90% data obsession, and never looked back.</p>
-                        <p>Today, I'm at Capital One, working in the Refinance line of business to turn massive data ecosystems into decisions that actually help customers. Before this, I was a consultant at Temple University and a Product Analytics wizard at Unilever, where I helped global stakeholders figure out where their money was going (and how to make more of it).</p>
-                        <p>I speak fluent Machine Learning, Statistical Modeling, and C-Suite Strategy. Whether it's optimizing supply chains for Colgate-Palmolive or building AI-driven tools, I thrive at the intersection of "How does this work?" and "How can we make it work better?"</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <img src="./assets/down-arrow-light.png" alt="Scroll down to Experience section" class="icon arrow down" 
-             onclick="location.href='./#experience'">
-    </section>
-
-    <!-- Experience Section -->
-    <section id="experience">
-        <p class="section__text__p1">Explore My</p>
-        <h1 class="title">Experience</h1>
-        <div class="experience-details-container">
-            <!-- Experience entries will be dynamically inserted here -->
-        </div>
-        <img src="./assets/down-arrow-light.png" alt="Scroll down to Projects section" class="icon arrow down" 
-             onclick="location.href='./#projects'">
-    </section>
-
-    <!-- Projects Section -->
-    <section id="projects">
-        <p class="section__text__p1">Explore My Creations</p>
-        <h1 class="title">Featured Projects</h1>
-            <div class="projects-wrapper">
-                <button class="project-nav-btn prev" aria-label="Previous Projects"><i class="fas fa-chevron-left"></i></button>
-                <div class="projects-scroll-container">
-                    <div class="projects-container">
-                        <!-- Projects will be dynamically inserted here -->
-                    </div>
-                </div>
-                <button class="project-nav-btn next" aria-label="Next Projects"><i class="fas fa-chevron-right"></i></button>
-            </div>        <img src="./assets/down-arrow-light.png" alt="Scroll down to Contact section" class="icon arrow down" 
-             onclick="location.href='./#contact'" aria-label="Scroll to Contact section" style="cursor: pointer;">
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact">
-        <p class="section__text__p1">Get in Touch</p>
-        <h1 class="title">Contact Me</h1>
-        <div class="contact-form-container">
-            <form id="contact-form">
-                <div class="form-group">
-                    <input type="text" id="name" name="name" placeholder="Full Name" required>
-                </div>
-                <div class="form-group">
-                    <input type="email" id="email" name="email" placeholder="Email Address" required>
-                </div>
-                <div class="form-group">
-                    <textarea id="message" name="message" rows="6" placeholder="Your Message" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-color-1">Send Message</button>
-            </form>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <ul class="nav-links">
-            <li><a href="#about">About</a></li>
-            <li><a href="#experience">Experience</a></li>
-            <li><a href="#projects">Projects</a></li>
+        <ul class="social">
+          <li><a href="https://linkedin.com/in/nishantiyer" target="_blank" rel="noopener">LinkedIn</a></li>
+          <li><a href="https://github.com/Nishant-Iyer" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="https://kaggle.com/nustanishant" target="_blank" rel="noopener">Kaggle</a></li>
         </ul>
-        <p>Copyright © <span id="current-year">2024</span> Nishant Iyer. All rights reserved.</p>
-    </footer>
+      </div>
+      <div class="hero-photo">
+        <img src="assets/img/profile.webp" alt="Nishant Iyer smiling, wearing glasses and a blue checked shirt" width="560" height="560" fetchpriority="high">
+      </div>
+    </section>
 
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.8.1/dist/vanilla-tilt.min.js"></script>
-    <script src="script.js"></script>
+    <!-- About -->
+    <section class="section wrap" id="about" aria-labelledby="about-title">
+      <h2 class="section-title" id="about-title">About</h2>
+      <div class="about-grid">
+        <div class="about-text">
+          <p>I'm a simple, nerdy guy who accidentally discovered that data is the world's most interesting puzzle. My background is a bit of a remix: I started in biotechnology, wrote a dissertation that was 10% biology and 90% data obsession, and never looked back.</p>
+          <p>Today I'm at Capital One, in the Refinance line of business, turning large data ecosystems into decisions that help customers. Before that I was a data analyst at Temple University and a product analytics consultant for Unilever, helping global stakeholders see where their money was going and how to make more of it.</p>
+          <p>I work across machine learning, statistical modeling and executive storytelling. Whether it's sizing untapped markets for Colgate-Palmolive or building AI tools on the side, I'm happiest between "how does this work?" and "how can we make it work better?"</p>
+        </div>
+        <dl class="facts">
+          <div><dt>Experience</dt><dd>5+ years in data analytics and BI</dd></div>
+          <div><dt>Education</dt><dd>M.S. Business Analytics, Temple University</dd></div>
+          <div><dt>Background</dt><dd>Biotechnology</dd></div>
+          <div><dt>Industries</dt><dd>Banking, consumer goods, higher education, media</dd></div>
+        </dl>
+      </div>
+
+      <h3 class="sub-title" id="skills">Tools I use</h3>
+      <div class="skills">
+        <div class="skill-group">
+          <h4>Data and code</h4>
+          <ul><li>SQL</li><li>Python</li><li>pandas</li><li>PySpark</li><li>Databricks</li><li>Excel and VBA</li></ul>
+        </div>
+        <div class="skill-group">
+          <h4>BI and reporting</h4>
+          <ul><li>Tableau</li><li>Power BI</li><li>Looker Studio</li><li>Streamlit</li></ul>
+        </div>
+        <div class="skill-group">
+          <h4>Modeling</h4>
+          <ul><li>A/B testing</li><li>Forecasting</li><li>Segmentation and CLV</li><li>Attribution</li><li>XGBoost and LightGBM</li><li>PyTorch</li><li>SHAP</li><li>Optimization (MILP)</li></ul>
+        </div>
+        <div class="skill-group">
+          <h4>Shipping it</h4>
+          <ul><li>FastAPI</li><li>Docker</li><li>MLflow</li><li>Git</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Experience -->
+    <section class="section wrap" id="experience" aria-labelledby="experience-title">
+      <h2 class="section-title" id="experience-title">Experience</h2>
+      <ol class="timeline">
+        <li class="job">
+          <img class="job-logo job-logo-full" src="assets/logos/capital-one.svg" alt="Capital One logo" width="56" height="56" loading="lazy">
+          <div class="job-body">
+            <h3 class="job-role">Senior Data Analyst</h3>
+            <p class="job-meta"><span class="job-company">Capital One</span> <span class="job-dates">May 2025 to present</span></p>
+            <!-- TODO(Nishant): add 2–4 bullets on scope, tools and impact you can share publicly. -->
+            <ul>
+              <li>Analytics for the Refinance line of business (ReFi LOB).</li>
+            </ul>
+          </div>
+        </li>
+        <li class="job">
+          <img class="job-logo" src="assets/logos/temple.webp" alt="Temple University logo" width="56" height="56" loading="lazy">
+          <div class="job-body">
+            <h3 class="job-role">Data Analyst</h3>
+            <p class="job-meta"><span class="job-company">Temple University</span> <span class="job-dates">Jan 2024 to May 2025</span></p>
+            <ul>
+              <li>Automated weekly lead reports with Excel VBA, saving 8+ hours a month and catching data issues sooner.</li>
+              <li>Built Tableau dashboards for the enrollment funnel and ran Python EDA and A/B tests on campaigns, lifting conversion 12% and engagement 20%.</li>
+              <li>Structured data with SQL and pandas for root-cause analysis and new dashboard metrics.</li>
+              <li>Presented insight decks to university leadership to guide planning decisions.</li>
+            </ul>
+          </div>
+        </li>
+        <li class="job">
+          <img class="job-logo" src="assets/logos/unilever.webp" alt="Unilever logo" width="56" height="56" loading="lazy">
+          <div class="job-body">
+            <h3 class="job-role">Product Analytics Consultant</h3>
+            <p class="job-meta"><span class="job-company">Unilever</span> <span class="job-dates">Jul 2024 to Dec 2024</span></p>
+            <ul>
+              <li>Built Power BI dashboards for pacing and inventory risk, enabling $3M+ in savings across product lines.</li>
+              <li>Automated ingestion of 15M+ records with Databricks pipelines for anomaly detection and real-time reporting.</li>
+              <li>Built regression and trend forecasting models that raised demand accuracy to 96% and reduced stockouts.</li>
+              <li>Defined shared KPIs with product, finance and supply teams, standardizing P&amp;L and POS tracking.</li>
+            </ul>
+          </div>
+        </li>
+        <li class="job">
+          <img class="job-logo" src="assets/logos/groupM.webp" alt="GroupM logo" width="56" height="56" loading="lazy">
+          <div class="job-body">
+            <h3 class="job-role">Marketing Data Analyst</h3>
+            <p class="job-meta"><span class="job-company">GroupM</span> <span class="job-dates">Jan 2022 to Jun 2023</span></p>
+            <ul>
+              <li>Ran SQL-driven attribution models for $3M+ in media spend, improving ROAS 22% and shaping cross-channel strategy.</li>
+              <li>Designed CLV segmentation models and pacing dashboards, reducing churn 18% and increasing repeat purchases.</li>
+              <li>Found 15% untapped markets through stakeholder interviews and demographic analysis, guiding a $1.2M Colgate-Palmolive campaign.</li>
+              <li>Built forecasting tools and automated Excel dashboards for client media planning.</li>
+            </ul>
+          </div>
+        </li>
+        <li class="job">
+          <img class="job-logo job-logo-dark" src="assets/logos/first-economy.webp" alt="First Economy logo" width="56" height="56" loading="lazy">
+          <div class="job-body">
+            <h3 class="job-role">Media Operations Analyst</h3>
+            <p class="job-meta"><span class="job-company">First Economy</span> <span class="job-dates">Mar 2021 to Jan 2022</span></p>
+            <ul>
+              <li>Automated reporting with Excel macros and Google Data Studio, cutting reporting lag 70%.</li>
+              <li>Led weekly QA, discrepancy resolution and report refreshes for campaign operations.</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Projects -->
+    <section class="section wrap" id="projects" aria-labelledby="projects-title">
+      <h2 class="section-title" id="projects-title">Projects</h2>
+
+      <article class="project project-featured">
+        <a class="project-media" href="projects/credit-card-fraud.html" tabindex="-1" aria-hidden="true">
+          <img src="assets/img/credit-card-fraud.webp" alt="" width="800" height="500" loading="lazy">
+        </a>
+        <div class="project-body">
+          <p class="project-metric"><strong>75.8%</strong> lower fraud cost than no model</p>
+          <h3 class="project-title"><a href="projects/credit-card-fraud.html">Credit card fraud detection</a></h3>
+          <p>A fraud model tuned for money, not accuracy. Only 0.17% of transactions are fraud, so I picked the alert threshold that minimizes review costs plus missed fraud, and added SHAP explanations so an analyst can see why each transaction was flagged.</p>
+          <ul class="tags"><li>PyTorch autoencoder</li><li>XGBoost</li><li>LightGBM</li><li>SHAP</li><li>FastAPI</li></ul>
+          <p class="project-links">
+            <a href="projects/credit-card-fraud.html">Read the case study</a>
+            <a href="https://credit-card-fraud-detection-rvtygaztzdva8ecohigihs.streamlit.app" target="_blank" rel="noopener">Live demo</a>
+            <a href="https://github.com/Nishant-Iyer/Credit-Card-Fraud-Detection" target="_blank" rel="noopener">Code</a>
+          </p>
+        </div>
+      </article>
+
+      <div class="project-grid">
+        <article class="project">
+          <a class="project-media" href="projects/wellbore-geology.html" tabindex="-1" aria-hidden="true">
+            <img src="assets/img/wellbore-prediction.webp" alt="" width="800" height="500" loading="lazy">
+          </a>
+          <div class="project-body">
+            <p class="project-metric"><strong>11.08 ft</strong> RMSE on unseen wells</p>
+            <h3 class="project-title"><a href="projects/wellbore-geology.html">Wellbore geology prediction</a></h3>
+            <p>Kaggle competition: predict rock-layer depth along horizontal wells. Physics-constrained path matching instead of a black-box regressor.</p>
+            <ul class="tags"><li>Viterbi DP</li><li>Spatial regression</li><li>Streamlit</li></ul>
+            <p class="project-links">
+              <a href="projects/wellbore-geology.html">Read the case study</a>
+              <a href="https://rogii-wellbore-geology-prediction-u9ejzh9ghvs8cdmnftsajc.streamlit.app" target="_blank" rel="noopener">Live demo</a>
+              <a href="https://github.com/Nishant-Iyer/Rogii-Wellbore-Geology-Prediction" target="_blank" rel="noopener">Code</a>
+            </p>
+          </div>
+        </article>
+
+        <article class="project">
+          <a class="project-media" href="https://global-distribution-optimization-center-wudamnacmixpl2i56vb36j.streamlit.app" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
+            <img src="assets/img/distribution-optimization.webp" alt="" width="800" height="500" loading="lazy">
+          </a>
+          <div class="project-body">
+            <p class="project-metric"><strong>47,000+</strong> cities, 4 solvers compared</p>
+            <h3 class="project-title">Global distribution center placement</h3>
+            <p>Chooses where to put distribution centers worldwide, weighting demand by purchasing power and penalizing countries with weak logistics. Results on an interactive 3D globe.</p>
+            <ul class="tags"><li>MILP (PuLP)</li><li>K-Medoids</li><li>PyTorch</li><li>FastAPI</li></ul>
+            <p class="project-links">
+              <a href="https://global-distribution-optimization-center-wudamnacmixpl2i56vb36j.streamlit.app" target="_blank" rel="noopener">Live demo</a>
+              <a href="https://github.com/Nishant-Iyer/Global-Distribution-Optimization-Center" target="_blank" rel="noopener">Code</a>
+            </p>
+          </div>
+        </article>
+
+        <article class="project">
+          <a class="project-media" href="https://nfl-gambling-market-analysis-nrtofnwx4xqxvpqj7mcvlj.streamlit.app" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
+            <img src="assets/img/nfl-analysis.webp" alt="" width="800" height="500" loading="lazy">
+          </a>
+          <div class="project-body">
+            <p class="project-metric"><strong>11,000+</strong> NFL games with real betting lines</p>
+            <h3 class="project-title">NFL betting market analysis</h3>
+            <p>Tests whether Over/Under lines can be beaten, using weather, travel and team-form features with walk-forward backtesting and Kelly bet sizing.</p>
+            <ul class="tags"><li>XGBoost</li><li>Time-series CV</li><li>SHAP</li><li>Streamlit</li></ul>
+            <p class="project-links">
+              <a href="https://nfl-gambling-market-analysis-nrtofnwx4xqxvpqj7mcvlj.streamlit.app" target="_blank" rel="noopener">Live demo</a>
+              <a href="https://github.com/Nishant-Iyer/NFL-Gambling-Market-Analysis" target="_blank" rel="noopener">Code</a>
+            </p>
+          </div>
+        </article>
+
+        <article class="project">
+          <a class="project-media" href="https://github.com/Nishant-Iyer/OpenClaw-Bellion" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
+            <img src="assets/bellion.svg" alt="" width="800" height="400" loading="lazy">
+          </a>
+          <div class="project-body">
+            <p class="project-metric"><strong>100% local</strong> personal finance agent</p>
+            <h3 class="project-title">Bellion: private financial AI agent</h3>
+            <p>A practical take on agentic AI: daily money briefings, proactive budget checks and WhatsApp access, all running on my own machine so financial data never leaves it.</p>
+            <ul class="tags"><li>Agentic AI</li><li>OpenClaw</li><li>Zero-trust design</li></ul>
+            <p class="project-links">
+              <a href="https://github.com/Nishant-Iyer/OpenClaw-Bellion" target="_blank" rel="noopener">Code</a>
+            </p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="section wrap" id="contact" aria-labelledby="contact-title">
+      <div class="contact-grid">
+        <div class="contact-text">
+          <h2 class="section-title" id="contact-title">Let's talk</h2>
+          <p>Questions about my work, a role, or a data problem you're stuck on? Send a note and I'll get back to you.</p>
+          <p>Prefer email? Write to <a href="mailto:contact@konnectingnots.com">contact@konnectingnots.com</a>.</p>
+        </div>
+        <form class="contact-form" id="contact-form" novalidate>
+          <!-- Get a free key at https://web3forms.com and paste it below. Until then the form opens the visitor's email app. -->
+          <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_ACCESS_KEY">
+          <input type="hidden" name="subject" value="New message from konnectingnots.com">
+          <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" autocomplete="name" required>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required>
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="5" required></textarea>
+          <button class="btn btn-primary" type="submit">Send message</button>
+          <p class="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; <span id="year">2026</span> Nishant Iyer</p>
+      <ul class="social">
+        <li><a href="https://linkedin.com/in/nishantiyer" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://github.com/Nishant-Iyer" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="https://kaggle.com/nustanishant" target="_blank" rel="noopener">Kaggle</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script src="script.js" defer></script>
 </body>
 </html>
