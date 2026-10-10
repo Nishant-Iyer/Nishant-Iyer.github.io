@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Global distribution center placement | Nishant Iyer</title>
-  <meta name="description" content="Case study: choosing distribution-center sites across the world&#39;s 1,000 largest cities, comparing K-Means, K-Medoids and an exact MILP, with a live demo.">
+  <meta name="description" content="Case study: choosing distribution-center sites across the world&#39;s 1,000 largest cities with road and sea freight distances, capacity limits and running costs, comparing K-Means, K-Medoids and a K-Medoids-seeded MILP. Includes a live demo.">
   <link rel="canonical" href="https://www.konnectingnots.com/projects/distribution-centers.html">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://www.konnectingnots.com/projects/distribution-centers.html">
   <meta property="og:title" content="Global distribution center placement | Nishant Iyer">
-  <meta property="og:description" content="Placing distribution centers across the world&#39;s 1,000 largest cities, and why a fast local search beat the exact solver.">
+  <meta property="og:description" content="Placing distribution centers across the world&#39;s 1,000 largest cities, measured by road and sea, with capacity and running costs.">
   <meta property="og:image" content="https://www.konnectingnots.com/assets/og-image-v2.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
@@ -42,49 +42,78 @@
   <main id="main" class="wrap case">
     <a class="case-back" href="../#projects">Back to projects</a>
     <h1>Global distribution center placement</h1>
-    <p class="case-lede">Where should a company put its warehouses to stay close to the most customers? I compared three ways of answering that across the world's 1,000 largest cities, and found that the "exact" solver was answering a smaller question than it seemed.</p>
+    <p class="case-lede">Where should a company put its warehouses to stay close to the most customers? I compared three ways of answering that across the world's 1,000 largest cities, measured distance the way freight actually moves, by road and by sea, and added the limits real warehouses have: capacity and running cost.</p>
 
     <dl class="case-stats">
       <div><dt>Cities</dt><dd>1,000</dd></div>
       <div><dt>Countries</dt><dd>129</dd></div>
-      <div><dt>Avg distance (k=5)</dt><dd>1,560 km</dd></div>
+      <div><dt>Road and sea, k=5</dt><dd>1,968 km</dd></div>
       <div><dt>Solve time</dt><dd>&lt; 1 s</dd></div>
     </dl>
 
     <h2>The problem</h2>
     <p>Pick <em>k</em> cities to host distribution centers so that customers, weighted by how much they buy, are as close as possible to their nearest center. Operations research calls this the <strong>p-median problem</strong>. It's easy to state and hard to solve exactly: choosing 5 sites from 1,000 cities has more than 8 trillion combinations.</p>
-    <p>The tool also lets a planner weight demand by population or by purchasing power, penalize sites in countries with weak logistics (the World Bank's Logistics Performance Index), and force specific cities to be included.</p>
+    <p>A planner can weight demand by population or by purchasing power, penalize sites in countries with weak logistics, force specific cities in, cap how much one center can handle, and charge each site a running cost. GDP per person, logistics scores (the World Bank's Logistics Performance Index) and price levels come from the World Bank for 126 of the 129 countries; the rest use the median of their income group.</p>
+
+    <h2>Measuring distance like freight</h2>
+    <p>A straight line over the globe happily drives a truck across the Atlantic. Freight can't, so every pair of cities gets a freight distance:</p>
+    <ul>
+      <li><strong>Same landmass:</strong> the straight line times a road detour factor for each country, from published estimates of how much longer roads are than straight lines (1.20 in the United States, 1.31 in India, 1.65 in France).</li>
+      <li><strong>Different landmass:</strong> road to the nearest coast, then the shortest sea route, then road again. Sea routes run on a half-degree ocean grid with the Suez and Panama canals and the narrow straits added, and the frozen Arctic closed.</li>
+    </ul>
+    <p>The sea routes come out close to the distances shipping lines quote: about 19,500 km from Rotterdam to Shanghai through Suez and 6,250 km from New York to Rotterdam. Landmasses follow real road links: the Channel Tunnel joins Britain to Europe, while the Darien Gap separates Central and South America and the closed Korean border makes South Korea an island.</p>
 
     <h2>Three approaches</h2>
     <ol>
-      <li><strong>K-Means:</strong> cluster cities in 3D space, then place each center at the city nearest its cluster's middle. Very fast, but it optimizes squared straight-line distance rather than the travel distance we care about.</li>
-      <li><strong>K-Medoids:</strong> work directly with distances along the Earth's surface. Start with a reasonable set of centers, then keep moving any center to any other city if that lowers total distance, until no move helps.</li>
-      <li><strong>Mixed-integer programming (MILP):</strong> write the problem as equations and hand it to a solver that proves its answer is optimal, but only over a list of candidate sites.</li>
+      <li><strong>K-Means:</strong> cluster cities in 3D space, then place each center at the city nearest its cluster's middle. Very fast, but it optimizes squared straight-line distance rather than the distance we care about.</li>
+      <li><strong>K-Medoids:</strong> work directly with the distance matrix. Start with a reasonable set of centers, then keep moving any center to any other city if that lowers total distance, until no move helps.</li>
+      <li><strong>Mixed-integer programming (MILP), seeded by K-Medoids:</strong> a solver that proves its answer is optimal, but only over a list of candidate sites. Instead of the most populous cities, the list comes from K-Medoids: its sites for nearby values of <em>k</em>, each site's nearest neighbours, and the biggest cities, about 230 to 480 candidates in all.</li>
     </ol>
 
     <h2>Results</h2>
-    <p>Average distance from a customer to their nearest center, in km. Lower is better.</p>
+    <p>Average distance from a customer to their nearest center, in km. Lower is better. Selected rows; the full table of 12 cases is in the <a href="https://github.com/Nishant-Iyer/Global-Distribution-Optimization-Center#-results" target="_blank" rel="noopener">repository</a>.</p>
     <table>
-      <thead><tr><th scope="col">Weighting, centers</th><th scope="col">K-Means</th><th scope="col">K-Medoids</th><th scope="col">MILP (top 50)</th></tr></thead>
+      <thead><tr><th scope="col">Distance, weighting, centers</th><th scope="col">K-Means</th><th scope="col">K-Medoids</th><th scope="col">Seeded MILP</th></tr></thead>
       <tbody>
-        <tr><td>Population, 3</td><td>2,141</td><td><strong>2,096</strong></td><td>2,145</td></tr>
-        <tr><td>Population, 5</td><td>1,581</td><td><strong>1,560</strong></td><td>1,609</td></tr>
-        <tr><td>Population, 8</td><td>1,131</td><td><strong>1,103</strong></td><td>1,152</td></tr>
-        <tr><td>Purchasing power, 5</td><td>1,499</td><td><strong>1,429</strong></td><td>1,470</td></tr>
-        <tr><td>Purchasing power, 8</td><td>1,072</td><td><strong>1,019</strong></td><td>1,069</td></tr>
+        <tr><td>Straight line, population, 5</td><td>1,581</td><td>1,560</td><td>1,560</td></tr>
+        <tr><td>Straight line, purchasing power, 5</td><td>1,449</td><td>1,379</td><td>1,379</td></tr>
+        <tr><td>Road and sea, population, 3</td><td>2,942</td><td>2,747</td><td>2,747</td></tr>
+        <tr><td>Road and sea, population, 5</td><td>2,153</td><td>1,968</td><td>1,968</td></tr>
+        <tr><td>Road and sea, population, 8</td><td>1,475</td><td>1,413</td><td>1,413</td></tr>
+        <tr><td>Road and sea, purchasing power, 5</td><td>1,877</td><td>1,770</td><td><strong>1,739</strong></td></tr>
+        <tr><td>Road and sea, purchasing power, 8</td><td>1,311</td><td>1,234</td><td>1,234</td></tr>
       </tbody>
     </table>
-    <p><strong>The "exact" solver never won.</strong> To keep it fast, it only allowed the 50 most populous cities as sites, and the best sites are often smaller, well-placed cities. Letting it consider more candidates closed the gap (1,609 km with 50, 1,569 with 100, 1,565 with 400) but took 74 seconds at 400. K-Medoids considers all 1,000 cities and reached 1,560 km in under a second. The lesson: an optimality guarantee only covers the problem you actually gave the solver.</p>
+    <p><strong>Freight distances are about a quarter longer, and the map changes.</strong> With 5 centers and population weighting, the average trip grows from 1,560 km to 1,968 km. The straight-line answer puts sites in São Paulo, Alexandria, Gwalior, Macheng and Birmingham. By road and sea they move to Lu'an in China, Raipur in India, Konya in Turkey, New Orleans and Libreville in Gabon. Konya serves Europe and the Middle East by road, Libreville serves Africa and, by sea, eastern South America, and New Orleans covers North America and the Pacific coast of South America.</p>
+    <p><strong>The seeded MILP mostly confirms K-Medoids, and sometimes beats it.</strong> In 10 of the 12 cases it proved the K-Medoids answer was the best on its candidate list. In the other two it found better ones, most clearly with purchasing-power weighting and 5 centers (1,739 km, 1.8% better). Each solve takes 25 to 90 seconds; K-Medoids takes under one. By contrast, a MILP limited to the 50 most populous cities lost to K-Medoids at every size (1,609 vs 1,560 km with 5 centers, straight line), because the best sites are often smaller, well-placed cities.</p>
 
-    <div class="callout">
-      <p><strong>Known limitation.</strong> GDP per person and logistics scores are filled in for 36 countries; the rest use placeholder values. That matters most for the purchasing-power and logistics options, and filling in full World Bank data is the obvious next step.</p>
-    </div>
+    <h2>Capacity and running costs</h2>
+    <p>Real centers have limits. With 5 centers and no limit, the center in China serves 51% of all demand. Capping each center changes the network:</p>
+    <table>
+      <thead><tr><th scope="col">Capacity per center (road and sea, 5 centers)</th><th scope="col">Average distance</th></tr></thead>
+      <tbody>
+        <tr><td>No limit</td><td>1,968 km</td></tr>
+        <tr><td>30% of demand</td><td>2,091 km</td></tr>
+        <tr><td>25% of demand</td><td>2,170 km</td></tr>
+      </tbody>
+    </table>
+    <p>At 25%, China gets two centers, and Europe, the Middle East and much of Africa share one in western Turkey. Here the MILP earns its keep: the capacity-aware search finds 2,195 km, and the MILP, seeded with that answer, proves 2,170 km is optimal on its candidate list (it may split a city between two centers, which the search doesn't).</p>
+    <p>Running costs let the model decide how many centers to open. Each site's cost is set at US prices and scaled by its country's price level, so a center in India costs about a quarter of one in the United States. The cost is expressed as distance: at 400 km, opening a center is worth it only if it cuts the average trip by more than 400 km times the site's price level.</p>
+    <table>
+      <thead><tr><th scope="col">Running cost of a US-priced center</th><th scope="col">Centers opened</th><th scope="col">Average distance</th></tr></thead>
+      <tbody>
+        <tr><td>100 km</td><td>16</td><td>1,078 km</td></tr>
+        <tr><td>200 km</td><td>11</td><td>1,271 km</td></tr>
+        <tr><td>400 km</td><td>6</td><td>1,929 km</td></tr>
+      </tbody>
+    </table>
+    <p>Price level is a blunt stand-in for running cost. On its own it pulls sites toward the cheapest economies, including some no company would build in. Combining it with the logistics penalty moves them toward places like Memphis and Kraków.</p>
 
     <h2>What I'd do next</h2>
     <ul>
-      <li><strong>Seed the MILP from K-Medoids.</strong> Use the fast answer to pick a smart candidate list, then let the exact solver confirm or improve it.</li>
-      <li><strong>Use road and shipping distances</strong> instead of straight lines over the globe, at least within continents.</li>
-      <li><strong>Add capacity and cost.</strong> Real centers have limits and different running costs; the MILP already supports capacities, and that's where it would earn its keep.</li>
+      <li><strong>Price each mode.</strong> A kilometre by ship costs far less than a kilometre by truck. Weighting road and sea separately would turn distance into transport cost.</li>
+      <li><strong>Route real roads</strong> for the busiest lanes with an open road network, instead of detour factors.</li>
+      <li><strong>Use real demand and site costs.</strong> Sales data instead of population, and rents and wages instead of national price levels.</li>
     </ul>
 
     <div class="case-links">

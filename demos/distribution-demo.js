@@ -2,7 +2,9 @@
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
   var RAD = Math.PI / 180;
-  var state = { k: 5, weighting: 'population', lpi: 0, locked: [] };
+  var CAPS = [0, 0.5, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1];
+  var DEFAULTS = function () { return { k: 5, weighting: 'population', lpi: 0, locked: [], dist: 'freight', site: 0, cap: 0, auto: false }; };
+  var state = DEFAULTS();
   var data = null, result = null, reqId = 0, nameIndex = {};
   var canvas = $('globe'), ctx = canvas.getContext('2d'), status = $('status');
   var view = { lon: 15, lat: 18 };
@@ -12,12 +14,18 @@
   // ---------- Controls ----------
   $('k').addEventListener('input', function (e) { state.k = +e.target.value; sync(); schedule(); });
   $('lpi').addEventListener('input', function (e) { state.lpi = +e.target.value / 10; sync(); schedule(); });
+  $('site').addEventListener('input', function (e) { state.site = +e.target.value; if (!state.site) state.auto = false; sync(); schedule(); });
+  $('cap').addEventListener('input', function (e) { state.cap = CAPS[+e.target.value]; sync(); schedule(); });
+  $('auto').addEventListener('change', function (e) { state.auto = e.target.checked; sync(); run(); });
+  document.querySelectorAll('#dist-buttons button').forEach(function (b) {
+    b.addEventListener('click', function () { state.dist = b.dataset.dist; sync(); run(); });
+  });
   document.querySelectorAll('#weight-buttons button').forEach(function (b) {
     b.addEventListener('click', function () { state.weighting = b.dataset.weight; sync(); run(); });
   });
   $('lock-add').addEventListener('click', addLock);
   $('lock-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); addLock(); } });
-  $('reset').addEventListener('click', function () { state = { k: 5, weighting: 'population', lpi: 0, locked: [] }; $('lock-msg').textContent = 'Force a site you already own; the optimizer places the rest around it.'; sync(); run(); });
+  $('reset').addEventListener('click', function () { state = DEFAULTS(); $('lock-msg').textContent = 'Force a site you already own; the optimizer places the rest around it.'; sync(); run(); });
 
   function addLock() {
     var v = $('lock-input').value.trim(), idx = nameIndex[v.toLowerCase()];
@@ -28,17 +36,24 @@
     }
     if (idx === undefined) { $('lock-msg').textContent = v ? 'Pick a city from the list: "' + v + '" isn’t one of the 1,000 cities.' : 'Type a city name first.'; return; }
     if (state.locked.indexOf(idx) >= 0) { $('lock-msg').textContent = label(idx) + ' is already locked.'; return; }
-    if (state.locked.length >= state.k) { $('lock-msg').textContent = 'You’ve locked as many cities as there are centers. Add a center or remove a city first.'; return; }
+    if (state.locked.length >= (state.auto ? 15 : state.k)) { $('lock-msg').textContent = 'You’ve locked as many cities as there are centers. Add a center or remove a city first.'; return; }
     state.locked.push(idx); $('lock-input').value = '';
     $('lock-msg').textContent = 'Locked ' + label(idx) + '. The optimizer places the rest around it.';
     sync(); run();
   }
 
   function sync() {
-    $('k').value = state.k; $('k-out').textContent = state.k;
+    $('k').value = state.auto && result ? result.k : state.k;
+    $('k-out').textContent = state.auto ? (result ? result.k + ' (chosen)' : 'choosing…') : state.k;
     $('lpi').value = Math.round(state.lpi * 10);
     $('lpi-out').textContent = state.lpi === 0 ? 'Off' : state.lpi < 0.4 ? 'Light' : state.lpi < 0.8 ? 'Medium' : 'Strong';
     document.querySelectorAll('#weight-buttons button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.weight === state.weighting)); });
+    document.querySelectorAll('#dist-buttons button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.dist === state.dist)); });
+    $('site').value = state.site; $('site-out').textContent = state.site ? fmt(state.site) + ' km' : 'Off';
+    $('cap').value = CAPS.indexOf(state.cap); $('cap-out').textContent = state.cap ? fmt(state.cap * 100) + '% of demand' : 'No limit';
+    $('auto').checked = state.auto; $('auto').disabled = !state.site;
+    $('auto-wrap').classList.toggle('disabled', !state.site);
+    $('k').disabled = state.auto;
     var ul = $('locked'); ul.innerHTML = '';
     state.locked.forEach(function (idx) {
       var li = document.createElement('li'); li.textContent = data ? label(idx) : '';
@@ -49,12 +64,14 @@
   }
 
   // ---------- Solver ----------
-  var worker = new Worker('distribution-worker.js?v=1'), timer = null;
+  var worker = new Worker('distribution-worker.js?v=2'), timer = null;
   function schedule() { clearTimeout(timer); timer = setTimeout(run, 150); }
   function run() {
     var id = ++reqId;
     if (result) canvas.style.opacity = '0.65'; else status.textContent = 'Solving…';
-    worker.postMessage({ id: id, opts: { k: state.k, weighting: state.weighting, lpiFactor: state.lpi, locked: state.locked.slice() } });
+    if (state.cap) status.textContent = result ? '' : 'Solving…';
+    worker.postMessage({ id: id, opts: { k: state.k, autoK: state.auto, weighting: state.weighting, lpiFactor: state.lpi,
+      locked: state.locked.slice(), distance: state.dist, siteKm: state.site, capacity: state.cap } });
   }
   worker.onmessage = function (e) {
     var r = e.data; if (r.id !== reqId) return;
@@ -65,12 +82,19 @@
     $('far').textContent = fmt(r.farShare * 100, r.farShare < 0.1 ? 1 : 0) + '%';
     $('time').textContent = r.ms < 1000 ? fmt(r.ms) + ' ms' : fmt(r.ms / 1000, 1) + ' s';
     $('passes').textContent = r.passes + ' improvement passes';
+    $('avg-sub').textContent = state.dist === 'freight' ? 'by road and sea' : 'in a straight line';
+    if (state.auto) { $('k-out').textContent = r.k + ' (chosen)'; $('k').value = r.k; }
+    var notes = [];
+    if (state.cap && r.capacity > state.cap + 1e-9) notes.push(r.k + ' centers can’t each stay under ' + fmt(state.cap * 100) + '%, so the limit is ' + fmt(r.capacity * 100) + '%.');
+    if (state.site) notes.push('Running costs add the equivalent of ' + fmt(r.runningKm) + ' km per customer.');
+    $('table-note').textContent = notes.join(' '); $('table-note').hidden = !notes.length;
+    $('cap-hint').textContent = state.cap && r.capacity > state.cap + 1e-9 ? 'Raised to ' + fmt(r.capacity * 100) + '% so ' + r.k + ' centers can serve everyone.' : 'The largest share of all demand one center can serve.';
     if (!view.focused) { focusOn(r.centers); view.focused = true; }
     draw(); fillTable();
   };
   worker.onerror = function () { status.textContent = 'The demo couldn’t start in this browser.'; };
 
-  fetch('data/distribution.json?v=1').then(function (r) { return r.json(); }).then(function (d) {
+  fetch('data/distribution.json?v=2').then(function (r) { return r.json(); }).then(function (d) {
     data = d;
     var dl = $('city-list'), frag = document.createDocumentFragment();
     d.cities.forEach(function (c, i) { var s = c[0] + ', ' + c[1]; nameIndex[s.toLowerCase()] = i; var o = document.createElement('option'); o.value = s; frag.appendChild(o); });

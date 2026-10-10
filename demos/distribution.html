@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
   <link rel="stylesheet" href="../style.css?v=5">
-  <link rel="stylesheet" href="demo.css?v=4">
+  <link rel="stylesheet" href="demo.css?v=6">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -40,13 +40,23 @@
 
   <main id="main" class="wrap demo">
     <h1>Distribution center demo</h1>
-    <p class="demo-lede">Where should a company put its warehouses to stay close to the most customers? Pick how many to open and what matters, and the optimizer searches all 1,000 of the world's largest cities for the best sites. It runs in your browser in about a second.</p>
+    <p class="demo-lede">Where should a company put its warehouses to stay close to the most customers? Pick how many to open and what matters, and the optimizer searches all 1,000 of the world's largest cities for the best sites. It runs in your browser, usually in about a second.</p>
 
     <div class="demo-layout">
       <form class="panel controls" aria-label="Scenario settings" onsubmit="return false">
         <div class="control">
           <label for="k">Distribution centers <output id="k-out" for="k">5</output></label>
           <input type="range" id="k" min="1" max="15" step="1" value="5">
+          <label class="check" id="auto-wrap"><input type="checkbox" id="auto"> Let running costs decide how many</label>
+        </div>
+
+        <div class="control">
+          <span class="control-label" id="dist-label">Measure distance</span>
+          <div class="segmented" role="group" aria-labelledby="dist-label" id="dist-buttons">
+            <button type="button" data-dist="freight" aria-pressed="true">By road and sea</button>
+            <button type="button" data-dist="straight" aria-pressed="false">Straight line</button>
+          </div>
+          <p class="hint">Road and sea follows coastlines, canals and road detours, and ships between continents.</p>
         </div>
 
         <div class="control">
@@ -65,6 +75,18 @@
         </div>
 
         <div class="control">
+          <label for="site">Running cost per center <output id="site-out" for="site">Off</output></label>
+          <input type="range" id="site" min="0" max="1000" step="50" value="0">
+          <p class="hint">At US prices, a center costs as much as moving every customer this much farther. Cheaper countries cost less.</p>
+        </div>
+
+        <div class="control">
+          <label for="cap">Capacity per center <output id="cap-out" for="cap">No limit</output></label>
+          <input type="range" id="cap" min="0" max="8" step="1" value="0">
+          <p class="hint" id="cap-hint">The largest share of all demand one center can serve.</p>
+        </div>
+
+        <div class="control">
           <label for="lock-input">Lock in a city</label>
           <div class="lock-row">
             <input id="lock-input" list="city-list" placeholder="Type a city, e.g. Singapore" autocomplete="off">
@@ -80,7 +102,7 @@
 
       <section class="demo-results" aria-label="Results">
         <div class="stats" aria-live="polite">
-          <div class="stat"><div class="label">Average distance</div><div class="value" id="avg">–</div><div class="sub">from a customer to their center</div></div>
+          <div class="stat"><div class="label">Average distance</div><div class="value" id="avg">–</div><div class="sub" id="avg-sub">by road and sea</div></div>
           <div class="stat"><div class="label">Far from a center</div><div class="value" id="far">–</div><div class="sub">of demand is over 3,000 km away</div></div>
           <div class="stat"><div class="label">Solved in</div><div class="value" id="time">–</div><div class="sub" id="passes">–</div></div>
         </div>
@@ -97,11 +119,12 @@
             <canvas id="globe" class="globe" role="img" aria-labelledby="globe-title" aria-describedby="globe-desc"></canvas>
             <div class="chart-status" id="status">Loading cities…</div>
           </div>
-          <p class="hint globe-hint">Drag to spin the globe.</p>
+          <p class="hint globe-hint">Drag to spin the globe. Lines show which center serves each city, not the route.</p>
           <p id="globe-desc" class="sr-only">Globe showing the selected distribution centers and lines to the cities each one serves. The table below lists the same results.</p>
         </div>
 
         <div class="panel">
+          <p class="table-note" id="table-note" hidden></p>
           <table class="sites" id="sites">
             <caption class="sr-only">Distribution centers and the share of demand each serves</caption>
             <thead><tr><th scope="col">Center</th><th scope="col">Country</th><th scope="col">Share of demand</th></tr></thead>
@@ -115,10 +138,11 @@
       <h2>How it works</h2>
       <ul>
         <li><strong>The problem:</strong> choose <em>k</em> cities as centers so that the demand-weighted distance from every city to its nearest center is as small as possible (the "p-median" problem).</li>
-        <li><strong>The method:</strong> start by adding centers one at a time, each in the spot that helps most. Then keep trying to move any center to any other city, applying the best move, until no move helps.</li>
-        <li><strong>Try:</strong> switch to purchasing power and watch centers move toward wealthier markets, or lock in a city you'd want regardless and see what it costs.</li>
+        <li><strong>The method:</strong> start by adding centers one at a time, each in the spot that helps most. Then keep trying to move any center to any other city, applying the best move, until no move helps. With capacity limits, the biggest cities pick first and each takes the nearest center with room.</li>
+        <li><strong>Distances:</strong> by road on the same landmass (straight line times a road detour factor for each country), otherwise by road to the coast, by sea along real shipping lanes through Suez and Panama, and by road again.</li>
+        <li><strong>Try:</strong> switch between road and sea and straight-line distance to see how much the oceans matter, set a running cost and let it pick how many centers to open, or cap each center at 25% of demand and watch Asia split.</li>
       </ul>
-      <p>Data: the 1,000 largest cities in the dataset, across 129 countries. GDP per person and logistics scores cover 36 countries; others use placeholder values. Read the <a href="../projects/distribution-centers.html">case study</a> or the <a href="https://github.com/Nishant-Iyer/Global-Distribution-Optimization-Center" target="_blank" rel="noopener">code</a>.</p>
+      <p>Data: the 1,000 largest cities in the dataset, across 129 countries. GDP per person, logistics scores and price levels come from the World Bank; a handful of countries it doesn't cover use the median of their income group. Read the <a href="../projects/distribution-centers.html">case study</a> or the <a href="https://github.com/Nishant-Iyer/Global-Distribution-Optimization-Center" target="_blank" rel="noopener">code</a>.</p>
     </section>
   </main>
 
@@ -129,6 +153,6 @@
     </div>
   </footer>
   <script src="../script.js?v=4" defer></script>
-  <script src="distribution-demo.js?v=1" defer></script>
+  <script src="distribution-demo.js?v=2" defer></script>
 </body>
 </html>
