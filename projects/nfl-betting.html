@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NFL betting market analysis | Nishant Iyer</title>
+  <meta name="description" content="Case study: can a model beat NFL Over/Under lines? A walk-forward backtest over 5,460 games finds 51.7% accuracy overall, but 55% when betting only the games where the model disagrees with the line, almost all of it on Unders. Includes a live betting demo.">
+  <link rel="canonical" href="https://www.konnectingnots.com/projects/nfl-betting.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.konnectingnots.com/projects/nfl-betting.html">
+  <meta property="og:title" content="NFL betting market analysis | Nishant Iyer">
+  <meta property="og:description" content="Testing whether public data can beat NFL totals, honestly: walk-forward backtesting and a live betting demo.">
+  <meta property="og:image" content="https://www.konnectingnots.com/assets/og-image-v2.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <script>
+    (function () { var t = null; try { t = localStorage.getItem('theme'); } catch (e) {}
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
+  <link rel="stylesheet" href="../style.css?v=5">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main">
+      <a class="brand" href="../" aria-label="Nishant Iyer, home">NI</a>
+      <ul class="nav-links nav-links-static">
+        <li><a href="../#projects">All projects</a></li>
+        <li><a href="mailto:contact@konnectingnots.com">Email</a></li>
+      </ul>
+      <button class="theme-toggle" type="button" aria-label="Switch to light theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <main id="main" class="wrap case">
+    <a class="case-back" href="../#projects">Back to projects</a>
+    <h1>NFL betting market analysis</h1>
+    <p class="case-lede">Sportsbooks set an Over/Under line for every NFL game. Can a model built from public data (team strength, form, rest, travel, weather) beat it? I tested that the way a bettor would have lived it: each season predicted only from the seasons before it.</p>
+
+    <dl class="case-stats">
+      <div><dt>Games tested</dt><dd>5,460</dd></div>
+      <div><dt>Overall accuracy</dt><dd>51.7%</dd></div>
+      <div><dt>Break-even</dt><dd>52.4%</dd></div>
+      <div><dt>Under bets won</dt><dd>56.0%</dd></div>
+    </dl>
+
+    <h2>The problem</h2>
+    <p>A standard bet costs $110 to win $100, so a bettor has to be right 52.4% of the time just to break even. Betting lines are set by people with far more data than any public model, which makes even that small edge hard to find.</p>
+    <p>It's also easy to fool yourself. A model that sees future games while it trains, or settings tuned on the same games used to score it, can look like it beats the market when it doesn't.</p>
+
+    <h2>Approach</h2>
+    <ol>
+      <li><strong>Data.</strong> 10,923 games from 1980 to 2024 with closing Over/Under lines, joined with stadium locations and game-day weather.</li>
+      <li><strong>Features.</strong> Elo ratings updated game by game, 3- and 5-game scoring form and volatility, rest days, away-team travel distance, temperature and wind.</li>
+      <li><strong>Choosing the model.</strong> Logistic regression and XGBoost were both tuned with Optuna, using only games before December 2003. XGBoost had the better validation score, so it was used from then on.</li>
+      <li><strong>Walk-forward testing.</strong> The last 5,460 games were split into five stretches. Each stretch was predicted by a model trained only on the games before it.</li>
+      <li><strong>Betting rules.</strong> Bet only when the model's win probability beats the 52.4% the odds imply. Pushes return the stake, and every bet is priced at −110.</li>
+    </ol>
+
+    <h2>Results</h2>
+    <p>Picking a side in every game doesn't work. Across all 5,460 test games the model was right 51.7% of the time, below break-even, and only the most recent stretch (2020 to 2024, 54.7%) cleared it.</p>
+    <p>Being selective changes the picture. On a $5,000 bankroll:</p>
+    <table>
+      <thead><tr><th scope="col">Strategy</th><th scope="col">Bets</th><th scope="col">Win rate</th><th scope="col">Return on stakes</th></tr></thead>
+      <tbody>
+        <tr><td>Flat $50, any edge over break-even</td><td>1,317</td><td>55.0%</td><td>+4.9%</td></tr>
+        <tr><td>Flat $50, edge of 3 points or more</td><td>341</td><td>55.7%</td><td>+6.2%</td></tr>
+        <tr><td>Half Kelly, edge of 3 points or more</td><td>341</td><td>55.7%</td><td>+3.6%, with a 56% drop along the way</td></tr>
+      </tbody>
+    </table>
+    <p>Nearly all of the edge comes from Unders: 56.0% across 1,109 Under bets, against 48.9% across 188 Over bets. That matches a pattern the betting market is known for: the public likes Overs, which can push totals slightly too high.</p>
+    <div class="callout">
+      <p><strong>How sure is this?</strong> The 55.0% win rate is about 1.9 standard errors above break-even. That's encouraging but not proof, and it assumes every bet was placed at −110 on the closing line. Real books move lines and limit winning accounts.</p>
+    </div>
+    <p>Kelly sizing grows the bankroll fastest on paper, but half Kelly still lost more than half the bankroll at its worst point. With an edge this thin, flat stakes are the safer way to bet it. You can try every combination in the <a href="../demos/nfl.html">live demo</a>.</p>
+
+    <h2>What I'd do next</h2>
+    <ul>
+      <li><strong>Use real prices.</strong> Per-game odds from several books would show how much line shopping adds, and whether the edge survives once lines move.</li>
+      <li><strong>Add player data.</strong> Injuries and quarterback changes move totals, and team-level stats miss them.</li>
+      <li><strong>Keep testing forward.</strong> Each new season adds about 280 out-of-sample games, which is the only way to tell whether the Under edge is real.</li>
+    </ul>
+
+    <div class="case-links">
+      <a class="btn btn-primary" href="../demos/nfl.html">Try the live demo</a>
+      <a class="btn btn-ghost" href="https://github.com/Nishant-Iyer/NFL-Gambling-Market-Analysis" target="_blank" rel="noopener">View the code</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; <span id="year">2026</span> Nishant Iyer</p>
+      <p><a href="../">Back to home</a></p>
+    </div>
+  </footer>
+  <script src="../script.js?v=4" defer></script>
+</body>
+</html>

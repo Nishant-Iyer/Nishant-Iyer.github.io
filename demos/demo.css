@@ -154,3 +154,4 @@ table.sites .lock-tag { font-size: 0.78rem; color: var(--text-faint); margin-lef
 .tx-row .hint { margin: 0; }
 .tx-row .btn.btn-small { margin-top: 0; }
 .tx-row .btn.btn-small { white-space: nowrap; }
+.chart-wrap canvas.bars { height: 280px; }

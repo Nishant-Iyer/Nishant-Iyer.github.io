@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NFL betting demo | Nishant Iyer</title>
+  <meta name="description" content="Interactive demo: bet on 20 seasons of NFL Over/Under lines with a model's out-of-sample predictions. Set the edge, side, stake sizing and odds and see what happens to the bankroll.">
+  <link rel="canonical" href="https://www.konnectingnots.com/demos/nfl.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="NFL betting demo | Nishant Iyer">
+  <meta property="og:description" content="Bet 20 seasons of NFL totals with a model, live in your browser.">
+  <meta property="og:image" content="https://www.konnectingnots.com/assets/og-image-v2.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <script>
+    (function () { var t = null; try { t = localStorage.getItem('theme'); } catch (e) {}
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
+  <link rel="stylesheet" href="../style.css?v=5">
+  <link rel="stylesheet" href="demo.css?v=5">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main">
+      <a class="brand" href="../" aria-label="Nishant Iyer, home">NI</a>
+      <ul class="nav-links nav-links-static">
+        <li><a href="../#projects">All projects</a></li>
+        <li><a href="../projects/nfl-betting.html">Case study</a></li>
+      </ul>
+      <button class="theme-toggle" type="button" aria-label="Switch to light theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+    </nav>
+  </header>
+
+    <main id="main" class="wrap demo">
+    <h1>NFL betting demo</h1>
+    <p class="demo-lede">Every game here was predicted by a model trained only on earlier seasons, so this is what betting it would actually have looked like. Choose when to bet and how much, and watch the bankroll play out over 20 NFL seasons.</p>
+
+    <div class="demo-layout">
+      <form class="panel controls" aria-label="Betting strategy" onsubmit="return false">
+        <div class="control">
+          <label for="edge">Minimum edge <output id="edge-out" for="edge"></output></label>
+          <input type="range" id="edge" min="0" max="10" step="0.5" value="3">
+          <p class="hint">Bet only when the model's win probability beats what the odds imply by at least this much.</p>
+        </div>
+
+        <div class="control">
+          <span class="control-label" id="side-label">Bet on</span>
+          <div class="segmented" role="group" aria-labelledby="side-label" id="side-buttons">
+            <button type="button" data-side="both" aria-pressed="true">Both</button>
+            <button type="button" data-side="over" aria-pressed="false">Overs</button>
+            <button type="button" data-side="under" aria-pressed="false">Unders</button>
+          </div>
+        </div>
+
+        <div class="control">
+          <span class="control-label" id="size-label">Bet size</span>
+          <div class="segmented" role="group" aria-labelledby="size-label" id="size-buttons">
+            <button type="button" data-size="flat" aria-pressed="true">Flat</button>
+            <button type="button" data-size="0.25" aria-pressed="false">¼ Kelly</button>
+            <button type="button" data-size="0.5" aria-pressed="false">½ Kelly</button>
+          </div>
+        </div>
+
+        <div class="control" id="stake-control">
+          <label for="stake">Flat stake <output id="stake-out" for="stake"></output></label>
+          <input type="range" id="stake" min="10" max="250" step="10" value="50">
+          <p class="hint">Starting bankroll is $5,000.</p>
+        </div>
+
+        <div class="control">
+          <span class="control-label" id="odds-label">Odds on every bet</span>
+          <div class="segmented" role="group" aria-labelledby="odds-label" id="odds-buttons">
+            <button type="button" data-odds="-110" aria-pressed="true">−110</button>
+            <button type="button" data-odds="-105" aria-pressed="false">−105</button>
+          </div>
+          <p class="hint" id="be-hint"></p>
+        </div>
+
+        <div class="control">
+          <label for="start">Start betting in <output id="start-out" for="start"></output></label>
+          <input type="range" id="start" min="2004" max="2022" step="1" value="2004">
+        </div>
+
+        <button type="button" class="btn btn-ghost" id="reset">Reset</button>
+      </form>
+
+      <section class="demo-results" aria-label="Results">
+        <div class="stats" aria-live="polite">
+          <div class="stat"><div class="label">Final bankroll</div><div class="value" id="final">–</div><div class="sub" id="final-sub">–</div></div>
+          <div class="stat"><div class="label">Win rate</div><div class="value" id="win">–</div><div class="sub" id="win-sub">–</div></div>
+          <div class="stat"><div class="label">Return on stakes</div><div class="value" id="roi">–</div><div class="sub" id="roi-sub">–</div></div>
+        </div>
+
+        <div class="panel chart-panel">
+          <div class="chart-head">
+            <h2 id="chart-title">Bankroll over time</h2>
+            <ul class="legend">
+              <li><span class="key" style="border-color: var(--series-1)"></span>Bankroll</li>
+              <li><span class="key dashed" style="border-color: var(--series-2)"></span>Starting bankroll</li>
+            </ul>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chart" role="img" aria-labelledby="chart-title" aria-describedby="chart-desc"></canvas>
+            <div class="chart-status" id="status">Loading games…</div>
+            <div class="tooltip" id="tip" hidden></div>
+          </div>
+          <p id="chart-desc" class="sr-only">Line chart of the bankroll after each bet placed by the chosen strategy, compared with the starting bankroll.</p>
+        </div>
+
+        <div class="panel chart-panel">
+          <div class="chart-head">
+            <h2 id="conf-title">How often the model is right, by confidence</h2>
+            <ul class="legend">
+              <li><span class="key dashed" style="border-color: var(--series-2)"></span>Break-even</li>
+            </ul>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="conf" class="bars" role="img" aria-labelledby="conf-title" aria-describedby="conf-desc"></canvas>
+            <div class="tooltip" id="tip2" hidden></div>
+          </div>
+          <p id="conf-desc" class="sr-only">Bar chart of the model's accuracy on out-of-sample games, grouped by how far its probability is from 50%, against the break-even win rate.</p>
+          <details class="table-view">
+            <summary>Show as a table</summary>
+            <table id="conf-table"><thead><tr><th scope="col">Model confidence</th><th scope="col">Games</th><th scope="col">Accuracy</th></tr></thead><tbody></tbody></table>
+          </details>
+        </div>
+
+        <div class="panel">
+          <table class="sites" id="bets">
+            <caption class="sr-only">The last ten bets placed by this strategy</caption>
+            <thead><tr><th scope="col">Last 10 bets</th><th scope="col">Line</th><th scope="col">Pick</th><th scope="col">Result</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <section class="demo-notes">
+      <h2>How it works</h2>
+      <ul>
+        <li><strong>The model:</strong> predicts the chance a game goes over the posted total from Elo team strength, recent scoring form, rest, travel and game-day weather.</li>
+        <li><strong>No peeking:</strong> the model and its settings were chosen on games before December 2003. Each later stretch of games was predicted by a model trained only on what came before it.</li>
+        <li><strong>Try:</strong> raise the edge to bet only the games the model is surest about, switch to ½ Kelly to see how sizing changes the risk, or move the start year to see how much the result depends on when you began.</li>
+      </ul>
+      <p id="data-note">Data: NFL games with closing Over/Under lines, joined with stadium weather. Pushes return the stake. Read the <a href="../projects/nfl-betting.html">case study</a> or the <a href="https://github.com/Nishant-Iyer/NFL-Gambling-Market-Analysis" target="_blank" rel="noopener">code</a>.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; <span id="year">2026</span> Nishant Iyer</p>
+      <p><a href="../">Back to home</a></p>
+    </div>
+  </footer>
+  <script src="../script.js?v=4" defer></script>
+    <script src="nfl-demo.js?v=1" defer></script>
+</body>
+</html>
