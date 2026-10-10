@@ -98,3 +98,40 @@ details.table-view th { color: var(--text-faint); font-weight: 500; }
   .stats { grid-template-columns: 1fr 1fr; }
   .stat:last-child { grid-column: 1 / -1; }
 }
+
+/* ---- Distribution demo ---- */
+.lock-row { display: flex; gap: 8px; }
+.lock-row input {
+  flex: 1; min-width: 0; font: inherit; color: var(--text); background: var(--bg);
+  border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 9px 12px;
+}
+.lock-row input:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px color-mix(in srgb, var(--cyan) 25%, transparent); }
+.lock-row .btn { min-height: 40px; padding: 0 16px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 10px 0 0; padding: 0; }
+.chips:empty { display: none; }
+.chips li {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 12px;
+  border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); font-size: 0.88rem;
+}
+.chips button { border: 0; background: none; color: var(--text-faint); cursor: pointer; font-size: 1rem; line-height: 1; padding: 2px 6px; border-radius: 999px; }
+.chips button:hover { color: var(--text); background: var(--line); }
+
+.legend .key.dot { width: 10px; height: 10px; border: 0; border-radius: 50%; }
+.legend .key.dot.center { background: var(--series-1); box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--series-1); }
+.legend .key.dot.city { width: 7px; height: 7px; background: var(--series-ink); opacity: .7; }
+
+.chart-wrap canvas.globe { height: auto; aspect-ratio: 1 / 1; max-height: 560px; margin-inline: auto; cursor: grab; touch-action: none; }
+.chart-wrap canvas.globe:active { cursor: grabbing; }
+.globe-hint { text-align: center; margin: 6px 0 2px; }
+
+table.sites { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 0.95rem; }
+table.sites th, table.sites td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); }
+table.sites th { color: var(--text-faint); font-weight: 500; font-size: 0.88rem; }
+table.sites tr:last-child td { border-bottom: 0; }
+table.sites .bar { display: flex; align-items: center; gap: 10px; }
+table.sites .bar span.track { flex: 1; height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; min-width: 60px; }
+table.sites .bar span.fill { display: block; height: 100%; border-radius: 4px; background: var(--series-1); }
+table.sites .bar b { font-weight: 600; min-width: 3.2em; text-align: right; }
+table.sites .lock-tag { font-size: 0.78rem; color: var(--text-faint); margin-left: 6px; }
+.demo-layout > * { min-width: 0; }
+.lock-row input { width: 100%; }

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Distribution center demo | Nishant Iyer</title>
+  <meta name="description" content="Interactive demo: choose how many distribution centers to open worldwide, how to weight demand and how much to penalize weak logistics, or lock in your own cities, and the optimizer re-solves in your browser.">
+  <link rel="canonical" href="https://www.konnectingnots.com/demos/distribution.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Distribution center placement demo | Nishant Iyer">
+  <meta property="og:description" content="Place distribution centers across the world's 1,000 largest cities, live in your browser.">
+  <meta property="og:image" content="https://www.konnectingnots.com/assets/og-image-v2.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <script>
+    (function () { var t = null; try { t = localStorage.getItem('theme'); } catch (e) {}
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
+  <link rel="stylesheet" href="../style.css?v=4">
+  <link rel="stylesheet" href="demo.css?v=3">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main">
+      <a class="brand" href="../" aria-label="Nishant Iyer, home">NI</a>
+      <ul class="nav-links nav-links-static">
+        <li><a href="../#projects">All projects</a></li>
+        <li><a href="../projects/distribution-centers.html">Case study</a></li>
+      </ul>
+      <button class="theme-toggle" type="button" aria-label="Switch to light theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <main id="main" class="wrap demo">
+    <h1>Distribution center demo</h1>
+    <p class="demo-lede">Where should a company put its warehouses to stay close to the most customers? Pick how many to open and what matters, and the optimizer searches all 1,000 of the world's largest cities for the best sites. It runs in your browser in about a second.</p>
+
+    <div class="demo-layout">
+      <form class="panel controls" aria-label="Scenario settings" onsubmit="return false">
+        <div class="control">
+          <label for="k">Distribution centers <output id="k-out" for="k">5</output></label>
+          <input type="range" id="k" min="1" max="15" step="1" value="5">
+        </div>
+
+        <div class="control">
+          <span class="control-label" id="weight-label">Weight demand by</span>
+          <div class="segmented" role="group" aria-labelledby="weight-label" id="weight-buttons">
+            <button type="button" data-weight="population" aria-pressed="true">Population</button>
+            <button type="button" data-weight="purchasing" aria-pressed="false">Purchasing power</button>
+          </div>
+          <p class="hint">Purchasing power multiplies population by GDP per person.</p>
+        </div>
+
+        <div class="control">
+          <label for="lpi">Avoid weak logistics <output id="lpi-out" for="lpi">Off</output></label>
+          <input type="range" id="lpi" min="0" max="10" step="1" value="0">
+          <p class="hint">Penalizes sites in countries with a low World Bank logistics score.</p>
+        </div>
+
+        <div class="control">
+          <label for="lock-input">Lock in a city</label>
+          <div class="lock-row">
+            <input id="lock-input" list="city-list" placeholder="Type a city, e.g. Singapore" autocomplete="off">
+            <button type="button" class="btn btn-ghost" id="lock-add">Add</button>
+          </div>
+          <datalist id="city-list"></datalist>
+          <ul class="chips" id="locked" aria-label="Locked cities"></ul>
+          <p class="hint" id="lock-msg">Force a site you already own; the optimizer places the rest around it.</p>
+        </div>
+
+        <button type="button" class="btn btn-ghost" id="reset">Reset</button>
+      </form>
+
+      <section class="demo-results" aria-label="Results">
+        <div class="stats" aria-live="polite">
+          <div class="stat"><div class="label">Average distance</div><div class="value" id="avg">–</div><div class="sub">from a customer to their center</div></div>
+          <div class="stat"><div class="label">Far from a center</div><div class="value" id="far">–</div><div class="sub">of demand is over 3,000 km away</div></div>
+          <div class="stat"><div class="label">Solved in</div><div class="value" id="time">–</div><div class="sub" id="passes">–</div></div>
+        </div>
+
+        <div class="panel chart-panel">
+          <div class="chart-head">
+            <h2 id="globe-title">Chosen sites and the cities they serve</h2>
+            <ul class="legend">
+              <li><span class="key dot center"></span>Distribution center</li>
+              <li><span class="key dot city"></span>City (size = demand)</li>
+            </ul>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="globe" class="globe" role="img" aria-labelledby="globe-title" aria-describedby="globe-desc"></canvas>
+            <div class="chart-status" id="status">Loading cities…</div>
+          </div>
+          <p class="hint globe-hint">Drag to spin the globe.</p>
+          <p id="globe-desc" class="sr-only">Globe showing the selected distribution centers and lines to the cities each one serves. The table below lists the same results.</p>
+        </div>
+
+        <div class="panel">
+          <table class="sites" id="sites">
+            <caption class="sr-only">Distribution centers and the share of demand each serves</caption>
+            <thead><tr><th scope="col">Center</th><th scope="col">Country</th><th scope="col">Share of demand</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <section class="demo-notes">
+      <h2>How it works</h2>
+      <ul>
+        <li><strong>The problem:</strong> choose <em>k</em> cities as centers so that the demand-weighted distance from every city to its nearest center is as small as possible (the "p-median" problem).</li>
+        <li><strong>The method:</strong> start by adding centers one at a time, each in the spot that helps most. Then keep trying to move any center to any other city, applying the best move, until no move helps.</li>
+        <li><strong>Try:</strong> switch to purchasing power and watch centers move toward wealthier markets, or lock in a city you'd want regardless and see what it costs.</li>
+      </ul>
+      <p>Data: the 1,000 largest cities in the dataset, across 129 countries. GDP per person and logistics scores cover 36 countries; others use placeholder values. Read the <a href="../projects/distribution-centers.html">case study</a> or the <a href="https://github.com/Nishant-Iyer/Global-Distribution-Optimization-Center" target="_blank" rel="noopener">code</a>.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; <span id="year">2026</span> Nishant Iyer</p>
+      <p><a href="../">Back to home</a></p>
+    </div>
+  </footer>
+  <script src="../script.js?v=4" defer></script>
+  <script src="distribution-demo.js?v=1" defer></script>
+</body>
+</html>
