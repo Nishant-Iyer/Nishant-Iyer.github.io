@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wellbore demo | Nishant Iyer</title>
+  <meta name="description" content="Interactive demo: predict rock-layer depth along a horizontal well with geology-constrained Viterbi path matching. Change the known section, smoothness and search window and watch it rerun.">
+  <link rel="canonical" href="https://www.konnectingnots.com/demos/wellbore.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Wellbore path-matching demo | Nishant Iyer">
+  <meta property="og:description" content="Run the wellbore geology model in your browser and change its settings live.">
+  <meta property="og:image" content="https://www.konnectingnots.com/assets/og-image-v2.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <script>
+    (function () { var t = null; try { t = localStorage.getItem('theme'); } catch (e) {}
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
+  <link rel="stylesheet" href="../style.css?v=4">
+  <link rel="stylesheet" href="demo.css?v=1">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main">
+      <a class="brand" href="../" aria-label="Nishant Iyer, home">NI</a>
+      <ul class="nav-links nav-links-static">
+        <li><a href="../#projects">All projects</a></li>
+        <li><a href="../projects/wellbore-geology.html">Case study</a></li>
+      </ul>
+      <button class="theme-toggle" type="button" aria-label="Switch to light theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <main id="main" class="wrap demo">
+    <h1>Wellbore path-matching demo</h1>
+    <p class="demo-lede">A horizontal well has to stay inside a thin rock layer. Past the point where depth measurements stop, this model predicts where the layer is by matching the drill bit's gamma-ray readings against a reference well. It runs right here in your browser: change the settings and it reruns on all ~7,000 points of the well.</p>
+
+    <div class="demo-layout">
+      <form class="panel controls" id="controls" aria-label="Model settings" onsubmit="return false">
+        <div class="control">
+          <span class="control-label" id="well-label">Well</span>
+          <div class="segmented" role="group" aria-labelledby="well-label" id="well-buttons"></div>
+        </div>
+
+        <div class="control">
+          <label for="known">Known depth data <output id="known-out" for="known"></output></label>
+          <input type="range" id="known" min="5" max="90" step="1" value="27">
+          <p class="hint">How much of the well has measured depth. The model predicts everything after it.</p>
+        </div>
+
+        <div class="control">
+          <label for="smooth">Smoothness <output id="smooth-out" for="smooth"></output></label>
+          <input type="range" id="smooth" min="0" max="100" step="1" value="50">
+          <p class="hint">How strongly the layer is kept from jumping. Real rock bends gradually.</p>
+        </div>
+
+        <div class="control">
+          <span class="control-label" id="window-label">Search window</span>
+          <div class="segmented" role="group" aria-labelledby="window-label" id="window-buttons">
+            <button type="button" data-window="15" aria-pressed="false">±15 ft</button>
+            <button type="button" data-window="30" aria-pressed="true">±30 ft</button>
+            <button type="button" data-window="45" aria-pressed="false">±45 ft</button>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-ghost" id="reset">Reset to model defaults</button>
+      </form>
+
+      <section class="demo-results" aria-label="Results">
+        <div class="stats" aria-live="polite">
+          <div class="stat"><div class="label">Path matching error</div><div class="value" id="rmse">–</div><div class="sub">RMSE on the predicted section</div></div>
+          <div class="stat"><div class="label">Baseline error</div><div class="value" id="base">–</div><div class="sub">Regional plane only</div></div>
+          <div class="stat"><div class="label">Error vs. baseline</div><div class="value good" id="gain">–</div><div class="sub" id="points">–</div></div>
+        </div>
+
+        <div class="panel chart-panel">
+          <div class="chart-head">
+            <h2 id="chart-title">Rock layer relative to the regional baseline</h2>
+            <ul class="legend">
+              <li><span class="key" style="border-color: var(--series-ink)"></span>Actual</li>
+              <li><span class="key" style="border-color: var(--series-1)"></span>Path matching</li>
+              <li><span class="key dashed" style="border-color: var(--series-2)"></span>Baseline</li>
+              <li><span class="key shade"></span>Known data</li>
+            </ul>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chart" role="img" aria-labelledby="chart-title" aria-describedby="chart-desc"></canvas>
+            <div class="chart-status" id="status">Loading well data…</div>
+            <div class="tooltip" id="tip" hidden></div>
+          </div>
+          <p id="chart-desc" class="sr-only">Line chart of the rock layer's depth offset from the regional baseline along the well, comparing the actual layer, the path-matching prediction and the baseline.</p>
+          <details class="table-view">
+            <summary>Show as a table</summary>
+            <table id="table"><thead><tr><th scope="col">Measured depth (ft)</th><th scope="col">Actual (ft)</th><th scope="col">Path matching (ft)</th><th scope="col">Error (ft)</th></tr></thead><tbody></tbody></table>
+          </details>
+        </div>
+      </section>
+    </div>
+
+    <section class="demo-notes">
+      <h2>What you're looking at</h2>
+      <ul>
+        <li><strong>Baseline:</strong> fit a tilted plane through the target rock layer in nearby wells, then anchor it using the known part of this well. In this demo each well's plane comes only from the <em>other</em> two sample wells, so nothing leaks from the answer.</li>
+        <li><strong>Path matching:</strong> at every foot past the known section, try every depth offset in the search window, score how well the gamma-ray reading matches the reference well at that depth, and penalize sudden jumps. The Viterbi algorithm then finds the single best path through all of them.</li>
+        <li><strong>Try:</strong> shrink the known data to 10% and see how far the prediction holds up, or set smoothness to the minimum and watch the path start chasing noise.</li>
+      </ul>
+      <p>Data: the three public sample wells from the ROGII Kaggle competition. Read the <a href="../projects/wellbore-geology.html">case study</a> or the <a href="https://github.com/Nishant-Iyer/Rogii-Wellbore-Geology-Prediction" target="_blank" rel="noopener">code</a>.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; <span id="year">2026</span> Nishant Iyer</p>
+      <p><a href="../">Back to home</a></p>
+    </div>
+  </footer>
+  <script src="../script.js?v=4" defer></script>
+  <script src="wellbore-demo.js?v=1" defer></script>
+</body>
+</html>

@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Wellbore geology prediction | Nishant Iyer</title>
-  <meta name="description" content="Case study: predicting rock-layer depth along horizontal oil wells with a physics-constrained Viterbi path finder. 11.08 ft RMSE on unseen wells in the ROGII Kaggle competition.">
+  <meta name="description" content="Case study: predicting rock-layer depth along horizontal oil wells with geology-constrained Viterbi path matching. 12.4 ft RMSE on held-out wells, 37% lower than the baseline. Includes a live in-browser demo.">
   <link rel="canonical" href="https://www.konnectingnots.com/projects/wellbore-geology.html">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://www.konnectingnots.com/projects/wellbore-geology.html">
   <meta property="og:title" content="Wellbore geology prediction | Nishant Iyer">
-  <meta property="og:description" content="Physics-constrained path matching instead of a black-box regressor: 11.08 ft RMSE on unseen wells.">
+  <meta property="og:description" content="Geology-constrained path matching instead of a black-box regressor: 12.4 ft RMSE on held-out wells, with a live demo.">
   <meta property="og:image" content="https://www.konnectingnots.com/assets/og-image-v2.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
@@ -44,7 +44,8 @@
     <p class="case-lede">A horizontal oil well has to stay inside a thin layer of rock for thousands of feet. This Kaggle competition asked how deep that layer sits along the rest of the well, given only the drill path and a gamma-ray reading. I solved it with geology-aware path matching rather than a black-box model.</p>
 
     <dl class="case-stats">
-      <div><dt>RMSE on unseen wells</dt><dd>11.08 ft</dd></div>
+      <div><dt>RMSE on held-out wells</dt><dd>12.4 ft</dd></div>
+      <div><dt>vs. baseline</dt><dd>−37%</dd></div>
       <div><dt>Depth search window</dt><dd>±30 ft</dd></div>
       <div><dt>Search resolution</dt><dd>0.5 ft</dd></div>
     </dl>
@@ -64,9 +65,19 @@
     <p>The smoothness penalty is what makes it work: real rock layers bend gradually, so the model is simply not allowed to predict anything else.</p>
 
     <h2>Results</h2>
-    <p>On validation wells the model had never seen, the predicted depth was off by <strong>11.08 ft RMSE</strong>, with the smoothness constraint keeping predictions stable far along each well.</p>
+    <p>Evaluated on the three public sample wells. For each one, the depth after the known section is hidden and predicted, and the regional plane is fitted only from the <em>other</em> wells, so nothing about the answer leaks in.</p>
+    <table>
+      <thead><tr><th scope="col">Well</th><th scope="col">Baseline only</th><th scope="col">With path matching</th></tr></thead>
+      <tbody>
+        <tr><td>Well 1</td><td>19.5 ft</td><td>10.1 ft</td></tr>
+        <tr><td>Well 2</td><td>21.4 ft</td><td>16.1 ft</td></tr>
+        <tr><td>Well 3</td><td>17.1 ft</td><td>7.2 ft</td></tr>
+        <tr><td><strong>All 14,151 points</strong></td><td><strong>19.6 ft</strong></td><td><strong>12.4 ft</strong></td></tr>
+      </tbody>
+    </table>
+    <p>Path matching cuts the error by about 37%. It helps most where the gamma-ray signature is distinctive (Well 3) and least where the layer drifts further than the search window allows (Well 2). You can see both effects for yourself in the <a href="../demos/wellbore.html">live demo</a>.</p>
     <div class="callout">
-      <p><strong>A note on the leaderboard.</strong> The three public-leaderboard test wells also appeared in the training data, so copying their known values scores a perfect zero. My pipeline does handle that case, but it says nothing about modeling skill. 11.08 ft is the honest number, and it's the one the private leaderboard depends on.</p>
+      <p><strong>Two things I fixed along the way.</strong> The original pipeline fitted each well's regional plane using neighbors that included the well itself, which flattered one well's error from 16.1 ft down to 5.7 ft. And because the public-leaderboard wells also appear in the training data, copying their answers scores a perfect zero. That shortcut is now off by default, since it measures nothing about the model.</p>
     </div>
 
     <h2>What I'd do next</h2>
@@ -77,7 +88,7 @@
     </ul>
 
     <div class="case-links">
-      <a class="btn btn-primary" href="https://rogii-wellbore-geology-prediction-u9ejzh9ghvs8cdmnftsajc.streamlit.app" target="_blank" rel="noopener">Open the live demo</a>
+      <a class="btn btn-primary" href="../demos/wellbore.html">Try the live demo</a>
       <a class="btn btn-ghost" href="https://github.com/Nishant-Iyer/Rogii-Wellbore-Geology-Prediction" target="_blank" rel="noopener">View the code</a>
     </div>
   </main>
