@@ -45,11 +45,11 @@
 input[type="range"] { width: 100%; accent-color: var(--cyan); height: 28px; }
 
 .demo-results { display: grid; gap: 16px; min-width: 0; }
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius-md); overflow: hidden; }
-.stat { background: var(--surface); padding: 14px 16px; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius-md); overflow: hidden; }
+.stat { display: flex; flex-direction: column; background: var(--surface); padding: 14px 16px; }
 .stat .label { font-size: 0.85rem; color: var(--text-faint); }
 .stat .value { font: 700 1.6rem var(--font-display); font-variant-numeric: tabular-nums; margin-top: 2px; }
-.stat .sub { font-size: 0.82rem; color: var(--text-faint); }
+.stat .sub { font-size: 0.82rem; line-height: 1.35; color: var(--text-faint); margin-top: 4px; }
 .stat .value.good { color: var(--good); }
 
 .chart-panel { padding: 16px 16px 10px; }
@@ -95,8 +95,10 @@ details.table-view th { color: var(--text-faint); font-weight: 500; }
   .chart-wrap canvas { height: 340px; }
 }
 @media (max-width: 480px) {
-  .stats { grid-template-columns: 1fr 1fr; }
-  .stat:last-child { grid-column: 1 / -1; }
+  .stats { grid-template-columns: 1fr; grid-auto-rows: auto; }
+  .stat { display: grid; grid-template-columns: 1fr auto; align-items: baseline; column-gap: 12px; }
+  .stat .value { grid-column: 2; grid-row: 1 / span 2; margin: 0; align-self: center; font-size: 1.4rem; }
+  .stat .label, .stat .sub { grid-column: 1; margin-top: 0; }
 }
 
 /* ---- Distribution demo ---- */

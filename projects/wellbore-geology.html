@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
-  <link rel="stylesheet" href="../style.css?v=4">
+  <link rel="stylesheet" href="../style.css?v=5">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -44,10 +44,10 @@
     <p class="case-lede">A horizontal oil well has to stay inside a thin layer of rock for thousands of feet. This Kaggle competition asked how deep that layer sits along the rest of the well, given only the drill path and a gamma-ray reading. I solved it with geology-aware path matching rather than a black-box model.</p>
 
     <dl class="case-stats">
-      <div><dt>RMSE on held-out wells</dt><dd>12.4 ft</dd></div>
+      <div><dt>Held-out RMSE</dt><dd>12.4 ft</dd></div>
       <div><dt>vs. baseline</dt><dd>−37%</dd></div>
-      <div><dt>Depth search window</dt><dd>±30 ft</dd></div>
-      <div><dt>Search resolution</dt><dd>0.5 ft</dd></div>
+      <div><dt>Search window</dt><dd>±30 ft</dd></div>
+      <div><dt>Resolution</dt><dd>0.5 ft</dd></div>
     </dl>
 
     <h2>The problem</h2>
@@ -76,9 +76,6 @@
       </tbody>
     </table>
     <p>Path matching cuts the error by about 37%. It helps most where the gamma-ray signature is distinctive (Well 3) and least where the layer drifts further than the search window allows (Well 2). You can see both effects for yourself in the <a href="../demos/wellbore.html">live demo</a>.</p>
-    <div class="callout">
-      <p><strong>Two things I fixed along the way.</strong> The original pipeline fitted each well's regional plane using neighbors that included the well itself, which flattered one well's error from 16.1 ft down to 5.7 ft. And because the public-leaderboard wells also appear in the training data, copying their answers scores a perfect zero. That shortcut is now off by default, since it measures nothing about the model.</p>
-    </div>
 
     <h2>What I'd do next</h2>
     <ul>

@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Global distribution center placement | Nishant Iyer</title>
-  <meta name="description" content="Case study: choosing distribution-center sites across the world\'s 1,000 largest cities. Comparing K-Means, K-Medoids and an exact MILP, two bugs fixed, and a live demo.">
+  <meta name="description" content="Case study: choosing distribution-center sites across the world&#39;s 1,000 largest cities, comparing K-Means, K-Medoids and an exact MILP, with a live demo.">
   <link rel="canonical" href="https://www.konnectingnots.com/projects/distribution-centers.html">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://www.konnectingnots.com/projects/distribution-centers.html">
   <meta property="og:title" content="Global distribution center placement | Nishant Iyer">
-  <meta property="og:description" content="Why a fast local search beat the "exact" solver, and what it took to get honest numbers.">
+  <meta property="og:description" content="Placing distribution centers across the world&#39;s 1,000 largest cities, and why a fast local search beat the exact solver.">
   <meta property="og:image" content="https://www.konnectingnots.com/assets/og-image-v2.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
-  <link rel="stylesheet" href="../style.css?v=4">
+  <link rel="stylesheet" href="../style.css?v=5">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -45,9 +45,9 @@
     <p class="case-lede">Where should a company put its warehouses to stay close to the most customers? I compared three ways of answering that across the world's 1,000 largest cities, and found that the "exact" solver was answering a smaller question than it seemed.</p>
 
     <dl class="case-stats">
-      <div><dt>Cities considered</dt><dd>1,000</dd></div>
+      <div><dt>Cities</dt><dd>1,000</dd></div>
       <div><dt>Countries</dt><dd>129</dd></div>
-      <div><dt>Avg distance, 5 centers</dt><dd>1,560 km</dd></div>
+      <div><dt>Avg distance (k=5)</dt><dd>1,560 km</dd></div>
       <div><dt>Solve time</dt><dd>&lt; 1 s</dd></div>
     </dl>
 
@@ -75,12 +75,6 @@
       </tbody>
     </table>
     <p><strong>The "exact" solver never won.</strong> To keep it fast, it only allowed the 50 most populous cities as sites, and the best sites are often smaller, well-placed cities. Letting it consider more candidates closed the gap (1,609 km with 50, 1,569 with 100, 1,565 with 400) but took 74 seconds at 400. K-Medoids considers all 1,000 cities and reached 1,560 km in under a second. The lesson: an optimality guarantee only covers the problem you actually gave the solver.</p>
-
-    <h2>Two bugs I fixed</h2>
-    <ul>
-      <li><strong>Centers drifting toward the equator.</strong> K-Means averages points in 3D, and the average of points on a sphere sits <em>inside</em> it. The code turned that inner point straight into latitude without pushing it back to the surface, which pulled every center toward the equator. Fixing it cut the 5-center distance from 1,634 to 1,581 km.</li>
-      <li><strong>A search that stopped early and changed every run.</strong> K-Medoids quit after 50 swaps instead of when no swap helped, and started from an unseeded random choice, so two runs could give different answers. It now applies the best swap each round until none helps, from a fixed seed.</li>
-    </ul>
 
     <div class="callout">
       <p><strong>Known limitation.</strong> GDP per person and logistics scores are filled in for 36 countries; the rest use placeholder values. That matters most for the purchasing-power and logistics options, and filling in full World Bank data is the obvious next step.</p>

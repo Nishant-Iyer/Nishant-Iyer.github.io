@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bellion: a private AI finance agent | Nishant Iyer</title>
-  <meta name="description" content="Case study: Bellion, a personal finance agent that runs its model and encrypted memory on my own machine and reaches me on Telegram. Architecture, what works, and three security fixes.">
+  <meta name="description" content="Case study: Bellion, a personal finance agent that keeps its model and encrypted memory on my own machine and reaches me on Telegram.">
   <link rel="canonical" href="https://www.konnectingnots.com/projects/bellion.html">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://www.konnectingnots.com/projects/bellion.html">
   <meta property="og:title" content="Bellion: a private AI finance agent | Nishant Iyer">
-  <meta property="og:description" content="Agentic AI applied to a real problem: my own money. What runs where, and what I fixed."exact" solver, and what it took to get honest numbers.">
+  <meta property="og:description" content="Agentic AI applied to a real problem: my own money, with the model and records kept on my machine.">
   <meta property="og:image" content="https://www.konnectingnots.com/assets/og-image-v2.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
-  <link rel="stylesheet" href="../style.css?v=4">
+  <link rel="stylesheet" href="../style.css?v=5">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -47,7 +47,7 @@
       <div><dt>Language model</dt><dd>Local</dd></div>
       <div><dt>Memory</dt><dd>AES-256</dd></div>
       <div><dt>Daily briefing</dt><dd>7:00 am</dd></div>
-      <div><dt>Security fixes</dt><dd>3</dd></div>
+      <div><dt>Interface</dt><dd>Telegram</dd></div>
     </dl>
 
     <h2>The problem</h2>
@@ -74,14 +74,6 @@
       </tbody>
     </table>
     <p>"Private" here means my records and history live on my machine, encrypted. It doesn't mean nothing ever touches the internet, and I think it's worth being precise about that.</p>
-
-    <h2>Three security fixes</h2>
-    <p>Reviewing the encrypted message gateway turned up three real problems, now fixed:</p>
-    <ul>
-      <li><strong>Forged messages.</strong> The gateway trusted any request that included my Telegram chat ID, which isn't a secret. It now requires Telegram's signed secret token on every request and rejects everything else.</li>
-      <li><strong>Plaintext in logs.</strong> It printed my decrypted chat history to the server log, which quietly undid the encryption. It now logs only counts.</li>
-      <li><strong>Command injection.</strong> The large-transaction alert built a shell command from merchant names, so a name with a quote in it could run commands on my laptop. It now passes arguments directly without a shell.</li>
-    </ul>
 
     <div class="callout">
       <p><strong>Honest status.</strong> The agent and its Telegram channel work today. The separate encrypted gateway stores every message correctly but still sends a placeholder reply; wiring the agent through it, so every message is encrypted end to end on my side, is the next step.</p>
