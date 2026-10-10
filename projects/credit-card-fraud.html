@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Credit card fraud detection | Nishant Iyer</title>
+  <meta name="description" content="Case study: a fraud model tuned to minimize business cost, not maximize accuracy. 75.8% lower fraud cost than having no model, on a dataset where only 0.17% of transactions are fraud.">
+  <link rel="canonical" href="https://www.konnectingnots.com/projects/credit-card-fraud.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.konnectingnots.com/projects/credit-card-fraud.html">
+  <meta property="og:title" content="Credit card fraud detection | Nishant Iyer">
+  <meta property="og:description" content="A fraud model tuned for money, not accuracy: 75.8% lower fraud cost than no model.">
+  <meta property="og:image" content="https://www.konnectingnots.com/assets/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <script>
+    (function () { var t = null; try { t = localStorage.getItem('theme'); } catch (e) {}
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main">
+      <a class="brand" href="../" aria-label="Nishant Iyer, home">NI</a>
+      <ul class="nav-links nav-links-static">
+        <li><a href="../#projects">All projects</a></li>
+        <li><a href="../#contact">Contact</a></li>
+      </ul>
+      <button class="theme-toggle" type="button" aria-label="Switch to light theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <main id="main" class="wrap case">
+    <a class="case-back" href="../#projects">Back to projects</a>
+    <h1>Credit card fraud detection</h1>
+    <p class="case-lede">Most fraud models are judged on accuracy. A bank cares about money. This project picks the alert threshold that costs the least once you count both the analysts reviewing alerts and the fraud that slips through.</p>
+
+    <dl class="case-stats">
+      <div><dt>Fraud cost vs. no model</dt><dd>−75.8%</dd></div>
+      <div><dt>Fraud caught (recall)</dt><dd>87.8%</dd></div>
+      <div><dt>AUPRC</dt><dd>0.858</dd></div>
+      <div><dt>Fraud rate in data</dt><dd>0.17%</dd></div>
+    </dl>
+
+    <h2>The problem</h2>
+    <p>The dataset holds about 285,000 European card transactions, and only 0.17% are fraud. A model that calls everything legitimate is 99.8% accurate and completely useless, so accuracy can't be the yardstick.</p>
+    <p>The real trade-off is between two costs:</p>
+    <ul>
+      <li><strong>Reviewing an alert</strong> takes an analyst's time. I priced this at $5 per flagged transaction.</li>
+      <li><strong>Missing a fraud</strong> loses the full transaction amount.</li>
+    </ul>
+    <p>Flag too much and review costs explode. Flag too little and fraud losses pile up. The goal is the cheapest point between them.</p>
+
+    <h2>Approach</h2>
+    <ol>
+      <li><strong>Features.</strong> Encoded time of day as a cycle (so 11:59 pm sits next to midnight) and scaled amounts with a robust scaler that isn't thrown off by a few huge transactions.</li>
+      <li><strong>An anomaly signal.</strong> Trained a small PyTorch autoencoder to reconstruct normal transactions. How badly it reconstructs a new one becomes an extra feature: fraud tends to look "unusual" in ways no single column shows.</li>
+      <li><strong>Handling the imbalance.</strong> Oversampled fraud with SMOTE during training only, never on the data used for evaluation.</li>
+      <li><strong>The model.</strong> A stacking ensemble: XGBoost and LightGBM make predictions, and a logistic regression learns how much to trust each one.</li>
+      <li><strong>The threshold.</strong> Instead of the default 0.5 cut-off, I swept 200 thresholds and priced each one with the cost function above. The cheapest landed at 0.116, which flags more transactions than the default and catches more fraud.</li>
+      <li><strong>Explaining decisions.</strong> SHAP attributions show which features pushed each transaction toward "fraud", so an analyst can see why it was flagged before acting on it.</li>
+    </ol>
+
+    <figure>
+      <img src="../assets/case/fraud-cost-curve.webp" alt="Line chart of total business cost against decision threshold. Cost stays near its minimum of about $2,600 up to a threshold of 0.116, then jumps to about $4,500 and stays roughly flat as more fraud is missed." width="1200" height="720" loading="lazy">
+      <figcaption>Total cost at each decision threshold. The cheapest point is 0.116, far below the default 0.5; just above it, a few large frauds start slipping through and cost jumps.</figcaption>
+    </figure>
+
+    <h2>Results</h2>
+    <p>On a held-out set of 56,962 transactions containing 98 frauds:</p>
+    <table>
+      <thead><tr><th scope="col">Strategy</th><th scope="col">Total cost</th></tr></thead>
+      <tbody>
+        <tr><td>Do nothing (let all fraud through)</td><td>$10,645</td></tr>
+        <tr><td>Manually review every transaction</td><td>$284,810</td></tr>
+        <tr><td><strong>Model at the cost-optimal threshold</strong></td><td><strong>$2,574</strong></td></tr>
+      </tbody>
+    </table>
+    <p>The model caught 86 of the 98 frauds and raised 44 false alarms out of nearly 57,000 legitimate transactions. That's $8,071 saved on this sample, a 75.8% cut in fraud cost.</p>
+
+    <figure>
+      <img src="../assets/case/fraud-pr-curve.webp" alt="Precision-recall curve for the stacking ensemble, with an area under the curve of 0.858." width="1200" height="900" loading="lazy">
+      <figcaption>Precision against recall. AUPRC is the right summary when positives are this rare.</figcaption>
+    </figure>
+
+    <h2>What I'd do next</h2>
+    <ul>
+      <li><strong>Pick the threshold on a separate validation set.</strong> Here it was chosen on the same data used to report results, which makes the savings figure a little optimistic.</li>
+      <li><strong>Stress-test the cost assumptions.</strong> Re-run the threshold search across a range of review costs, since $5 is an estimate and the best threshold moves with it.</li>
+      <li><strong>Monitor for drift.</strong> Fraud patterns change. Tracking the autoencoder's reconstruction error over time would give an early warning that the model is going stale.</li>
+    </ul>
+
+    <div class="case-links">
+      <a class="btn btn-primary" href="https://credit-card-fraud-detection-rvtygaztzdva8ecohigihs.streamlit.app" target="_blank" rel="noopener">Open the live demo</a>
+      <a class="btn btn-ghost" href="https://github.com/Nishant-Iyer/Credit-Card-Fraud-Detection" target="_blank" rel="noopener">View the code</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; <span id="year">2026</span> Nishant Iyer</p>
+      <p><a href="../">Back to home</a></p>
+    </div>
+  </footer>
+  <script src="../script.js" defer></script>
+</body>
+</html>

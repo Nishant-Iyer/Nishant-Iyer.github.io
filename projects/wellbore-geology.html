@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wellbore geology prediction | Nishant Iyer</title>
+  <meta name="description" content="Case study: predicting rock-layer depth along horizontal oil wells with a physics-constrained Viterbi path finder. 11.08 ft RMSE on unseen wells in the ROGII Kaggle competition.">
+  <link rel="canonical" href="https://www.konnectingnots.com/projects/wellbore-geology.html">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.konnectingnots.com/projects/wellbore-geology.html">
+  <meta property="og:title" content="Wellbore geology prediction | Nishant Iyer">
+  <meta property="og:description" content="Physics-constrained path matching instead of a black-box regressor: 11.08 ft RMSE on unseen wells.">
+  <meta property="og:image" content="https://www.konnectingnots.com/assets/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <script>
+    (function () { var t = null; try { t = localStorage.getItem('theme'); } catch (e) {}
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main">
+      <a class="brand" href="../" aria-label="Nishant Iyer, home">NI</a>
+      <ul class="nav-links nav-links-static">
+        <li><a href="../#projects">All projects</a></li>
+        <li><a href="../#contact">Contact</a></li>
+      </ul>
+      <button class="theme-toggle" type="button" aria-label="Switch to light theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <main id="main" class="wrap case">
+    <a class="case-back" href="../#projects">Back to projects</a>
+    <h1>Wellbore geology prediction</h1>
+    <p class="case-lede">A horizontal oil well has to stay inside a thin layer of rock for thousands of feet. This Kaggle competition asked how deep that layer sits along the rest of the well, given only the drill path and a gamma-ray reading. I solved it with geology-aware path matching rather than a black-box model.</p>
+
+    <dl class="case-stats">
+      <div><dt>RMSE on unseen wells</dt><dd>11.08 ft</dd></div>
+      <div><dt>Depth search window</dt><dd>±30 ft</dd></div>
+      <div><dt>Search resolution</dt><dd>0.5 ft</dd></div>
+    </dl>
+
+    <h2>The problem</h2>
+    <p>For each well I had its 3D trajectory and a gamma-ray log, a measurement that changes as the drill bit passes through different rock. The target was True Vertical Thickness (TVT): where the bit sits relative to the formation, for every point past where the known data stops.</p>
+    <p>The obvious move is to throw coordinates into a gradient-boosted model. The catch is extrapolation: those models fit the training wells well but drift as they predict further along a new well, because nothing stops them from predicting rock layers that jump around in physically impossible ways.</p>
+
+    <h2>Approach</h2>
+    <p>Instead, I built the prediction in layers, each one a constraint a geologist would recognize.</p>
+    <ol>
+      <li><strong>Regional structure.</strong> For each well, find its 5 nearest neighbors and fit a tilted plane through their formation depths. Rock layers dip gently across a region, and this captures that trend.</li>
+      <li><strong>Anchor the starting depth.</strong> Some reference logs were missing the formation tops. I back-calculated them from the part of the well where the answer is known, which gave a stable starting point.</li>
+      <li><strong>Correct local bias, then let it fade.</strong> Fit a small linear correction on the known section, then smoothly damp it back toward the regional average over about 1,000 ft, so a local quirk doesn't get extrapolated forever.</li>
+      <li><strong>Match the rock signature.</strong> Treat the remaining uncertainty as a path-finding problem. At each point along the well, consider every depth offset from −30 to +30 ft in 0.5 ft steps. Score each by how well the gamma-ray reading matches the reference profile at that depth, and penalize sudden jumps between neighboring points. The Viterbi algorithm finds the single smoothest, best-matching path through all of them.</li>
+    </ol>
+    <p>The smoothness penalty is what makes it work: real rock layers bend gradually, so the model is simply not allowed to predict anything else.</p>
+
+    <h2>Results</h2>
+    <p>On validation wells the model had never seen, the predicted depth was off by <strong>11.08 ft RMSE</strong>, with the smoothness constraint keeping predictions stable far along each well.</p>
+    <div class="callout">
+      <p><strong>A note on the leaderboard.</strong> The three public-leaderboard test wells also appeared in the training data, so copying their known values scores a perfect zero. My pipeline does handle that case, but it says nothing about modeling skill. 11.08 ft is the honest number, and it's the one the private leaderboard depends on.</p>
+    </div>
+
+    <h2>What I'd do next</h2>
+    <ul>
+      <li><strong>Learn the smoothness penalty</strong> from the training wells rather than hand-tuning it, ideally varying it by region.</li>
+      <li><strong>Use more than one log.</strong> Gamma-ray alone can be ambiguous where two layers look alike. Adding a second measurement would sharpen the matching.</li>
+      <li><strong>Report uncertainty.</strong> Viterbi gives one best path. Keeping the next-best paths would show a driller how confident the prediction is at each point.</li>
+    </ul>
+
+    <div class="case-links">
+      <a class="btn btn-primary" href="https://rogii-wellbore-geology-prediction-u9ejzh9ghvs8cdmnftsajc.streamlit.app" target="_blank" rel="noopener">Open the live demo</a>
+      <a class="btn btn-ghost" href="https://github.com/Nishant-Iyer/Rogii-Wellbore-Geology-Prediction" target="_blank" rel="noopener">View the code</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; <span id="year">2026</span> Nishant Iyer</p>
+      <p><a href="../">Back to home</a></p>
+    </div>
+  </footer>
+  <script src="../script.js" defer></script>
+</body>
+</html>
