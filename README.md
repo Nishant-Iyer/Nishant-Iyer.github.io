@@ -34,4 +34,4 @@ python3 -m http.server 8000
 
 ## Deploy
 
-GitHub Pages serves the `main` branch. The `CNAME` file points it at `www.konnectingnots.com`.
+Hosted on Cloudflare Workers (static assets). Every push to `main` deploys automatically to `konnectingnots.com` and `www.konnectingnots.com`. The repository is private; Cloudflare reads it through its GitHub app.
