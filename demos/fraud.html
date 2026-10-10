@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fraud detection demo | Nishant Iyer</title>
+  <meta name="description" content="Interactive demo: score real card transactions with a fraud model running in your browser, change the amount and pattern, and set the alert threshold and review cost to see what fraud costs the business.">
+  <link rel="canonical" href="https://www.konnectingnots.com/demos/fraud.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Fraud detection demo | Nishant Iyer">
+  <meta property="og:description" content="Score card transactions and tune the alert policy, live in your browser.">
+  <meta property="og:image" content="https://www.konnectingnots.com/assets/og-image-v2.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <script>
+    (function () { var t = null; try { t = localStorage.getItem('theme'); } catch (e) {}
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
+  <link rel="stylesheet" href="../style.css?v=5">
+  <link rel="stylesheet" href="demo.css?v=5">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main">
+      <a class="brand" href="../" aria-label="Nishant Iyer, home">NI</a>
+      <ul class="nav-links nav-links-static">
+        <li><a href="../#projects">All projects</a></li>
+        <li><a href="../projects/credit-card-fraud.html">Case study</a></li>
+      </ul>
+      <button class="theme-toggle" type="button" aria-label="Switch to light theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <main id="main" class="wrap demo">
+    <h1>Fraud detection demo</h1>
+    <p class="demo-lede">Score real card transactions with the trained fraud model, running in your browser. Change a transaction to see how the model reacts, then set the alert policy and see what fraud would cost the business across every held-out transaction.</p>
+
+    <div class="demo-layout">
+      <form class="panel controls" aria-label="Demo settings" onsubmit="return false">
+        <h2 class="control-group">Transaction</h2>
+        <div class="control">
+          <span class="control-label" id="kind-label">Pick a real transaction</span>
+          <div class="segmented" role="group" aria-labelledby="kind-label" id="kind-buttons">
+            <button type="button" data-kind="1" aria-pressed="true">Fraud</button>
+            <button type="button" data-kind="0" aria-pressed="false">Legitimate</button>
+          </div>
+          <div class="tx-row"><p class="hint" id="tx-info">Loading…</p><button type="button" class="btn btn-ghost btn-small" id="another">Next</button></div>
+        </div>
+
+        <div class="control">
+          <label for="amount">Amount <output id="amount-out" for="amount"></output></label>
+          <input type="range" id="amount" min="0" max="2500" step="1" value="0">
+        </div>
+
+        <div class="control">
+          <label for="blend">How unusual it looks <output id="blend-out" for="blend">100%</output></label>
+          <input type="range" id="blend" min="0" max="100" step="1" value="100">
+          <p class="hint">At 0% its 28 anonymized card features are swapped for those of a typical legitimate purchase.</p>
+        </div>
+
+        <h2 class="control-group">Alert policy</h2>
+        <div class="control">
+          <label for="thr">Alert threshold <output id="thr-out" for="thr"></output></label>
+          <input type="range" id="thr" min="0" max="100" step="1" value="50">
+          <button type="button" class="btn btn-ghost btn-small" id="cheapest">Use the cheapest threshold</button>
+        </div>
+
+        <div class="control">
+          <label for="review">Cost to review an alert <output id="review-out" for="review">$5</output></label>
+          <input type="range" id="review" min="1" max="50" step="1" value="5">
+          <p class="hint">Analyst time per flagged transaction. Missed fraud costs its full amount.</p>
+        </div>
+
+        <button type="button" class="btn btn-ghost" id="reset">Reset</button>
+      </form>
+
+      <section class="demo-results" aria-label="Results">
+        <div class="stats" aria-live="polite">
+          <div class="stat"><div class="label">Fraud score</div><div class="value" id="score">–</div><div class="sub" id="verdict">–</div></div>
+          <div class="stat"><div class="label">Pattern anomaly</div><div class="value" id="anomaly">–</div><div class="sub">autoencoder error vs. a typical purchase</div></div>
+          <div class="stat"><div class="label">Fraud cost, test set</div><div class="value" id="cost">–</div><div class="sub" id="cost-sub">–</div></div>
+        </div>
+
+        <div class="panel chart-panel">
+          <div class="chart-head">
+            <h2 id="chart-title">Total cost by alert threshold</h2>
+            <ul class="legend">
+              <li><span class="key" style="border-color: var(--series-1)"></span>Model</li>
+              <li><span class="key dashed" style="border-color: var(--series-2)"></span>No model</li>
+            </ul>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chart" role="img" aria-labelledby="chart-title" aria-describedby="chart-desc"></canvas>
+            <div class="chart-status" id="status">Loading the model…</div>
+            <div class="tooltip" id="tip" hidden></div>
+          </div>
+          <p id="chart-desc" class="sr-only">Line chart of total cost (alert reviews plus missed fraud) on the held-out test set at each alert threshold, compared with the cost of having no model.</p>
+        </div>
+
+        <div class="panel">
+          <table class="sites" id="outcome">
+            <caption class="sr-only">Outcome on the held-out test set at the current threshold</caption>
+            <thead><tr><th scope="col">At this threshold</th><th scope="col">Test set</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <section class="demo-notes">
+      <h2>How it works</h2>
+      <ul>
+        <li><strong>The model:</strong> an autoencoder trained only on legitimate purchases measures how unusual each transaction looks. That score joins the card features in XGBoost and LightGBM, and a logistic regression combines the two.</li>
+        <li><strong>The cost:</strong> every alert costs a review, and every missed fraud costs its amount. The cheapest threshold balances the two, and it moves when reviews get more expensive.</li>
+        <li><strong>Try:</strong> take a fraud and slide "How unusual it looks" toward 0% to see where the model stops flagging it, or raise the review cost and watch the cheapest threshold climb.</li>
+      </ul>
+      <p id="data-note">Data: the public European cardholder dataset (284,807 transactions, 0.17% fraud). The threshold was chosen on a validation split; costs here are on the separate test set. Read the <a href="../projects/credit-card-fraud.html">case study</a> or the <a href="https://github.com/Nishant-Iyer/Credit-Card-Fraud-Detection" target="_blank" rel="noopener">code</a>.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; <span id="year">2026</span> Nishant Iyer</p>
+      <p><a href="../">Back to home</a></p>
+    </div>
+  </footer>
+  <script src="../script.js?v=4" defer></script>
+  <script src="fraud-engine.js?v=1" defer></script>
+  <script src="fraud-demo.js?v=1" defer></script>
+</body>
+</html>

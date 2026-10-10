@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Credit card fraud detection | Nishant Iyer</title>
-  <meta name="description" content="Case study: a fraud model tuned to minimize business cost, not maximize accuracy. 75.8% lower fraud cost than having no model, on a dataset where only 0.17% of transactions are fraud.">
+  <meta name="description" content="Case study: a fraud model tuned to minimize business cost, not maximize accuracy. 75% lower fraud cost than having no model, on a dataset where only 0.17% of transactions are fraud.">
   <link rel="canonical" href="https://www.konnectingnots.com/projects/credit-card-fraud.html">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://www.konnectingnots.com/projects/credit-card-fraud.html">
   <meta property="og:title" content="Credit card fraud detection | Nishant Iyer">
-  <meta property="og:description" content="A fraud model tuned for money, not accuracy: 75.8% lower fraud cost than no model.">
+  <meta property="og:description" content="A fraud model tuned for money, not accuracy: 75% lower fraud cost than no model.">
   <meta property="og:image" content="https://www.konnectingnots.com/assets/og-image-v2.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
@@ -44,9 +44,9 @@
     <p class="case-lede">Most fraud models are judged on accuracy. A bank cares about money. This project picks the alert threshold that costs the least once you count both the analysts reviewing alerts and the fraud that slips through.</p>
 
     <dl class="case-stats">
-      <div><dt>Cost vs. no model</dt><dd>−75.8%</dd></div>
-      <div><dt>Fraud caught</dt><dd>87.8%</dd></div>
-      <div><dt>AUPRC</dt><dd>0.858</dd></div>
+      <div><dt>Cost vs. no model</dt><dd>−75.0%</dd></div>
+      <div><dt>Fraud caught</dt><dd>84.7%</dd></div>
+      <div><dt>AUPRC</dt><dd>0.863</dd></div>
       <div><dt>Fraud rate</dt><dd>0.17%</dd></div>
     </dl>
 
@@ -61,17 +61,17 @@
 
     <h2>Approach</h2>
     <ol>
-      <li><strong>Features.</strong> Encoded time of day as a cycle (so 11:59 pm sits next to midnight) and scaled amounts with a robust scaler that isn't thrown off by a few huge transactions.</li>
+      <li><strong>Features.</strong> The 28 anonymized card features plus the amount, scaled with a robust scaler that isn't thrown off by a few huge transactions.</li>
       <li><strong>An anomaly signal.</strong> Trained a small PyTorch autoencoder to reconstruct normal transactions. How badly it reconstructs a new one becomes an extra feature: fraud tends to look "unusual" in ways no single column shows.</li>
       <li><strong>Handling the imbalance.</strong> Oversampled fraud with SMOTE during training only, never on the data used for evaluation.</li>
       <li><strong>The model.</strong> A stacking ensemble: XGBoost and LightGBM make predictions, and a logistic regression learns how much to trust each one.</li>
-      <li><strong>The threshold.</strong> Instead of the default 0.5 cut-off, I swept 200 thresholds and priced each one with the cost function above. The cheapest landed at 0.116, which flags more transactions than the default and catches more fraud.</li>
+      <li><strong>The threshold.</strong> Instead of the default 0.5 cut-off, I swept 200 thresholds and priced each one with the cost function above, using a validation split carved out of the training data. The cheapest landed at 0.232. The test set was scored once, at that threshold.</li>
       <li><strong>Explaining decisions.</strong> SHAP attributions show which features pushed each transaction toward "fraud", so an analyst can see why it was flagged before acting on it.</li>
     </ol>
 
     <figure>
-      <img src="../assets/case/fraud-cost-curve.webp" alt="Line chart of total business cost against decision threshold. Cost stays near its minimum of about $2,600 up to a threshold of 0.116, then jumps to about $4,500 and stays roughly flat as more fraud is missed." width="1200" height="720" loading="lazy">
-      <figcaption>Total cost at each decision threshold. The cheapest point is 0.116, far below the default 0.5; just above it, a few large frauds start slipping through and cost jumps.</figcaption>
+      <img src="../assets/case/fraud-cost-curve.webp?v=2" alt="Line chart of total cost on the test set against decision threshold on a log scale. Cost falls from about $4,500 at very low thresholds to about $2,500 near 0.2, stays near $2,650 up to 0.9, then jumps as fraud is missed. The do-nothing cost is $10,645." width="1200" height="720" loading="lazy">
+      <figcaption>Total cost on the test set at each threshold. The threshold picked on validation (0.232) lands close to the test-set minimum, so the choice carries over to unseen data.</figcaption>
     </figure>
 
     <h2>Results</h2>
@@ -81,25 +81,24 @@
       <tbody>
         <tr><td>Do nothing (let all fraud through)</td><td>$10,645</td></tr>
         <tr><td>Manually review every transaction</td><td>$284,810</td></tr>
-        <tr><td><strong>Model at the cost-optimal threshold</strong></td><td><strong>$2,574</strong></td></tr>
+        <tr><td><strong>Model at the threshold chosen on validation</strong></td><td><strong>$2,666</strong></td></tr>
       </tbody>
     </table>
-    <p>The model caught 86 of the 98 frauds and raised 44 false alarms out of nearly 57,000 legitimate transactions. That's $8,071 saved on this sample, a 75.8% cut in fraud cost.</p>
+    <p>The model caught 83 of the 98 frauds and raised 35 false alarms out of nearly 57,000 legitimate transactions. That's $7,979 saved on this sample, a 75.0% cut in fraud cost.</p>
 
     <figure>
-      <img src="../assets/case/fraud-pr-curve.webp" alt="Precision-recall curve for the stacking ensemble, with an area under the curve of 0.858." width="1200" height="900" loading="lazy">
+      <img src="../assets/case/fraud-pr-curve.webp?v=2" alt="Precision-recall curve for the stacking ensemble, with an area under the curve of 0.863." width="1200" height="900" loading="lazy">
       <figcaption>Precision against recall. AUPRC is the right summary when positives are this rare.</figcaption>
     </figure>
 
     <h2>What I'd do next</h2>
     <ul>
-      <li><strong>Pick the threshold on a separate validation set.</strong> Here it was chosen on the same data used to report results, which makes the savings figure a little optimistic.</li>
-      <li><strong>Stress-test the cost assumptions.</strong> Re-run the threshold search across a range of review costs, since $5 is an estimate and the best threshold moves with it.</li>
+      <li><strong>Use real loss data.</strong> Replace the $5 review cost and full-amount loss with a bank's actual numbers, including chargebacks recovered. The demo shows how far the best threshold moves when these change.</li>
       <li><strong>Monitor for drift.</strong> Fraud patterns change. Tracking the autoencoder's reconstruction error over time would give an early warning that the model is going stale.</li>
     </ul>
 
     <div class="case-links">
-      <a class="btn btn-primary" href="https://credit-card-fraud-detection-rvtygaztzdva8ecohigihs.streamlit.app" target="_blank" rel="noopener">Open the live demo</a>
+      <a class="btn btn-primary" href="../demos/fraud.html">Try the live demo</a>
       <a class="btn btn-ghost" href="https://github.com/Nishant-Iyer/Credit-Card-Fraud-Detection" target="_blank" rel="noopener">View the code</a>
     </div>
   </main>

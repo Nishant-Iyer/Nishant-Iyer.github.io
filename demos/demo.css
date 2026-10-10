@@ -137,3 +137,20 @@ table.sites .bar b { font-weight: 600; min-width: 3.2em; text-align: right; }
 table.sites .lock-tag { font-size: 0.78rem; color: var(--text-faint); margin-left: 6px; }
 .demo-layout > * { min-width: 0; }
 .lock-row input { width: 100%; }
+
+/* ---- Fraud demo ---- */
+.controls .control-group { font: 600 0.78rem var(--font-body); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-faint); margin: 0 0 -8px; }
+.controls .control-group ~ .control-group { border-top: 1px solid var(--line); padding-top: 20px; margin-top: 2px; }
+.btn.btn-small { min-height: 34px; padding: 0 14px; font-size: 0.88rem; margin-top: 10px; }
+.flag { display: inline-flex; align-items: center; gap: 6px; }
+.flag::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--text-faint); flex: none; }
+.flag.on::before { background: var(--warn); }
+.flag.off::before { background: var(--good); }
+:root { --warn: #e8a317; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --warn: #a66a00; } }
+:root[data-theme="light"] { --warn: #a66a00; }
+.legend .key.marker { width: 0; height: 12px; border-top: 0; border-left: 1.5px dashed var(--text-faint); }
+.tx-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; }
+.tx-row .hint { margin: 0; }
+.tx-row .btn.btn-small { margin-top: 0; }
+.tx-row .btn.btn-small { white-space: nowrap; }
