@@ -4,7 +4,7 @@ Personal portfolio of **Nishant Iyer**, Senior Associate at Capital One.
 
 **[Visit the live site](https://www.konnectingnots.com)**
 
-![Preview of the portfolio](assets/og-image-v2.jpg)
+![Preview of the portfolio](assets/og-image-v3.jpg)
 
 ## What's here
 
