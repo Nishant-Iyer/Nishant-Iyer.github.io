@@ -1,8 +1,8 @@
 # konnectingnots.com
 
-Personal portfolio of **Nishant Iyer**, Senior Data Analyst at Capital One.
+Personal portfolio of **Nishant Iyer**, Senior Associate at Capital One.
 
-**Live site:** https://www.konnectingnots.com
+**[Visit the live site](https://www.konnectingnots.com)**
 
 ![Preview of the portfolio](assets/og-image-v2.jpg)
 
