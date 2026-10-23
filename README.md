@@ -13,6 +13,10 @@ Personal portfolio of **Nishant Iyer**, Senior Associate at Capital One.
 
 Plain HTML, CSS and a little JavaScript. No build step, no framework, no dependencies beyond Google Fonts. Light and dark themes follow the visitor's system setting and can be toggled.
 
+## Travel book (`travel/`)
+
+A guide to every place in the USA, served at **travel.konnectingnots.com** (and `/travel/`): 6,591 destinations from Wikivoyage with things to do, food, best time to visit, budget, itineraries, Google Maps links, photos from Wikimedia Commons, and a personal journal saved in the visitor's browser. The pages are generated; don't hand-edit them. Text is CC BY-SA 4.0 from Wikivoyage contributors (credited on every page).
+
 ## Editing
 
 | To change… | Edit |
