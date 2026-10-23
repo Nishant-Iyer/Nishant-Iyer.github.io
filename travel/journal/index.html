@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My travel journal — Travel USA</title>
+<meta name="description" content="My personal travel journal.">
+<meta property="og:title" content="My travel journal — Travel USA"><meta property="og:description" content="My personal travel journal.">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<script>(function(){var t=null;try{t=localStorage.getItem('theme')}catch(e){}if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
+<link rel="stylesheet" href="/travel/assets/travel.css?v=2">
+<link rel="stylesheet" href="/travel/assets/leaflet/leaflet.css"><meta name="robots" content="noindex">
+</head>
+<body data-page="journal">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="tv-top">
+  <div class="tv-wrap tv-topin">
+    <a class="tv-brand" href="/travel/"><span class="tv-logo" aria-hidden="true">✈</span> Travel <span class="tv-brand-sub">USA</span></a>
+    <form class="tv-search" action="/travel/search/" role="search"><input type="search" name="q" placeholder="Search 6,500+ places…" aria-label="Search places" autocomplete="off"><div class="tv-sugg" hidden></div></form>
+    <nav class="tv-nav"><a href="/travel/states/">States</a><a href="/travel/map/">Map</a><a href="/travel/journal/">My journal</a>
+      <button class="theme-toggle" type="button" aria-label="Switch theme"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button></nav>
+  </div>
+</header>
+<main id="main">
+<div class="tv-wrap"><h1 style="margin-top:32px">My travel journal</h1>
+<p class="tv-dim">Everything you've written on place pages, saved in this browser. Export a backup now and then. You can import it on another device or browser.</p>
+<div class="tv-stat-cards"><div><b id="j-v">0</b>places visited</div><div><b id="j-s">0</b>states visited</div><div><b id="j-b">0</b>on my bucket list</div><div><b id="j-w">0</b>spots I want to see</div></div>
+<div class="tv-acts" style="margin-bottom:18px"><button class="tv-btn" id="j-exp" type="button">Export backup (.json)</button><label class="tv-btn tv-ghost" style="cursor:pointer">Import backup<input id="j-imp" type="file" accept=".json,application/json" hidden></label><button class="tv-btn tv-ghost" id="j-print" type="button">Print my journal</button></div>
+<h2>Where I've been</h2><div class="tv-lmap tv-jmap" id="j-map"></div>
+<h2>My stories</h2><div id="j-list"><p class="tv-dim">Nothing yet. Open any place and use “My experience” at the bottom of its page.</p></div>
+<h2>Bucket list</h2><div class="tv-grid" id="j-bucket"></div>
+<h2>States</h2><div class="tv-chips" id="j-states"></div></div>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+function render(){var A=tvJournal.load(),ks=Object.keys(A),vis=ks.filter(function(k){return A[k].visited}),st={},w=0;
+vis.forEach(function(k){st[A[k].st]=1});ks.forEach(function(k){w+=(A[k].want||[]).length});
+document.getElementById('j-v').textContent=vis.length;document.getElementById('j-s').textContent=Object.keys(st).length;
+document.getElementById('j-b').textContent=ks.filter(function(k){return A[k].bucket}).length;document.getElementById('j-w').textContent=w;
+var ent=ks.filter(function(k){var e=A[k];return e.notes||e.best||e.food||e.rating||e.visited}).sort(function(a,b){return(A[b].date||A[b].updated||'')>(A[a].date||A[a].updated||'')?1:-1});
+if(ent.length)document.getElementById('j-list').innerHTML=ent.map(function(k){var e=A[k];return '<div class="tv-entry"><h3><a href="/travel/'+k+'/#journal">'+tvEsc(e.title||k)+'</a> <span class="tv-stars">'+'★'.repeat(e.rating||0)+'</span></h3><p class="tv-dim">'+[e.visited?'Visited':'',e.date,e.with?'with '+tvEsc(e.with):'',e.back].filter(Boolean).join(' · ')+'</p>'+(e.best?'<p><b>Best thing I did:</b> '+tvEsc(e.best)+'</p>':'')+(e.food?'<p><b>Best thing I ate:</b> '+tvEsc(e.food)+'</p>':'')+(e.stay?'<p><b>Stayed at:</b> '+tvEsc(e.stay)+'</p>':'')+(e.notes?'<pre>'+tvEsc(e.notes)+'</pre>':'')+((e.want||[]).length?'<p class="tv-dim">Want to see: '+tvEsc(e.want.join(', '))+'</p>':'')+'</div>'}).join('');
+tvIndex().then(function(list){var by={};list.forEach(function(r){by[r.s]=r});
+document.getElementById('j-bucket').innerHTML=ks.filter(function(k){return A[k].bucket&&!A[k].visited}).map(function(k){var r=by[k]||{n:A[k].title,s:k};return '<a class="tv-pc" href="/travel/'+k+'/">'+(r.f?'<img class="tv-pc-img" src="'+tvThumb(r.f,330)+'" alt="" loading="lazy">':'<div class="tv-pc-ph"></div>')+'<div class="tv-pc-b"><h3>'+tvEsc(r.n)+'</h3><p>'+tvEsc(list.states[r.st]||'')+'</p></div></a>'}).join('')||'<p class="tv-dim">Tick “On my bucket list” on any place page.</p>';
+document.getElementById('j-states').innerHTML=Object.keys(list.states).filter(function(s){return s!=='US'}).sort(function(a,b){return list.states[a]<list.states[b]?-1:1}).map(function(s){return '<span class="tv-chip'+(st[s]?' on':'')+'">'+(st[s]?'✓ ':'')+tvEsc(list.states[s])+'</span>'}).join('');
+tvWhenLeaflet(function(){var L=window.L,el=document.getElementById('j-map');if(el._m){el._m.remove()}var m=L.map(el).setView([39.5,-98.35],4);el._m=m;tvTiles(m);var pts=[];
+ks.forEach(function(k){var e=A[k],r=by[k];var la=e.lat||(r&&r.la),lo=e.lon||(r&&r.lo);if(!la||!(e.visited||e.bucket))return;L.circleMarker([la,lo],{radius:8,color:'#fff',weight:2,fillColor:e.visited?'#22c55e':'#f5c04a',fillOpacity:.95}).addTo(m).bindPopup('<a href="/travel/'+k+'/">'+tvEsc(e.title||k)+'</a>');pts.push([la,lo])});
+if(pts.length)m.fitBounds(pts,{padding:[30,30],maxZoom:9});});});}
+render();
+document.getElementById('j-exp').addEventListener('click',function(){var b=new Blob([JSON.stringify(tvJournal.load(),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='travel-journal-'+new Date().toISOString().slice(0,10)+'.json';a.click();});
+document.getElementById('j-imp').addEventListener('change',function(){var f=this.files[0];if(!f)return;f.text().then(function(t){try{var inc=JSON.parse(t),cur=tvJournal.load();Object.keys(inc).forEach(function(k){if(!cur[k]||(inc[k].updated||'')>(cur[k].updated||''))cur[k]=inc[k]});tvJournal.save(cur);render();alert('Imported '+Object.keys(inc).length+' entries.')}catch(e){alert('That file is not a journal backup.')}})});
+document.getElementById('j-print').addEventListener('click',function(){window.print()});
+});
+</script></main>
+<footer class="tv-foot"><div class="tv-wrap">
+  
+  <p>Maps open in Google Maps. Your journal is saved in this browser; use <a href="/travel/journal/">My journal</a> to export a backup.</p>
+  <p><a href="https://www.konnectingnots.com/">konnectingnots.com</a> · Built by Nishant Iyer</p>
+</div></footer>
+<script src="/travel/assets/travel.js?v=2" defer></script>
+<script src="/travel/assets/leaflet/leaflet.js" defer></script>
+</body></html>
