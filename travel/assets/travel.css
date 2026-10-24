@@ -245,3 +245,30 @@ p{margin:0 0 1em}
 }
 .tv-rate button{min-width:34px;min-height:34px}
 .tv-noresults{padding:24px;border:1px dashed var(--line);border-radius:var(--radius-md);color:var(--text-soft)}
+
+/* food */
+.tv-badges{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 6px}
+.tv-cu{font-size:.74rem;padding:2px 8px;border-radius:6px;background:var(--surface-2);color:var(--text-soft)}
+.tv-dg{font-size:.74rem;padding:2px 8px;border-radius:6px;background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok);font-weight:600}
+.tv-dg-strong{background:var(--ok);color:#04130a}
+.tv-food{border-color:color-mix(in srgb,var(--cyan) 45%,var(--line))}
+.tv-dp-q{margin:10px 0 6px;font-size:.95rem}
+.tv-dietpick .tv-chips{margin:0 0 6px}
+.tv-dp-sep{width:1px;background:var(--line);margin:0 4px}
+.tv-chip-x.on{border-color:var(--gold);color:var(--text)}
+.tv-cuchips{margin:6px 0 10px}
+.tv-frows{padding-left:20px;margin:6px 0 12px}
+.tv-frows li{margin-bottom:6px}
+.tv-lv{font-size:.72rem;font-weight:700;padding:2px 7px;border-radius:999px;white-space:nowrap}
+.tv-lv5,.tv-lv4,.tv-lv3{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.tv-lv2{background:color-mix(in srgb,var(--cyan) 16%,transparent);color:var(--cyan)}
+.tv-lv1{background:var(--surface-2);color:var(--text-faint)}
+.tv-foodtips{margin:12px 0 6px}
+.tv-foodtips summary{cursor:pointer;font-weight:600}
+.tv-listing.tv-fit{border-color:color-mix(in srgb,var(--ok) 60%,var(--line))}
+.tv-listing.tv-unfit{opacity:.55}
+.tv-ffrow{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin:8px 0 12px}
+.tv-ffrow label{display:flex;flex-direction:column;gap:4px;font-weight:600;font-size:.88rem}
+.tv-field{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-sm);padding:9px 11px;min-height:42px}
+.tv-fres{display:flex;flex-direction:column;gap:8px}
+.tv-frow{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:12px 14px}

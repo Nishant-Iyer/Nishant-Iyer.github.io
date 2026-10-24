@@ -27,7 +27,7 @@ def nearby(t, a, k=8, maxmi=80):
         if tt in skip or '/' in tt and tt.split('/')[0] == t.split('/')[0]: continue
         out.append((tt, round(float(d[i]))))
     return out
-VER = '5'
+VER = '6'
 from saved import SAVED
 
 STATE_NAME = {'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California', 'CO': 'Colorado', 'CT': 'Connecticut',
@@ -146,6 +146,7 @@ window.tvImgErr=function(im){{if(!im.dataset.tried&&im.dataset.full){{im.dataset
     <form class="tv-search" action="/travel/search/" role="search"><input type="search" name="q" placeholder="Search 6,500+ places" aria-label="Search places" autocomplete="off"><div class="tv-sugg" hidden></div></form>
     <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
     <ul class="nav-links" id="nav-links">
+      <li><a href="/travel/food/">Food</a></li>
       <li><a href="/travel/states/">States</a></li>
       <li><a href="/travel/map/">Map</a></li>
       <li><a href="/travel/journal/">My journal</a></li>
@@ -195,6 +196,9 @@ def attribution(a):
             f'Photos from Wikimedia Commons; tap a photo for its author and license. Weather, budget, drive times and itineraries are estimates computed from that data.</p>')
 
 # ---------------------------------------------------------------- blocks -> html
+def lid(L): return 'l-' + re.sub(r'[^a-z0-9]+', '-', (L.get('n') or '').lower()).strip('-')[:50]
+
+
 def listing_html(L, a, show_kind=False):
     k = L.get('k', 'listing'); kl = KIND.get(k, ('Place', ''))[0]
     meta = []
@@ -217,8 +221,22 @@ def listing_html(L, a, show_kind=False):
         photo = f'<a class="tv-lthumb" href="{filepage(L["img"])}" data-lb="{commons(L["img"], 1280)}" data-cap="{esc(L.get("n", ""))}">{img(L["img"], 330, L.get("n", ""))}</a>'
     alt = f' <span class="tv-dim">({esc(L["alt"])})</span>' if L.get('alt') else ''
     data = f' data-lat="{L["lat"]}" data-lon="{L["lon"]}"' if L.get('lat') and L.get('lon') else ''
+    badges = ''
+    if 'dt' in L:
+        data += f' data-cu="{esc("|".join(L["cu"]))}" data-dt="{" ".join(k + ":" + v for k, v in L["dt"].items())}" data-tier="{L.get("tier", 0)}" id="{lid(L)}"'
+        bl = [f'<span class="tv-cu">{esc(c)}</span>' for c in L['cu']]
+        dt = L['dt']
+        if dt.get('vegan') == 'only': bl.append('<span class="tv-dg tv-dg-strong">Vegan restaurant</span>')
+        elif dt.get('veg') == 'only': bl.append('<span class="tv-dg tv-dg-strong">Vegetarian restaurant</span>')
+        else:
+            if dt.get('vegan') == 'yes': bl.append('<span class="tv-dg">Vegan options</span>')
+            elif dt.get('veg') == 'yes': bl.append('<span class="tv-dg">Vegetarian options</span>')
+        for k, lab in (('halal', 'Halal'), ('kosher', 'Kosher'), ('gf', 'Gluten-free options')):
+            if dt.get(k) == 'yes': bl.append(f'<span class="tv-dg">{lab}</span>')
+        if L.get('tier'): bl.append(f'<span class="tv-cu">{"$" * L["tier"]}</span>')
+        badges = f'<div class="tv-badges">{"".join(bl)}</div>' if bl else ''
     return (f'<article class="tv-listing tv-k-{k}"{data} data-name="{esc(L.get("n", ""))}" data-kind="{k}">{photo}<div class="tv-lbody">'
-            f'<h4><span class="tv-kind">{kl}</span> {esc(L.get("n", ""))}{alt}</h4>'
+            f'<h4><span class="tv-kind">{kl}</span> {esc(L.get("n", ""))}{alt}</h4>{badges}'
             + (f'<p>{L["c"]}</p>' if L.get('c') else '') + (f'<div class="tv-meta">{"".join(meta)}</div>' if meta else '')
             + f'<div class="tv-acts">{"".join(links)}<button class="tv-btn tv-btn-sm tv-ghost tv-want" type="button" data-item="{esc(L.get("n", ""))}">☆ Want to go</button></div></div></article>')
 
@@ -344,18 +362,26 @@ def plan_html(a):
     return '<section class="tv-plan" id="plan"><h2>Plan your trip</h2><div class="tv-cards">' + ''.join(cards) + '</div></section>'
 
 
+def food_links(a):
+    city = place_name(a['t']); st = STATE_NAME.get(a['st'], '')
+    loc = city + ', ' + (place_name(a['t'].split('/')[0]) + ', ' if '/' in a['t'] else '') + st
+    z = f'https://www.zabihah.com/halal-restaurants/{re.sub(r"[^a-z0-9]+", "-", city.lower()).strip("-")}-{a["st"].lower()}-us' if a.get('type') in ('city', 'district') else ''
+    return f' data-loc="{esc(loc)}" data-ll="{a.get("lat") or ""},{a.get("lon") or ""}" data-zab="{esc(z)}"'
+
+
 def food_html(a):
     eat = next((s for s in a['secs'] if s['h'] in ('Eat', 'Eat and drink', 'Eat & drink')), None)
-    if not eat: return ''
-    intro = [b['p'] for b in eat['b'] if 'p' in b][:2]
-    names = [b['L']['n'] for b in eat['b'] if 'L' in b and b['L'].get('n')]
-    if not intro and not names: return ''
-    tiers = [b['h3'] for b in eat['b'] if 'h3' in b]
-    s = '<section class="tv-card tv-food" id="food"><h3>How is the food here?</h3>' + ''.join(f'<p>{p}</p>' for p in intro)
-    if names:
-        s += f'<p><b>{len(names)} places to eat listed</b>' + (f' across {", ".join(esc(t) for t in tiers[:4])}' if tiers else '') + ', including ' + \
-             esc(', '.join(names[:5])) + '. <a href="#sec-eat">See them all ↓</a></p>'
-    return s + '</section>'
+    intro = [b['p'] for b in eat['b'] if 'p' in b][:2] if eat else []
+    n_food = a.get('n', {}).get('eat', 0) + a.get('n', {}).get('drink', 0)
+    if not intro and not n_food and a.get('type') not in ('city', 'district', 'park'): return ''
+    cu = a.get('food', {}).get('cu', [])
+    return (f'<section class="tv-card tv-food" id="food"{food_links(a)}><h3>Food for you</h3>'
+            + ''.join(f'<p>{p}</p>' for p in intro)
+            + '<div class="tv-dietpick"></div>'
+            + (f'<p class="tv-dp-q"><b>Cuisine</b> <span class="tv-dim">(tap to filter)</span></p><div class="tv-chips tv-cuchips">' + ''.join(f'<button type="button" class="tv-chip" data-cu="{esc(c)}">{esc(c)} {n}</button>' for c, n in cu[:12] if c != 'Bar / Café') + '</div>' if cu else '')
+            + '<div class="tv-foodlist" aria-live="polite"></div>'
+            + '<div class="tv-foodlive"></div><details class="tv-foodtips"><summary>What to ask about, for your diet</summary><ul></ul></details>'
+            + f'<p class="tv-dim">Diet labels come from each listing\'s description and cuisine; “likely” means the cuisine usually has good choices, not a promise. Check with the restaurant. <a href="/travel/food/?in={a["slug"]}">Open the food finder</a></p></section>')
 
 
 def section_id(h): return 'sec-' + re.sub(r'[^a-z0-9]+', '-', h.lower()).strip('-')
@@ -456,6 +482,7 @@ def place_page(t, a):
         cls = ' tv-sec-list' if s['h'] in ('See', 'Do', 'Eat', 'Drink', 'Sleep', 'Buy') else ''
         guide.append(f'<section class="tv-sec{cls}" id="{section_id(s["h"])}"><h2>{esc(s["h"])}</h2>{blocks_html(s["b"], a)}</section>')
     has_map = any('L' in b and b['L'].get('lat') for s in a['secs'] for b in s['b'])
+    food_block = food_html(a)
     near = nearby(t, a)
     near_html = ''
     if near:
@@ -469,13 +496,13 @@ def place_page(t, a):
     mapsec = '<section id="map"><h2>Map</h2><div class="tv-lmap" data-center="' + (f'{a["lat"]},{a["lon"]}' if a.get('lat') else '') + '"></div><p class="tv-dim">Every listing with a location. Tap a pin for its Google Maps link.</p></section>' if has_map else ''
     body = f'''{hero}{facts_html}
 <div class="tv-wrap tv-layout">
-<details class="tv-toc" open><summary>On this page</summary><nav class="tv-toc-links" aria-label="On this page"><a href="#overview">Overview</a>{'<a href="#best">Best things</a>' if hl else ''}{'<a href="#plan">Plan your trip</a>' if a.get('climate') or a.get('itin') or a.get('air') else ''}{'<a href="#food">Food</a>' if any(s['h']=='Eat' for s in a['secs']) else ''}{'<a href="#photos">Photos</a>' if gal else ''}{'<a href="#inside">Places inside</a>' if kids else ''}{'<a href="#map">Map</a>' if mapsec else ''}{''.join(toc)}{'<a href="#nearby">Nearby</a>' if near else ''}<a href="#journal">My experience</a></nav></details>
+<details class="tv-toc" open><summary>On this page</summary><nav class="tv-toc-links" aria-label="On this page"><a href="#overview">Overview</a>{'<a href="#best">Best things</a>' if hl else ''}{'<a href="#plan">Plan your trip</a>' if a.get('climate') or a.get('itin') or a.get('air') else ''}{'<a href="#food">Food for you</a>' if food_block else ''}{'<a href="#photos">Photos</a>' if gal else ''}{'<a href="#inside">Places inside</a>' if kids else ''}{'<a href="#map">Map</a>' if mapsec else ''}{''.join(toc)}{'<a href="#nearby">Nearby</a>' if near else ''}<a href="#journal">My experience</a></nav></details>
 <article class="tv-main">
 {saved_html(t, a)}<section id="overview"><h2 class="tv-vh">Overview</h2>{lead}<p class="tv-counts">{esc(' · '.join(cnt))}</p>
 <p class="tv-fresh">Updated from Wikivoyage on {DUMP_TXT} · <a href="{wv_edit(t)}" target="_blank" rel="noopener">Something wrong or missing? Improve it on Wikivoyage</a></p>{thin}</section>
 {hl}
 {plan_html(a)}
-{food_html(a)}
+{food_block}
 {gal}
 {kids}
 {mapsec}
@@ -571,6 +598,8 @@ def home_page():
 <div class="tv-stats"><div><b>{len(P):,}</b>places</div><div><b>{n_list:,}</b>things to see, do, eat & stay</div><div><b id="tv-my-visited">0</b>places I've visited</div><div><b id="tv-my-states">0</b>states I've visited</div></div>
 </section>
 <div class="tv-wrap">
+<section class="tv-section" id="eat"><h2>Eat your way</h2><p class="tv-dim">Vegan, vegetarian, eggs-only, pescatarian or chicken-and-fish only? Pick once and every guide ranks its restaurants for you. Choose several for a mixed group.</p>
+<div class="tv-card"><div class="tv-dietpick"></div><p style="margin:10px 0 0"><a class="tv-btn" href="/travel/food/">Open the food finder</a></p></div></section>
 <section class="tv-section" id="countries"><h2>Countries</h2><div class="tv-countries">
 <a class="tv-country is-live" href="#states"><span class="tv-flag">🇺🇸</span><span><b>United States</b><small>{len(P):,} places · all 50 states</small></span><span class="tv-pill">Live</span></a>
 {"".join(f'<div class="tv-country"><span class="tv-flag">{f}</span><span><b>{n}</b><small>Coming soon</small></span></div>' for f, n in COMING)}
@@ -682,6 +711,68 @@ def build_redirects():
         + ''.join(f'<url><loc>{u}</loc><lastmod>{META["dump"]}</lastmod></url>\n' for u in urls) + '</urlset>\n')
 
 
+FOOD_BODY = '''<div class="tv-wrap"><h1 style="margin-top:32px">Food finder</h1>
+<p class="tv-dim">Every place to eat and drink in the guide, ranked for your diet. Your choice is remembered on every page.</p>
+<div class="tv-card"><div class="tv-dietpick"></div>
+<div class="tv-ffrow"><label>Cuisine<select id="fcu" class="tv-field"><option value="">Any cuisine</option>{cus}</select></label>
+<label>Where<select id="fst" class="tv-field"><option value="">Choose a state…</option></select></label>
+<label>Price<select id="fpr" class="tv-field"><option value="">Any</option><option value="1">$ Budget</option><option value="2">$$ Mid-range</option><option value="3">$$$ Splurge</option></select></label>
+<label>Name<input id="fq" class="tv-field" type="search" placeholder="Optional"></label>
+<button class="tv-btn tv-ghost" id="fnear" type="button">📍 Near me</button></div>
+<label class="tv-chk"><input type="checkbox" id="fconf"> Only confirmed options (hide “likely” and “limited”)</label></div>
+<p id="fstatus" class="tv-dim" aria-live="polite">Choose a state, or use Near me.</p>
+<div id="fres" class="tv-fres"></div><p style="text-align:center"><button class="tv-btn tv-ghost" id="fmore" hidden>Show more</button></p></div>
+<script>
+document.addEventListener('DOMContentLoaded',function(){{
+var P=new URLSearchParams(location.search),cache={{}},center=null,shown=40,st=document.getElementById('fst'),res=document.getElementById('fres'),stat=document.getElementById('fstatus'),more=document.getElementById('fmore');
+function d(a,b,c,e){{var r=Math.PI/180,x=Math.sin((c-a)*r/2),y=Math.sin((e-b)*r/2);return 7918*Math.asin(Math.sqrt(x*x+Math.cos(a*r)*Math.cos(c*r)*y*y))}}
+function loadSt(s){{if(cache[s])return Promise.resolve(cache[s]);return fetch('/travel/assets/food/'+s+'.json').then(function(r){{return r.json()}}).then(function(j){{cache[s]=j;return j}})}}
+var IDX=null;
+function statesNear(c,list){{var s={{}};list.forEach(function(r){{if(r.la!=null&&d(c[0],c[1],r.la,r.lo)<60)s[r.st]=1}});return Object.keys(s)}}
+function run(){{var v=tvDiet.get(),cu=document.getElementById('fcu').value,pr=+document.getElementById('fpr').value,q=document.getElementById('fq').value.trim().toLowerCase(),conf=document.getElementById('fconf').checked;
+ var states=center?statesNear(center,IDX):(st.value?[st.value]:[]);if(!states.length){{stat.textContent=center?'Nothing in the guide within 60 miles.':'Choose a state, or use Near me.';res.innerHTML='';more.hidden=true;return}}
+ stat.textContent='Loading…';Promise.all(states.map(loadSt)).then(function(arrs){{var rows=[];arrs.forEach(function(a){{a.forEach(function(e){{
+  if(cu&&e[3].split('|').indexOf(cu)<0)return;if(pr&&e[5]!==pr)return;if(q&&(e[0]+' '+e[2]).toLowerCase().indexOf(q)<0)return;
+  var sc=tvScore(e[4],v);if(sc<(conf?3:1))return;var dist=center&&e[6]!=null?d(center[0],center[1],e[6],e[7]):null;if(center&&(dist==null||dist>40))return;rows.push([sc,dist,e])}})}});
+  rows.sort(function(a,b){{return (b[0]-a[0])||((a[1]==null?1e9:a[1])-(b[1]==null?1e9:b[1]))}});
+  stat.innerHTML='<b>'+rows.length.toLocaleString()+'</b> places'+(v.d.length?' for your diet':'')+(center?' within 40 miles':'');
+  res.innerHTML=rows.slice(0,shown).map(function(r){{var e=r[2],qq=e[0]+', '+(e[9]?e[9]+', ':'')+e[2];return '<div class="tv-frow"><div><a href="/travel/'+e[1]+'/#'+e[8]+'"><b>'+tvEsc(e[0])+'</b></a> <span class="tv-dim">'+tvEsc(e[3].replace(/\|/g,' · '))+(e[5]?' · '+'$'.repeat(e[5]):'')+'</span>'+(v.d.length?' <span class="tv-lv tv-lv'+r[0]+'">'+(tvDiet.LVTXT[r[0]]||'')+'</span>':'')+'<br><span class="tv-dim">'+tvEsc(e[2])+(r[1]!=null?' · '+Math.round(r[1])+' mi':'')+'</span></div><a class="tv-btn tv-btn-sm tv-maps" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(qq)+'" data-q="'+tvEsc(qq)+'"'+(e[6]!=null?' data-ll="'+e[6]+','+e[7]+'"':'')+' target="_blank" rel="noopener">Maps</a></div>'}}).join('')||'<div class="tv-noresults">No matches. Loosen a filter, or use the live links on a place page to search Google Maps, Yelp or HappyCow.</div>';
+  more.hidden=rows.length<=shown}})}}
+['fcu','fpr','fconf'].forEach(function(id){{document.getElementById(id).addEventListener('change',function(){{shown=40;run()}})}});
+document.getElementById('fq').addEventListener('input',function(){{shown=40;run()}});
+st.addEventListener('change',function(){{center=null;shown=40;run()}});
+more.addEventListener('click',function(){{shown+=40;run()}});
+document.addEventListener('tv-diet',function(){{shown=40;run()}});
+document.getElementById('fnear').addEventListener('click',function(){{var b=this;b.textContent='Locating…';navigator.geolocation.getCurrentPosition(function(p){{center=[p.coords.latitude,p.coords.longitude];st.value='';b.textContent='📍 Near me';run()}},function(){{b.textContent='Location blocked'}})}});
+tvIndex().then(function(l){{IDX=l;Object.keys(l.states).filter(function(k){{return k!=='US'}}).sort(function(a,b){{return l.states[a]<l.states[b]?-1:1}}).forEach(function(k){{var o=document.createElement('option');o.value=k;o.textContent=l.states[k];st.appendChild(o)}});
+ var near=P.get('near'),inp=P.get('in');
+ if(near&&near.split(',')[0]){{center=near.split(',').map(Number)}}
+ else if(inp){{var r=l.filter(function(x){{return x.s===inp}})[0];if(r){{if(r.la!=null)center=[r.la,r.lo];else st.value=r.st}}}}
+ if(P.get('st'))st.value=P.get('st');run()}});
+}});
+</script>'''
+
+
+def build_food():
+    from food import CUISINES
+    by = {}
+    for t, a in P.items():
+        for s in a['secs']:
+            for b in s['b']:
+                L = b.get('L')
+                if not L or 'dt' not in L: continue
+                la, lo = (L.get('lat'), L.get('lon')) if L.get('lat') and L.get('lon') else (a.get('lat'), a.get('lon'))
+                by.setdefault(a['st'], []).append([L['n'], a['slug'], place_name(t) + ', ' + STATE_NAME.get(a['st'], ''), '|'.join(L['cu']),
+                    ' '.join(k + ':' + v for k, v in L['dt'].items()), L.get('tier', 0),
+                    round(la, 4) if la is not None else None, round(lo, 4) if lo is not None else None, lid(L), L.get('addr', '')[:80]])
+    os.makedirs(os.path.join(OUT, 'assets', 'food'), exist_ok=True)
+    for st, rows in by.items():
+        open(os.path.join(OUT, 'assets', 'food', st + '.json'), 'w', encoding='utf-8').write(json.dumps(rows, separators=(',', ':'), ensure_ascii=False))
+    cus = ''.join(f'<option>{esc(l)}</option>' for l, _ in CUISINES) + '<option>Bar / Café</option>'
+    write('food/index.html', page('Food finder: vegan, vegetarian, halal and more — Travel', 'Find places to eat that suit your diet, by cuisine, state or distance.',
+                                  FOOD_BODY.replace('{cus}', cus).replace('{{', '{').replace('}}', '}'), 'food', canon='/travel/food/'))
+
+
 def build_hubs():
     os.makedirs(os.path.join(OUT, 'assets'), exist_ok=True)
     open(os.path.join(OUT, 'assets', 'index.json'), 'w', encoding='utf-8').write(index_json())
@@ -702,6 +793,7 @@ if __name__ == '__main__':
         write(a['slug'] + '/index.html', place_page(t, a))
     build_hubs()
     build_redirects()
+    build_food()
     print('pages done')
 
 
