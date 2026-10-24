@@ -520,6 +520,16 @@
   }
   document.addEventListener('click', function (e) { if (e.target.closest('.tv-sethome')) { e.preventDefault(); openHomeDialog(); } });
   paintHome();
+
+  // ---------- saved Instagram reels: nothing from Instagram loads until the visitor taps play ----------
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.tv-reel'); if (!b) return;
+    var box = b.nextElementSibling; if (!box) return;
+    box.innerHTML = '<blockquote class="instagram-media" data-instgrm-permalink="' + b.dataset.url + '" data-instgrm-version="14" style="max-width:420px;width:100%;margin:10px 0"></blockquote>';
+    b.remove();
+    if (window.instgrm) window.instgrm.Embeds.process();
+    else if (!document.getElementById('ig-embed')) { var sc = document.createElement('script'); sc.id = 'ig-embed'; sc.async = true; sc.src = 'https://www.instagram.com/embed.js'; document.body.appendChild(sc); }
+  });
 })();
 
   // ---------- food for every diet ----------
@@ -702,4 +712,14 @@
   }
   document.addEventListener('click', function (e) { if (e.target.closest('.tv-sethome')) { e.preventDefault(); openHomeDialog(); } });
   paintHome();
+
+  // ---------- saved Instagram reels: nothing from Instagram loads until the visitor taps play ----------
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.tv-reel'); if (!b) return;
+    var box = b.nextElementSibling; if (!box) return;
+    box.innerHTML = '<blockquote class="instagram-media" data-instgrm-permalink="' + b.dataset.url + '" data-instgrm-version="14" style="max-width:420px;width:100%;margin:10px 0"></blockquote>';
+    b.remove();
+    if (window.instgrm) window.instgrm.Embeds.process();
+    else if (!document.getElementById('ig-embed')) { var sc = document.createElement('script'); sc.id = 'ig-embed'; sc.async = true; sc.src = 'https://www.instagram.com/embed.js'; document.body.appendChild(sc); }
+  });
 })();

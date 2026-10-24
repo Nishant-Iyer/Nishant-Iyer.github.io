@@ -27,7 +27,7 @@ def nearby(t, a, k=8, maxmi=80):
         if tt in skip or '/' in tt and tt.split('/')[0] == t.split('/')[0]: continue
         out.append((tt, round(float(d[i]))))
     return out
-VER = '7'
+VER = '8'
 from saved import SAVED
 
 STATE_NAME = {'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California', 'CO': 'Colorado', 'CT': 'Connecticut',
@@ -223,6 +223,13 @@ def listing_html(L, a, show_kind=False):
         meta.append(f'<span class="tv-checked{" tv-old" if old else ""}" title="When a Wikivoyage editor last checked this listing">{"⚠ Last checked " if old else "Checked "}{MON[m - 1]} {y}{" — confirm before you go" if old else ""}</span>')
     links = [maps_link(maps_q(L, a), (L.get('lat'), L.get('lon')) if L.get('lat') and L.get('lon') else None, 'Maps')]
     if L.get('url'): links.append(f'<a class="tv-btn tv-btn-sm tv-ghost" href="{esc(L["url"])}" target="_blank" rel="nofollow noopener">Website</a>')
+    vids = ''
+    if L.get('k') in ('eat', 'drink') and L.get('n'):
+        q = L['n'] + ' ' + city_ctx(a).split(',')[0]
+        vids = ('<div class="tv-vids"><span class="tv-dim">Video reviews:</span> '
+                f'<a href="https://www.google.com/search?q={quote_plus("site:instagram.com/reel " + chr(34) + L["n"] + chr(34) + " " + city_ctx(a).split(",")[0])}" target="_blank" rel="noopener">Instagram reels</a> · '
+                f'<a href="https://www.tiktok.com/search?q={quote_plus(q)}" target="_blank" rel="noopener">TikTok</a> · '
+                f'<a href="https://www.youtube.com/results?search_query={quote_plus(q + " food review")}" target="_blank" rel="noopener">YouTube</a></div>')
     photo = ''
     if L.get('img') and not L['img'].lower().endswith(('.svg', '.pdf')):
         photo = f'<a class="tv-lthumb" href="{filepage(L["img"])}" data-lb="{commons(L["img"], 1280)}" data-cap="{esc(L.get("n", ""))}">{img(L["img"], 330, L.get("n", ""))}</a>'
@@ -245,7 +252,7 @@ def listing_html(L, a, show_kind=False):
     return (f'<article class="tv-listing tv-k-{k}"{data} data-name="{esc(L.get("n", ""))}" data-kind="{k}">{photo}<div class="tv-lbody">'
             f'<h4><span class="tv-kind">{kl}</span> {esc(L.get("n", ""))}{alt}</h4>{badges}'
             + (f'<p>{L["c"]}</p>' if L.get('c') else '') + (f'<div class="tv-meta">{"".join(meta)}</div>' if meta else '')
-            + f'<div class="tv-acts">{"".join(links)}<button class="tv-btn tv-btn-sm tv-ghost tv-want" type="button" data-item="{esc(L.get("n", ""))}">☆ Want to go</button></div></div></article>')
+            + vids + f'<div class="tv-acts">{"".join(links)}<button class="tv-btn tv-btn-sm tv-ghost tv-want" type="button" data-item="{esc(L.get("n", ""))}">☆ Want to go</button></div></div></article>')
 
 
 def blocks_html(bl, a):
@@ -422,7 +429,8 @@ def saved_html(t, a):
     lab = {'food': 'Eat', 'stay': 'Stay', 'place': 'See'}
     items = ''.join(f'<li><span class="tv-kind">{lab[x["k"]]}</span> <b>{esc(x["n"])}</b> — {esc(x["note"])} · '
                     + maps_link(x['n'] + ', ' + city_ctx(a), None, 'Open in Maps', 'tv-link') + ' · '
-                    + f'<a href="{x["url"]}" target="_blank" rel="noopener">Instagram post</a></li>' for x in sv)
+                    + f'<a href="{x["url"]}" target="_blank" rel="noopener">Instagram post</a>'
+                    + f' <button type="button" class="tv-btn tv-btn-sm tv-ghost tv-reel" data-url="{x["url"]}">▶ Watch here</button><div class="tv-reelbox"></div></li>' for x in sv)
     return f'<aside class="tv-saved-box"><strong>★ On my list from Instagram</strong><ul>{items}</ul></aside>'
 
 

@@ -280,3 +280,5 @@ p{margin:0 0 1em}
 button.tv-link{background:none;border:0;padding:0;color:var(--link);font:inherit;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .tv-facts-bar button.tv-link{font-family:var(--font-display)}
 @media (max-width:600px){.tv-homebox{top:12px!important;bottom:auto}}
+.tv-vids{font-size:.85rem;margin:-2px 0 8px}.tv-vids a{font-weight:600}
+.tv-reelbox:empty{display:none}

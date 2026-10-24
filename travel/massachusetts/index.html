@@ -14,7 +14,7 @@ window.tvImgErr=function(im){if(!im.dataset.tried&&im.dataset.full){im.dataset.t
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
 <link rel="stylesheet" href="/style.css?v=6">
-<link rel="stylesheet" href="/travel/assets/travel.css?v=7">
+<link rel="stylesheet" href="/travel/assets/travel.css?v=8">
 
 </head>
 <body data-page="place">
@@ -174,6 +174,6 @@ window.tvImgErr=function(im){if(!im.dataset.tried&&im.dataset.full){im.dataset.t
   </div>
 </footer>
 <script src="/script.js?v=4" defer></script>
-<script src="/travel/assets/travel.js?v=7" defer></script>
+<script src="/travel/assets/travel.js?v=8" defer></script>
 <script>document.querySelectorAll('[data-filter]').forEach(function(c){c.addEventListener('click',function(e){var b=e.target.closest('.tv-chip');if(!b)return;c.querySelectorAll('.tv-chip').forEach(function(x){x.classList.toggle('on',x===b)});var ty=b.dataset.ty;c.nextElementSibling.querySelectorAll('.tv-pc').forEach(function(p){p.style.display=!ty||p.dataset.ty===ty?'':'none'})})});</script>
 </body></html>
