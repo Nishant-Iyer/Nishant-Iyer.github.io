@@ -5,3 +5,5 @@ LICENSE
 tools
 .github
 travel.new
+.git
+.wrangler
