@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Food finder: vegan, vegetarian, halal and more — Travel</title>
+<meta name="description" content="Find places to eat that suit your diet, by cuisine, state or distance.">
+<meta name="theme-color" content="#0a0e14" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f6f8fa" media="(prefers-color-scheme: light)">
+<meta property="og:title" content="Food finder: vegan, vegetarian, halal and more — Travel"><meta property="og:description" content="Find places to eat that suit your diet, by cuisine, state or distance."><link rel="canonical" href="https://travel.konnectingnots.com/travel/food/">
+<link rel="icon" type="image/svg+xml" href="/travel/assets/favicon.svg">
+<script>(function(){var t=null;try{t=localStorage.getItem('theme')}catch(e){}if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);})();
+window.tvImgErr=function(im){if(!im.dataset.tried&&im.dataset.full){im.dataset.tried=1;im.src=im.dataset.full;return}var a=im.closest('.tv-lthumb');if(a){a.remove();return}im.style.visibility='hidden'};</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
+<link rel="stylesheet" href="/style.css?v=6">
+<link rel="stylesheet" href="/travel/assets/travel.css?v=6">
+
+</head>
+<body data-page="food">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <nav class="nav wrap tv-navbar" aria-label="Main">
+    <a class="tv-logo" href="/travel/" aria-label="Travel, home"><svg class="tv-mark" viewBox="0 0 40 40" width="30" height="30" aria-hidden="true"><defs><linearGradient id="tvg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--cyan)"/><stop offset="1" style="stop-color:var(--violet)"/></linearGradient></defs><g fill="none" stroke="url(#tvg)" stroke-width="2.6" stroke-linecap="round"><circle cx="20" cy="21" r="11"/><ellipse cx="20" cy="21" rx="4.6" ry="11"/><path d="M9 21h22"/><path d="M4 11.5C12 4 26 3.5 35 11" stroke-dasharray="1 4"/></g><path d="M36.5 9.5l-4 .3 2.2 3z" style="fill:var(--violet)"/></svg><span>Travel</span></a>
+    <form class="tv-search" action="/travel/search/" role="search"><input type="search" name="q" placeholder="Search 6,500+ places" aria-label="Search places" autocomplete="off"><div class="tv-sugg" hidden></div></form>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="/travel/food/">Food</a></li>
+      <li><a href="/travel/states/">States</a></li>
+      <li><a href="/travel/map/">Map</a></li>
+      <li><a href="/travel/journal/">My journal</a></li>
+    </ul>
+    <button class="theme-toggle" type="button" aria-label="Switch theme">
+      <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+    </button>
+  </nav>
+</header>
+<main id="main">
+<div class="tv-wrap"><h1 style="margin-top:32px">Food finder</h1>
+<p class="tv-dim">Every place to eat and drink in the guide, ranked for your diet. Your choice is remembered on every page.</p>
+<div class="tv-card"><div class="tv-dietpick"></div>
+<div class="tv-ffrow"><label>Cuisine<select id="fcu" class="tv-field"><option value="">Any cuisine</option><option>Indian</option><option>Nepali / Himalayan</option><option>Pakistani / Afghan</option><option>Chinese</option><option>Japanese</option><option>Korean</option><option>Thai</option><option>Vietnamese</option><option>Filipino</option><option>Asian</option><option>Middle Eastern</option><option>Mediterranean / Greek</option><option>Ethiopian / African</option><option>Mexican</option><option>Latin American</option><option>Italian</option><option>Pizza</option><option>French</option><option>Spanish / Tapas</option><option>German / European</option><option>Seafood</option><option>Steakhouse</option><option>BBQ</option><option>Burgers</option><option>Chicken</option><option>Southern / Soul</option><option>American</option><option>Breakfast / Brunch</option><option>Bakery / Café</option><option>Dessert / Ice cream</option><option>Vegan / Vegetarian</option><option>Hawaiian</option><option>Bar / Café</option></select></label>
+<label>Where<select id="fst" class="tv-field"><option value="">Choose a state…</option></select></label>
+<label>Price<select id="fpr" class="tv-field"><option value="">Any</option><option value="1">$ Budget</option><option value="2">$$ Mid-range</option><option value="3">$$$ Splurge</option></select></label>
+<label>Name<input id="fq" class="tv-field" type="search" placeholder="Optional"></label>
+<button class="tv-btn tv-ghost" id="fnear" type="button">📍 Near me</button></div>
+<label class="tv-chk"><input type="checkbox" id="fconf"> Only confirmed options (hide “likely” and “limited”)</label></div>
+<p id="fstatus" class="tv-dim" aria-live="polite">Choose a state, or use Near me.</p>
+<div id="fres" class="tv-fres"></div><p style="text-align:center"><button class="tv-btn tv-ghost" id="fmore" hidden>Show more</button></p></div>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+var P=new URLSearchParams(location.search),cache={},center=null,shown=40,st=document.getElementById('fst'),res=document.getElementById('fres'),stat=document.getElementById('fstatus'),more=document.getElementById('fmore');
+function d(a,b,c,e){var r=Math.PI/180,x=Math.sin((c-a)*r/2),y=Math.sin((e-b)*r/2);return 7918*Math.asin(Math.sqrt(x*x+Math.cos(a*r)*Math.cos(c*r)*y*y))}
+function loadSt(s){if(cache[s])return Promise.resolve(cache[s]);return fetch('/travel/assets/food/'+s+'.json').then(function(r){return r.json()}).then(function(j){cache[s]=j;return j})}
+var IDX=null;
+function statesNear(c,list){var s={};list.forEach(function(r){if(r.la!=null&&d(c[0],c[1],r.la,r.lo)<60)s[r.st]=1});return Object.keys(s)}
+function run(){var v=tvDiet.get(),cu=document.getElementById('fcu').value,pr=+document.getElementById('fpr').value,q=document.getElementById('fq').value.trim().toLowerCase(),conf=document.getElementById('fconf').checked;
+ var states=center?statesNear(center,IDX):(st.value?[st.value]:[]);if(!states.length){stat.textContent=center?'Nothing in the guide within 60 miles.':'Choose a state, or use Near me.';res.innerHTML='';more.hidden=true;return}
+ stat.textContent='Loading…';Promise.all(states.map(loadSt)).then(function(arrs){var rows=[];arrs.forEach(function(a){a.forEach(function(e){
+  if(cu&&e[3].split('|').indexOf(cu)<0)return;if(pr&&e[5]!==pr)return;if(q&&(e[0]+' '+e[2]).toLowerCase().indexOf(q)<0)return;
+  var sc=tvScore(e[4],v);if(sc<(conf?3:1))return;var dist=center&&e[6]!=null?d(center[0],center[1],e[6],e[7]):null;if(center&&(dist==null||dist>40))return;rows.push([sc,dist,e])})});
+  rows.sort(function(a,b){return (b[0]-a[0])||((a[1]==null?1e9:a[1])-(b[1]==null?1e9:b[1]))});
+  stat.innerHTML='<b>'+rows.length.toLocaleString()+'</b> places'+(v.d.length?' for your diet':'')+(center?' within 40 miles':'');
+  res.innerHTML=rows.slice(0,shown).map(function(r){var e=r[2],qq=e[0]+', '+(e[9]?e[9]+', ':'')+e[2];return '<div class="tv-frow"><div><a href="/travel/'+e[1]+'/#'+e[8]+'"><b>'+tvEsc(e[0])+'</b></a> <span class="tv-dim">'+tvEsc(e[3].replace(/\|/g,' · '))+(e[5]?' · '+'$'.repeat(e[5]):'')+'</span>'+(v.d.length?' <span class="tv-lv tv-lv'+r[0]+'">'+(tvDiet.LVTXT[r[0]]||'')+'</span>':'')+'<br><span class="tv-dim">'+tvEsc(e[2])+(r[1]!=null?' · '+Math.round(r[1])+' mi':'')+'</span></div><a class="tv-btn tv-btn-sm tv-maps" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(qq)+'" data-q="'+tvEsc(qq)+'"'+(e[6]!=null?' data-ll="'+e[6]+','+e[7]+'"':'')+' target="_blank" rel="noopener">Maps</a></div>'}).join('')||'<div class="tv-noresults">No matches. Loosen a filter, or use the live links on a place page to search Google Maps, Yelp or HappyCow.</div>';
+  more.hidden=rows.length<=shown})}
+['fcu','fpr','fconf'].forEach(function(id){document.getElementById(id).addEventListener('change',function(){shown=40;run()})});
+document.getElementById('fq').addEventListener('input',function(){shown=40;run()});
+st.addEventListener('change',function(){center=null;shown=40;run()});
+more.addEventListener('click',function(){shown+=40;run()});
+document.addEventListener('tv-diet',function(){shown=40;run()});
+document.getElementById('fnear').addEventListener('click',function(){var b=this;b.textContent='Locating…';navigator.geolocation.getCurrentPosition(function(p){center=[p.coords.latitude,p.coords.longitude];st.value='';b.textContent='📍 Near me';run()},function(){b.textContent='Location blocked'})});
+tvIndex().then(function(l){IDX=l;Object.keys(l.states).filter(function(k){return k!=='US'}).sort(function(a,b){return l.states[a]<l.states[b]?-1:1}).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=l.states[k];st.appendChild(o)});
+ var near=P.get('near'),inp=P.get('in');
+ if(near&&near.split(',')[0]){center=near.split(',').map(Number)}
+ else if(inp){var r=l.filter(function(x){return x.s===inp})[0];if(r){if(r.la!=null)center=[r.la,r.lo];else st.value=r.st}}
+ if(P.get('st'))st.value=P.get('st');run()});
+});
+</script></main>
+<footer class="site-footer">
+  <div class="wrap tv-foot-notes"><p>Your journal is saved in this browser. Back it up from <a href="/travel/journal/">My journal</a>. <span class="tv-mappref"></span></p></div>
+  <div class="wrap footer-inner">
+    <p>&copy; <span id="year">2026</span> Nishant Iyer · <a href="/travel/">Travel</a></p>
+    <ul class="social">
+      <li><a href="https://www.konnectingnots.com/">Portfolio</a></li>
+      <li><a href="mailto:contact@konnectingnots.com">contact@konnectingnots.com</a></li>
+      <li><a href="https://linkedin.com/in/nishantiyer" target="_blank" rel="noopener">LinkedIn</a></li>
+      <li><a href="https://github.com/Nishant-Iyer" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/script.js?v=4" defer></script>
+<script src="/travel/assets/travel.js?v=6" defer></script>
+
+</body></html>

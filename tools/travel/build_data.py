@@ -2,6 +2,7 @@ import pickle, re, json, math, csv, statistics, unicodedata, os, sys, hashlib
 from collections import defaultdict
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from wiki import parse_article
+from food import classify, price_tier
 
 arts, red = pickle.load(open('raw/arts.pkl', 'rb'))
 us, par = pickle.load(open('raw/us.pkl', 'rb'))
@@ -295,7 +296,22 @@ def all_listings(a):
     return out
 
 index = []
+FOOD = []
 for t, a in places.items():
+    # food: cuisine + diet suitability for every eat/drink listing
+    fc = {}; fd = {}
+    for s in a['secs']:
+        h3 = ''
+        for b in s['b']:
+            if 'h3' in b: h3 = b['h3']
+            L = b.get('L')
+            if L and L.get('k') in ('eat', 'drink') and L.get('n'):
+                L['cu'], L['dt'] = classify(L)
+                L['tier'] = price_tier(L, h3)
+                for c in L['cu']: fc[c] = fc.get(c, 0) + 1
+                for k, v in L['dt'].items():
+                    if v in ('only', 'yes'): fd[k] = fd.get(k, 0) + 1
+    a['food'] = {'cu': sorted(fc.items(), key=lambda x: -x[1]), 'dt': fd}
     ls = all_listings(a)
     a['n'] = {k: len(v) for k, v in ls.items()}
     if a.get('lat') is not None:

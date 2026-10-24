@@ -339,5 +339,207 @@
       Object.keys(al).forEach(function (o) { if (cur[o] && !cur[al[o]]) { cur[al[o]] = cur[o]; delete cur[o]; moved++; } });
       if (moved) save(cur);
     }).catch(function () {});
-  })();
+  
+  // ---------- food for every diet ----------
+  var DIETS = [['vegan', 'Vegan'], ['veg', 'Vegetarian'], ['egg', 'Vegetarian + eggs'], ['fish', 'Pescatarian'], ['cf', 'Chicken & fish only']];
+  var EXTRAS = [['halal', 'Halal'], ['kosher', 'Kosher'], ['gf', 'Gluten-free']];
+  var LV = { only: 4, yes: 3, likely: 2, limited: 1, no: -1 };
+  var LVTXT = { 4: 'Dedicated', 3: 'Confirmed options', 2: 'Likely good options', 1: 'Limited options' };
+  var PHRASE = { vegan: 'vegan', veg: 'vegetarian', egg: 'vegetarian', fish: 'seafood', cf: 'chicken', halal: 'halal', kosher: 'kosher', gf: 'gluten free' };
+  var TIPS = {
+    vegan: ['Ask whether beans, rice or tortillas are cooked with lard or chicken stock (common in Mexican and Southern cooking).', 'Thai and Vietnamese dishes often use fish sauce; ask for soy sauce instead.', 'Naan and many Indian curries use ghee, butter, cream or yogurt; chana masala and aloo gobi are often vegan if made with oil.', 'Ethiopian veggie combos (shiro, misir, gomen) are usually vegan.'],
+    veg: ['Ask whether soups, rice and sauces use chicken or beef stock.', 'Caesar dressing and Worcestershire sauce contain anchovies; gelatin hides in desserts and gummies.', 'Refried beans and tamales can be made with lard.', 'Pizza, Indian, Middle Eastern and Mediterranean places almost always have real options.'],
+    egg: ['Breakfast places, diners and bakeries are easy wins: omelettes, egg sandwiches, frittatas.', 'Check sauces and soups for meat stock, as a vegetarian would.', 'Fresh pasta and many baked goods contain egg, which suits you.'],
+    fish: ['Sushi, poke, fish tacos and seafood shacks are your safest bets.', 'Ask whether soups and rice use chicken or beef stock.', 'New England clam chowder sometimes includes bacon or salt pork; ask for it without.'],
+    cf: ['Burgers, sausages, meatballs and chili are beef or pork by default; ask for chicken or turkey versions.', 'Pepperoni, sausage and bacon are the usual pizza meats; grilled chicken is usually available.', 'In the South, greens, beans and soups are often cooked with ham or bacon.', 'Gravies, stews and pho broth are often beef-based; ask before ordering.'],
+    halal: ['Many halal places are Middle Eastern, Pakistani, Afghan or Indian; ask whether the meat is zabiha.', 'Gelatin, alcohol in sauces and pork-based stocks are the usual hidden issues.'],
+    kosher: ['Certified kosher restaurants are concentrated in larger cities; look for a hechsher (certification) on the door or menu.'],
+    gf: ['Ask about shared fryers and soy sauce (contains wheat); tamari is the usual gluten-free swap.']
+  };
+  var DKEY = 'tv-diet';
+  function getDiet() { try { var v = JSON.parse(localStorage.getItem(DKEY) || 'null'); if (v && v.d) return v; } catch (e) {} return { d: [], x: [] }; }
+  function setDiet(v) { try { localStorage.setItem(DKEY, JSON.stringify(v)); } catch (e) {} document.dispatchEvent(new CustomEvent('tv-diet')); }
+  window.tvDiet = { get: getDiet, set: setDiet, DIETS: DIETS, LV: LV, LVTXT: LVTXT };
+  function parseDt(s) { var o = {}; (s || '').split(' ').forEach(function (p) { var kv = p.split(':'); if (kv[1]) o[kv[0]] = kv[1]; }); return o; }
+  function scoreFor(dt, diet) {
+    var sc = 5;
+    for (var i = 0; i < diet.d.length; i++) { var v = LV[dt[diet.d[i]]]; if (v === undefined) v = 0; sc = Math.min(sc, v); }
+    for (var j = 0; j < diet.x.length; j++) if (dt[diet.x[j]] !== 'yes') return -1;
+    return diet.d.length ? sc : (diet.x.length ? 3 : 5);
+  }
+  window.tvScore = function (dtStr, diet) { return scoreFor(parseDt(dtStr), diet); };
+  function renderPicker(box) {
+    var v = getDiet();
+    box.innerHTML = '<p class="tv-dp-q"><b>Who\'s eating?</b> Pick one, or several for a group: we\'ll show places that work for everyone.</p>' +
+      '<div class="tv-chips"><button type="button" class="tv-chip' + (v.d.length ? '' : ' on') + '" data-all>Everything</button>' +
+      DIETS.map(function (d) { return '<button type="button" class="tv-chip' + (v.d.indexOf(d[0]) >= 0 ? ' on' : '') + '" data-d="' + d[0] + '">' + d[1] + '</button>'; }).join('') +
+      '<span class="tv-dp-sep"></span>' + EXTRAS.map(function (d) { return '<button type="button" class="tv-chip tv-chip-x' + (v.x.indexOf(d[0]) >= 0 ? ' on' : '') + '" data-x="' + d[0] + '">' + d[1] + '</button>'; }).join('') + '</div>';
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.tv-dietpick .tv-chip'); if (!b) return;
+    var v = getDiet();
+    if (b.hasAttribute('data-all')) v = { d: [], x: [] };
+    else if (b.dataset.d) { var i = v.d.indexOf(b.dataset.d); if (i >= 0) v.d.splice(i, 1); else v.d.push(b.dataset.d); }
+    else if (b.dataset.x) { var k = v.x.indexOf(b.dataset.x); if (k >= 0) v.x.splice(k, 1); else v.x.push(b.dataset.x); }
+    setDiet(v);
+  });
+  function paintPickers() { document.querySelectorAll('.tv-dietpick').forEach(renderPicker); }
+  document.addEventListener('tv-diet', paintPickers);
+  paintPickers();
+
+  var FP = document.querySelector('.tv-food');
+  if (FP) {
+    var cuSel = '';
+    FP.querySelectorAll('.tv-cuchips .tv-chip').forEach(function (b) {
+      b.addEventListener('click', function () { cuSel = cuSel === b.dataset.cu ? '' : b.dataset.cu; FP.querySelectorAll('.tv-cuchips .tv-chip').forEach(function (x) { x.classList.toggle('on', x.dataset.cu === cuSel); }); paintFood(); });
+    });
+    function liveLinks(v) {
+      // a group searches for its strictest diet, plus any must-haves (halal, kosher, gluten-free)
+      var strict = ['vegan', 'veg', 'egg', 'fish', 'cf'].filter(function (k) { return v.d.indexOf(k) >= 0; })[0];
+      var loc = FP.dataset.loc, phr = (strict ? [PHRASE[strict]] : []).concat(v.x.map(function (k) { return PHRASE[k]; })).join(' ');
+      var q = (phr ? phr + ' ' : '') + (cuSel ? cuSel.split(' /')[0] + ' ' : '') + 'restaurants near ' + loc;
+      var out = '<p class="tv-dp-q"><b>See ratings and reviews</b> for “' + esc(q) + '”:</p><div class="tv-acts">' +
+        '<a class="tv-btn tv-btn-sm tv-maps" href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q) + '" data-q="' + esc(q) + '" target="_blank" rel="noopener">Maps</a>' +
+        '<a class="tv-btn tv-btn-sm tv-ghost" href="https://www.yelp.com/search?find_desc=' + encodeURIComponent((phr || '') + ' ' + (cuSel ? cuSel.split(' /')[0] : 'restaurants')) + '&find_loc=' + encodeURIComponent(loc) + '" target="_blank" rel="noopener">Yelp</a>';
+      if (v.d.indexOf('vegan') >= 0 || v.d.indexOf('veg') >= 0 || v.d.indexOf('egg') >= 0)
+        out += '<a class="tv-btn tv-btn-sm tv-ghost" href="https://www.google.com/search?q=' + encodeURIComponent('site:happycow.net ' + loc) + '" target="_blank" rel="noopener">HappyCow</a>';
+      if (v.x.indexOf('halal') >= 0 && FP.dataset.zab) out += '<a class="tv-btn tv-btn-sm tv-ghost" href="' + FP.dataset.zab + '" target="_blank" rel="noopener">Zabihah</a>';
+      return out + '</div>';
+    }
+    function paintFood() {
+      var v = getDiet(), rows = [];
+      document.querySelectorAll('.tv-listing[data-dt]').forEach(function (el) {
+        if (cuSel && (el.dataset.cu || '').split('|').indexOf(cuSel) < 0) return;
+        var sc = scoreFor(parseDt(el.dataset.dt), v);
+        if (sc >= 1) rows.push([sc, el]);
+      });
+      rows.sort(function (a, b) { return b[0] - a[0]; });
+      var conf = rows.filter(function (r) { return r[0] >= 3 && r[0] < 5; }).length;
+      var list = FP.querySelector('.tv-foodlist'), html = '';
+      if (!v.d.length && !v.x.length) html = '<p class="tv-dim">' + rows.length + ' places to eat and drink' + (cuSel ? ' (' + esc(cuSel) + ')' : '') + ' in this guide. Pick a diet above to rank them for you.</p>';
+      else html = '<p><b>' + rows.length + '</b> place' + (rows.length === 1 ? '' : 's') + ' could work' + (conf ? ', <b>' + conf + '</b> with confirmed options' : '') + '.</p>';
+      html += '<ol class="tv-frows">' + rows.slice(0, 8).map(function (r) {
+        var el = r[1], m = el.querySelector('.tv-maps'), tier = +el.dataset.tier;
+        return '<li><a href="#' + el.id + '"><b>' + esc(el.dataset.name) + '</b></a> <span class="tv-dim">' + esc((el.dataset.cu || '').replace(/\|/g, ' · ')) + (tier ? ' · ' + '$'.repeat(tier) : '') + '</span>' +
+          (v.d.length ? ' <span class="tv-lv tv-lv' + r[0] + '">' + (LVTXT[r[0]] || '') + '</span>' : '') + (m ? ' ' + m.outerHTML.replace('tv-btn tv-btn-sm', 'tv-link').replace(/<svg.*?<\/svg>/, '') : '') + '</li>';
+      }).join('') + '</ol>';
+      if ((v.d.length || v.x.length) && rows.filter(function (r) { return r[0] >= 2; }).length < 3)
+        html += '<aside class="tv-box"><strong>Few good matches in this guide.</strong><p>Try the live links below, or <a href="/travel/food/?near=' + FP.dataset.ll + '">find matches within 40 miles</a> in the food finder.</p></aside>';
+      list.innerHTML = html;
+      FP.querySelector('.tv-foodlive').innerHTML = liveLinks(v);
+      var keys = v.d.concat(v.x), tips = [];
+      keys.forEach(function (k) { (TIPS[k] || []).forEach(function (t) { if (tips.indexOf(t) < 0) tips.push(t); }); });
+      var td = FP.querySelector('.tv-foodtips');
+      td.hidden = !tips.length; td.querySelector('ul').innerHTML = tips.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('');
+      // mark matching listings in the Eat/Drink sections
+      document.querySelectorAll('.tv-listing[data-dt]').forEach(function (el) {
+        var sc = scoreFor(parseDt(el.dataset.dt), v), on = (v.d.length || v.x.length);
+        el.classList.toggle('tv-fit', !!on && sc >= 3); el.classList.toggle('tv-unfit', !!on && sc < 1);
+      });
+    }
+    document.addEventListener('tv-diet', paintFood);
+    paintFood();
+  }
+})();
+
+  // ---------- food for every diet ----------
+  var DIETS = [['vegan', 'Vegan'], ['veg', 'Vegetarian'], ['egg', 'Vegetarian + eggs'], ['fish', 'Pescatarian'], ['cf', 'Chicken & fish only']];
+  var EXTRAS = [['halal', 'Halal'], ['kosher', 'Kosher'], ['gf', 'Gluten-free']];
+  var LV = { only: 4, yes: 3, likely: 2, limited: 1, no: -1 };
+  var LVTXT = { 4: 'Dedicated', 3: 'Confirmed options', 2: 'Likely good options', 1: 'Limited options' };
+  var PHRASE = { vegan: 'vegan', veg: 'vegetarian', egg: 'vegetarian', fish: 'seafood', cf: 'chicken', halal: 'halal', kosher: 'kosher', gf: 'gluten free' };
+  var TIPS = {
+    vegan: ['Ask whether beans, rice or tortillas are cooked with lard or chicken stock (common in Mexican and Southern cooking).', 'Thai and Vietnamese dishes often use fish sauce; ask for soy sauce instead.', 'Naan and many Indian curries use ghee, butter, cream or yogurt; chana masala and aloo gobi are often vegan if made with oil.', 'Ethiopian veggie combos (shiro, misir, gomen) are usually vegan.'],
+    veg: ['Ask whether soups, rice and sauces use chicken or beef stock.', 'Caesar dressing and Worcestershire sauce contain anchovies; gelatin hides in desserts and gummies.', 'Refried beans and tamales can be made with lard.', 'Pizza, Indian, Middle Eastern and Mediterranean places almost always have real options.'],
+    egg: ['Breakfast places, diners and bakeries are easy wins: omelettes, egg sandwiches, frittatas.', 'Check sauces and soups for meat stock, as a vegetarian would.', 'Fresh pasta and many baked goods contain egg, which suits you.'],
+    fish: ['Sushi, poke, fish tacos and seafood shacks are your safest bets.', 'Ask whether soups and rice use chicken or beef stock.', 'New England clam chowder sometimes includes bacon or salt pork; ask for it without.'],
+    cf: ['Burgers, sausages, meatballs and chili are beef or pork by default; ask for chicken or turkey versions.', 'Pepperoni, sausage and bacon are the usual pizza meats; grilled chicken is usually available.', 'In the South, greens, beans and soups are often cooked with ham or bacon.', 'Gravies, stews and pho broth are often beef-based; ask before ordering.'],
+    halal: ['Many halal places are Middle Eastern, Pakistani, Afghan or Indian; ask whether the meat is zabiha.', 'Gelatin, alcohol in sauces and pork-based stocks are the usual hidden issues.'],
+    kosher: ['Certified kosher restaurants are concentrated in larger cities; look for a hechsher (certification) on the door or menu.'],
+    gf: ['Ask about shared fryers and soy sauce (contains wheat); tamari is the usual gluten-free swap.']
+  };
+  var DKEY = 'tv-diet';
+  function getDiet() { try { var v = JSON.parse(localStorage.getItem(DKEY) || 'null'); if (v && v.d) return v; } catch (e) {} return { d: [], x: [] }; }
+  function setDiet(v) { try { localStorage.setItem(DKEY, JSON.stringify(v)); } catch (e) {} document.dispatchEvent(new CustomEvent('tv-diet')); }
+  window.tvDiet = { get: getDiet, set: setDiet, DIETS: DIETS, LV: LV, LVTXT: LVTXT };
+  function parseDt(s) { var o = {}; (s || '').split(' ').forEach(function (p) { var kv = p.split(':'); if (kv[1]) o[kv[0]] = kv[1]; }); return o; }
+  function scoreFor(dt, diet) {
+    var sc = 5;
+    for (var i = 0; i < diet.d.length; i++) { var v = LV[dt[diet.d[i]]]; if (v === undefined) v = 0; sc = Math.min(sc, v); }
+    for (var j = 0; j < diet.x.length; j++) if (dt[diet.x[j]] !== 'yes') return -1;
+    return diet.d.length ? sc : (diet.x.length ? 3 : 5);
+  }
+  window.tvScore = function (dtStr, diet) { return scoreFor(parseDt(dtStr), diet); };
+  function renderPicker(box) {
+    var v = getDiet();
+    box.innerHTML = '<p class="tv-dp-q"><b>Who\'s eating?</b> Pick one, or several for a group: we\'ll show places that work for everyone.</p>' +
+      '<div class="tv-chips"><button type="button" class="tv-chip' + (v.d.length ? '' : ' on') + '" data-all>Everything</button>' +
+      DIETS.map(function (d) { return '<button type="button" class="tv-chip' + (v.d.indexOf(d[0]) >= 0 ? ' on' : '') + '" data-d="' + d[0] + '">' + d[1] + '</button>'; }).join('') +
+      '<span class="tv-dp-sep"></span>' + EXTRAS.map(function (d) { return '<button type="button" class="tv-chip tv-chip-x' + (v.x.indexOf(d[0]) >= 0 ? ' on' : '') + '" data-x="' + d[0] + '">' + d[1] + '</button>'; }).join('') + '</div>';
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.tv-dietpick .tv-chip'); if (!b) return;
+    var v = getDiet();
+    if (b.hasAttribute('data-all')) v = { d: [], x: [] };
+    else if (b.dataset.d) { var i = v.d.indexOf(b.dataset.d); if (i >= 0) v.d.splice(i, 1); else v.d.push(b.dataset.d); }
+    else if (b.dataset.x) { var k = v.x.indexOf(b.dataset.x); if (k >= 0) v.x.splice(k, 1); else v.x.push(b.dataset.x); }
+    setDiet(v);
+  });
+  function paintPickers() { document.querySelectorAll('.tv-dietpick').forEach(renderPicker); }
+  document.addEventListener('tv-diet', paintPickers);
+  paintPickers();
+
+  var FP = document.querySelector('.tv-food');
+  if (FP) {
+    var cuSel = '';
+    FP.querySelectorAll('.tv-cuchips .tv-chip').forEach(function (b) {
+      b.addEventListener('click', function () { cuSel = cuSel === b.dataset.cu ? '' : b.dataset.cu; FP.querySelectorAll('.tv-cuchips .tv-chip').forEach(function (x) { x.classList.toggle('on', x.dataset.cu === cuSel); }); paintFood(); });
+    });
+    function liveLinks(v) {
+      // a group searches for its strictest diet, plus any must-haves (halal, kosher, gluten-free)
+      var strict = ['vegan', 'veg', 'egg', 'fish', 'cf'].filter(function (k) { return v.d.indexOf(k) >= 0; })[0];
+      var loc = FP.dataset.loc, phr = (strict ? [PHRASE[strict]] : []).concat(v.x.map(function (k) { return PHRASE[k]; })).join(' ');
+      var q = (phr ? phr + ' ' : '') + (cuSel ? cuSel.split(' /')[0] + ' ' : '') + 'restaurants near ' + loc;
+      var out = '<p class="tv-dp-q"><b>See ratings and reviews</b> for “' + esc(q) + '”:</p><div class="tv-acts">' +
+        '<a class="tv-btn tv-btn-sm tv-maps" href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q) + '" data-q="' + esc(q) + '" target="_blank" rel="noopener">Maps</a>' +
+        '<a class="tv-btn tv-btn-sm tv-ghost" href="https://www.yelp.com/search?find_desc=' + encodeURIComponent((phr || '') + ' ' + (cuSel ? cuSel.split(' /')[0] : 'restaurants')) + '&find_loc=' + encodeURIComponent(loc) + '" target="_blank" rel="noopener">Yelp</a>';
+      if (v.d.indexOf('vegan') >= 0 || v.d.indexOf('veg') >= 0 || v.d.indexOf('egg') >= 0)
+        out += '<a class="tv-btn tv-btn-sm tv-ghost" href="https://www.google.com/search?q=' + encodeURIComponent('site:happycow.net ' + loc) + '" target="_blank" rel="noopener">HappyCow</a>';
+      if (v.x.indexOf('halal') >= 0 && FP.dataset.zab) out += '<a class="tv-btn tv-btn-sm tv-ghost" href="' + FP.dataset.zab + '" target="_blank" rel="noopener">Zabihah</a>';
+      return out + '</div>';
+    }
+    function paintFood() {
+      var v = getDiet(), rows = [];
+      document.querySelectorAll('.tv-listing[data-dt]').forEach(function (el) {
+        if (cuSel && (el.dataset.cu || '').split('|').indexOf(cuSel) < 0) return;
+        var sc = scoreFor(parseDt(el.dataset.dt), v);
+        if (sc >= 1) rows.push([sc, el]);
+      });
+      rows.sort(function (a, b) { return b[0] - a[0]; });
+      var conf = rows.filter(function (r) { return r[0] >= 3 && r[0] < 5; }).length;
+      var list = FP.querySelector('.tv-foodlist'), html = '';
+      if (!v.d.length && !v.x.length) html = '<p class="tv-dim">' + rows.length + ' places to eat and drink' + (cuSel ? ' (' + esc(cuSel) + ')' : '') + ' in this guide. Pick a diet above to rank them for you.</p>';
+      else html = '<p><b>' + rows.length + '</b> place' + (rows.length === 1 ? '' : 's') + ' could work' + (conf ? ', <b>' + conf + '</b> with confirmed options' : '') + '.</p>';
+      html += '<ol class="tv-frows">' + rows.slice(0, 8).map(function (r) {
+        var el = r[1], m = el.querySelector('.tv-maps'), tier = +el.dataset.tier;
+        return '<li><a href="#' + el.id + '"><b>' + esc(el.dataset.name) + '</b></a> <span class="tv-dim">' + esc((el.dataset.cu || '').replace(/\|/g, ' · ')) + (tier ? ' · ' + '$'.repeat(tier) : '') + '</span>' +
+          (v.d.length ? ' <span class="tv-lv tv-lv' + r[0] + '">' + (LVTXT[r[0]] || '') + '</span>' : '') + (m ? ' ' + m.outerHTML.replace('tv-btn tv-btn-sm', 'tv-link').replace(/<svg.*?<\/svg>/, '') : '') + '</li>';
+      }).join('') + '</ol>';
+      if ((v.d.length || v.x.length) && rows.filter(function (r) { return r[0] >= 2; }).length < 3)
+        html += '<aside class="tv-box"><strong>Few good matches in this guide.</strong><p>Try the live links below, or <a href="/travel/food/?near=' + FP.dataset.ll + '">find matches within 40 miles</a> in the food finder.</p></aside>';
+      list.innerHTML = html;
+      FP.querySelector('.tv-foodlive').innerHTML = liveLinks(v);
+      var keys = v.d.concat(v.x), tips = [];
+      keys.forEach(function (k) { (TIPS[k] || []).forEach(function (t) { if (tips.indexOf(t) < 0) tips.push(t); }); });
+      var td = FP.querySelector('.tv-foodtips');
+      td.hidden = !tips.length; td.querySelector('ul').innerHTML = tips.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('');
+      // mark matching listings in the Eat/Drink sections
+      document.querySelectorAll('.tv-listing[data-dt]').forEach(function (el) {
+        var sc = scoreFor(parseDt(el.dataset.dt), v), on = (v.d.length || v.x.length);
+        el.classList.toggle('tv-fit', !!on && sc >= 3); el.classList.toggle('tv-unfit', !!on && sc < 1);
+      });
+    }
+    document.addEventListener('tv-diet', paintFood);
+    paintFood();
+  }
 })();

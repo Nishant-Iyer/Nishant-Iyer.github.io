@@ -14,7 +14,7 @@ window.tvImgErr=function(im){if(!im.dataset.tried&&im.dataset.full){im.dataset.t
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
 <link rel="stylesheet" href="/style.css?v=6">
-<link rel="stylesheet" href="/travel/assets/travel.css?v=5">
+<link rel="stylesheet" href="/travel/assets/travel.css?v=6">
 
 </head>
 <body data-page="home">
@@ -25,6 +25,7 @@ window.tvImgErr=function(im){if(!im.dataset.tried&&im.dataset.full){im.dataset.t
     <form class="tv-search" action="/travel/search/" role="search"><input type="search" name="q" placeholder="Search 6,500+ places" aria-label="Search places" autocomplete="off"><div class="tv-sugg" hidden></div></form>
     <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Menu</span><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
     <ul class="nav-links" id="nav-links">
+      <li><a href="/travel/food/">Food</a></li>
       <li><a href="/travel/states/">States</a></li>
       <li><a href="/travel/map/">Map</a></li>
       <li><a href="/travel/journal/">My journal</a></li>
@@ -44,6 +45,8 @@ window.tvImgErr=function(im){if(!im.dataset.tried&&im.dataset.full){im.dataset.t
 <div class="tv-stats"><div><b>6,591</b>places</div><div><b>100,403</b>things to see, do, eat & stay</div><div><b id="tv-my-visited">0</b>places I've visited</div><div><b id="tv-my-states">0</b>states I've visited</div></div>
 </section>
 <div class="tv-wrap">
+<section class="tv-section" id="eat"><h2>Eat your way</h2><p class="tv-dim">Vegan, vegetarian, eggs-only, pescatarian or chicken-and-fish only? Pick once and every guide ranks its restaurants for you. Choose several for a mixed group.</p>
+<div class="tv-card"><div class="tv-dietpick"></div><p style="margin:10px 0 0"><a class="tv-btn" href="/travel/food/">Open the food finder</a></p></div></section>
 <section class="tv-section" id="countries"><h2>Countries</h2><div class="tv-countries">
 <a class="tv-country is-live" href="#states"><span class="tv-flag">🇺🇸</span><span><b>United States</b><small>6,591 places · all 50 states</small></span><span class="tv-pill">Live</span></a>
 <div class="tv-country"><span class="tv-flag">🇨🇦</span><span><b>Canada</b><small>Coming soon</small></span></div><div class="tv-country"><span class="tv-flag">🇲🇽</span><span><b>Mexico</b><small>Coming soon</small></span></div><div class="tv-country"><span class="tv-flag">🇯🇵</span><span><b>Japan</b><small>Coming soon</small></span></div><div class="tv-country"><span class="tv-flag">🇮🇳</span><span><b>India</b><small>Coming soon</small></span></div><div class="tv-country"><span class="tv-flag">🇮🇹</span><span><b>Italy</b><small>Coming soon</small></span></div><div class="tv-country"><span class="tv-flag">🇨🇭</span><span><b>Switzerland</b><small>Coming soon</small></span></div><div class="tv-country"><span class="tv-flag">🇬🇧</span><span><b>United Kingdom</b><small>Coming soon</small></span></div><div class="tv-country"><span class="tv-flag">🇫🇷</span><span><b>France</b><small>Coming soon</small></span></div><div class="tv-country"><span class="tv-flag">🇪🇸</span><span><b>Spain</b><small>Coming soon</small></span></div><div class="tv-country"><span class="tv-flag">🇵🇹</span><span><b>Portugal</b><small>Coming soon</small></span></div><div class="tv-country"><span class="tv-flag">🇬🇷</span><span><b>Greece</b><small>Coming soon</small></span></div><div class="tv-country"><span class="tv-flag">🇦🇹</span><span><b>Austria</b><small>Coming soon</small></span></div><div class="tv-country"><span class="tv-flag">🇳🇴</span><span><b>Norway</b><small>Coming soon</small></span></div><div class="tv-country"><span class="tv-flag">🇹🇷</span><span><b>Turkey</b><small>Coming soon</small></span></div><div class="tv-country"><span class="tv-flag">🇮🇩</span><span><b>Indonesia</b><small>Coming soon</small></span></div><div class="tv-country"><span class="tv-flag">🇦🇪</span><span><b>United Arab Emirates</b><small>Coming soon</small></span></div>
@@ -70,6 +73,6 @@ window.tvImgErr=function(im){if(!im.dataset.tried&&im.dataset.full){im.dataset.t
   </div>
 </footer>
 <script src="/script.js?v=4" defer></script>
-<script src="/travel/assets/travel.js?v=5" defer></script>
+<script src="/travel/assets/travel.js?v=6" defer></script>
 
 </body></html>
