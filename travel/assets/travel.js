@@ -9,14 +9,7 @@
   function save(all) { try { localStorage.setItem(KEY, JSON.stringify(all)); return true; } catch (e) { return false; } }
   window.tvJournal = { load: load, save: save, KEY: KEY };
 
-  // ---------- theme ----------
-  var tb = document.querySelector('.theme-toggle');
-  var sysLight = window.matchMedia('(prefers-color-scheme: light)');
-  function cur() { return root.getAttribute('data-theme') || (sysLight.matches ? 'light' : 'dark'); }
-  if (tb) tb.addEventListener('click', function () {
-    var n = cur() === 'dark' ? 'light' : 'dark'; root.setAttribute('data-theme', n);
-    try { localStorage.setItem('theme', n); } catch (e) {}
-  });
+  // Theme toggle, mobile menu and header border come from the portfolio's /script.js.
 
   // ---------- images: fall back to original, then hide ----------
   window.tvImgErr = function (im) {
@@ -223,8 +216,8 @@
         document.querySelectorAll('.tv-listing[data-lat]').forEach(function (el) {
           var la = +el.dataset.lat, lo = +el.dataset.lon; if (!la || !lo) return;
           var mk = L.circleMarker([la, lo], { radius: 7, weight: 2, color: '#fff', fillColor: col[el.dataset.kind] || '#94a3b8', fillOpacity: .95 }).addTo(m);
-          var g = el.querySelector('.tv-acts a');
-          mk.bindPopup('<b>' + esc(el.dataset.name) + '</b><br>' + (g ? '<a href="' + g.href + '" target="_blank" rel="noopener">Google Maps</a>' : ''));
+          var g = el.querySelector('.tv-acts .tv-maps');
+          mk.bindPopup('<b>' + esc(el.dataset.name) + '</b><br>' + (g ? g.outerHTML.replace('tv-btn tv-btn-sm', 'tv-link').replace(/<svg.*?<\/svg>/, '').replace('>Maps<', '>Open in Maps<') : ''));
           pts.push([la, lo]);
         });
         if (pts.length) m.fitBounds(pts, { padding: [24, 24], maxZoom: 15 });
@@ -233,4 +226,59 @@
     }, { rootMargin: '200px' });
     io.observe(lmap);
   }
+
+  // ---------- maps app chooser ----------
+  var MKEY = 'tv-maps-app';
+  var APPS = [
+    { id: 'google', name: 'Google Maps', bg: '#1a73e8', ic: 'G' },
+    { id: 'apple', name: 'Apple Maps', bg: '#34c759', ic: 'A' },
+    { id: 'waze', name: 'Waze', bg: '#33ccff', ic: 'W' }
+  ];
+  if (/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) APPS.unshift(APPS.splice(1, 1)[0]);
+  function enc(s) { return encodeURIComponent(s || ''); }
+  function mapUrl(id, d) {
+    var q = d.q, ll = d.ll, fr = d.from;
+    if (id === 'apple') return fr ? 'https://maps.apple.com/?saddr=' + enc(fr) + '&daddr=' + enc(q) : 'https://maps.apple.com/?q=' + enc(q) + (ll ? '&ll=' + ll : '');
+    if (id === 'waze') return ll ? 'https://waze.com/ul?ll=' + ll + '&navigate=yes' : 'https://waze.com/ul?q=' + enc(q) + '&navigate=yes';
+    return fr ? 'https://www.google.com/maps/dir/?api=1&origin=' + enc(fr) + '&destination=' + enc(q) : 'https://www.google.com/maps/search/?api=1&query=' + enc(q);
+  }
+  function pref() { try { return localStorage.getItem(MKEY) || ''; } catch (e) { return ''; } }
+  function setPref(v) { try { if (v) localStorage.setItem(MKEY, v); else localStorage.removeItem(MKEY); } catch (e) {} paintPref(); }
+  function go(id, d) { var w = window.open(mapUrl(id, d), '_blank', 'noopener'); if (!w) location.href = mapUrl(id, d); }
+  function closeMenu() { document.querySelectorAll('.tv-mapmenu,.tv-mapback').forEach(function (x) { x.remove(); }); }
+  function openMenu(btn, d) {
+    closeMenu();
+    var back = document.createElement('div'); back.className = 'tv-mapback';
+    var m = document.createElement('div'); m.className = 'tv-mapmenu'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-label', 'Open in which maps app?');
+    m.innerHTML = '<p>Open in</p>' + APPS.map(function (a) {
+      return '<a href="' + mapUrl(a.id, d) + '" data-app="' + a.id + '" target="_blank" rel="noopener"><span class="tv-mi" style="background:' + a.bg + '">' + a.ic + '</span>' + a.name + '</a>';
+    }).join('') + '<label><input type="checkbox" id="tv-mrem"> Always use this app</label>';
+    document.body.appendChild(back); document.body.appendChild(m);
+    var r = btn.getBoundingClientRect(), mh = m.offsetHeight, mw = m.offsetWidth;
+    var top = r.bottom + 8; if (top + mh > window.innerHeight - 8) top = Math.max(8, r.top - mh - 8);
+    m.style.top = top + 'px'; m.style.left = Math.max(8, Math.min(r.left, window.innerWidth - mw - 8)) + 'px';
+    back.addEventListener('click', closeMenu);
+    m.addEventListener('click', function (e) {
+      var a = e.target.closest('a[data-app]'); if (!a) return;
+      if (m.querySelector('#tv-mrem').checked) setPref(a.dataset.app);
+      setTimeout(closeMenu, 50);
+    });
+    var first = m.querySelector('a'); if (first) first.focus();
+  }
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.tv-maps'); if (!b || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault();
+    var d = { q: b.dataset.q, ll: b.dataset.ll, from: b.dataset.from };
+    var p = pref();
+    if (p) go(p, d); else openMenu(b, d);
+  });
+  function paintPref() {
+    document.querySelectorAll('.tv-mappref').forEach(function (el) {
+      var p = pref(), app = APPS.filter(function (a) { return a.id === p; })[0];
+      el.innerHTML = 'Maps app: <b>' + (app ? app.name : 'ask every time') + '</b>' + (app ? ' · <a href="#" class="tv-mapreset">ask every time</a>' : '');
+    });
+  }
+  document.addEventListener('click', function (e) { if (e.target.closest('.tv-mapreset')) { e.preventDefault(); setPref(''); } });
+  paintPref();
 })();
