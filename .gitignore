@@ -6,3 +6,7 @@ node_modules/
 .idea/
 Thumbs.db
 *.log
+tools/travel/raw/
+tools/travel/data/
+tools/travel/__pycache__/
+travel.new/

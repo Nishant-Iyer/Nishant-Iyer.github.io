@@ -1,0 +1,35 @@
+name: Update travel book
+
+# Wikivoyage publishes a full dump on the 1st of each month; rebuild a few days later.
+on:
+  schedule:
+    - cron: "17 9 5 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: travel-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install numpy
+      - name: Rebuild from the latest Wikivoyage dump
+        run: tools/travel/update.sh
+      - name: Commit and push if anything changed
+        run: |
+          git config user.name "travel-book-bot"
+          git config user.email "travel-book-bot@users.noreply.github.com"
+          git add -A travel tools/travel/state
+          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
+          git commit -m "Travel book: monthly update from Wikivoyage $(cat tools/travel/state/last-dump.txt)"
+          git push
