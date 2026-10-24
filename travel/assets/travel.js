@@ -93,32 +93,47 @@
   function esc(s) { return String(s || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   window.tvEsc = esc;
 
-  // ---------- header suggestions ----------
+  // ---------- search suggestions (NN/g + Baymard guidance) ----------
+  function hiName(name, q) {
+    var n = norm(name), i = n.indexOf(norm(q.trim()));
+    if (i < 0) return '<b class="tv-hit">' + esc(name) + '</b>';
+    var L = q.trim().length;   // typed part plain, the predicted part bold
+    return '<b class="tv-hit">' + esc(name.slice(0, i)) + '</b><span>' + esc(name.slice(i, i + L)) + '</span><b class="tv-hit">' + esc(name.slice(i + L)) + '</b>';
+  }
+  var dim = null;
+  function setDim(on) {
+    if (on && !dim) { dim = document.createElement('div'); dim.className = 'tv-sdim'; document.body.appendChild(dim); dim.addEventListener('click', function () { document.querySelectorAll('.tv-sugg').forEach(function (x) { x.hidden = true; }); setDim(false); }); }
+    if (!on && dim) { dim.remove(); dim = null; }
+  }
   document.querySelectorAll('.tv-search, .tv-bigsearch').forEach(function (form) {
-    var inp = form.querySelector('input'), box = form.querySelector('.tv-sugg'), sel = -1;
+    var inp = form.querySelector('input'), box = form.querySelector('.tv-sugg'), sel = -1, typed = '', res = [];
     if (!inp || !box) return;
+    function close() { box.hidden = true; setDim(false); sel = -1; }
     inp.addEventListener('focus', getIndex);
     inp.addEventListener('input', function () {
-      var v = inp.value; sel = -1;
-      if (v.trim().length < 2) { box.hidden = true; return; }
+      typed = inp.value; sel = -1;
+      if (typed.trim().length < 2) { close(); return; }
       getIndex().then(function (list) {
-        var res = search(v, list, 8);
+        res = search(typed, list, window.innerWidth < 600 ? 5 : 8);
+        if (!res.length) { box.innerHTML = '<a href="/travel/search/?q=' + encodeURIComponent(typed) + '">No place called “' + esc(typed) + '” yet — search all places</a>'; box.hidden = false; setDim(true); return; }
         box.innerHTML = res.map(function (r) {
           return '<a href="/travel/' + r.s + '/">' + (r.f ? '<img src="' + thumb(r.f, 120) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' : '<span class="ph"></span>') +
-            '<span>' + esc(r.n) + '<small>' + esc(TY[r.ty] || '') + ' · ' + esc(list.states[r.st] || r.st) + '</small></span></a>';
-        }).join('') + '<a href="/travel/search/?q=' + encodeURIComponent(v) + '"><span>See all results for “' + esc(v) + '”</span></a>';
-        box.hidden = false;
+            '<span>' + hiName(r.n, typed) + '<small>' + esc(TY[r.ty] || '') + ' · ' + esc(list.states[r.st] || r.st) + '</small></span></a>';
+        }).join('') + '<a href="/travel/search/?q=' + encodeURIComponent(typed) + '"><span>See all results for “' + esc(typed) + '”</span></a>';
+        box.hidden = false; setDim(true);
       });
     });
     inp.addEventListener('keydown', function (e) {
       var items = box.querySelectorAll('a'); if (box.hidden || !items.length) return;
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-        e.preventDefault(); sel = (sel + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+        e.preventDefault(); sel = (sel + (e.key === 'ArrowDown' ? 1 : -1) + items.length + 1) % (items.length + 1) - 0;
+        if (sel === items.length) sel = -1;   // loop back to what was typed
         items.forEach(function (a, i) { a.classList.toggle('on', i === sel); });
+        inp.value = sel >= 0 && res[sel] ? res[sel].n : typed;
       } else if (e.key === 'Enter' && sel >= 0) { e.preventDefault(); location.href = items[sel].href; }
-      else if (e.key === 'Escape') box.hidden = true;
+      else if (e.key === 'Escape') { e.preventDefault(); inp.value = typed; close(); }
     });
-    document.addEventListener('click', function (e) { if (!form.contains(e.target)) box.hidden = true; });
+    document.addEventListener('click', function (e) { if (!form.contains(e.target) && e.target !== dim) close(); });
   });
 
   // ---------- visited markers on cards ----------
@@ -139,13 +154,13 @@
     var fields = J.querySelectorAll('input[name], textarea[name], select[name]');
     var stars = J.querySelectorAll('.tv-rate button');
     var status = J.querySelector('.tv-saved');
-    var qv = document.querySelector('.tv-quickvisit');
+    var qvs = document.querySelectorAll('.tv-quickvisit');
     function entry() { return load()[slug] || {}; }
     function fill() {
       var e = entry();
       fields.forEach(function (f) { if (f.type === 'checkbox') f.checked = !!e[f.name]; else f.value = e[f.name] || ''; });
       stars.forEach(function (b) { b.classList.toggle('on', +b.dataset.v <= (e.rating || 0)); });
-      if (qv) { qv.classList.toggle('is-on', !!e.visited); qv.textContent = e.visited ? '✓ Visited' : '✓ Mark visited'; }
+      qvs.forEach(function (qv) { qv.classList.toggle('is-on', !!e.visited); qv.textContent = qv.classList.contains('tv-mb') ? '✓ Visited' : (e.visited ? '✓ Visited' : '✓ Mark visited'); });
       document.querySelectorAll('.tv-want').forEach(function (b) { var on = (e.want || []).indexOf(b.dataset.item) >= 0; b.classList.toggle('is-on', on); b.textContent = on ? '★ Want to go' : '☆ Want to go'; });
     }
     var timer;
@@ -167,7 +182,7 @@
       });
     });
     stars.forEach(function (b) { b.addEventListener('click', function () { var v = +b.dataset.v; store({ rating: entry().rating === v ? 0 : v }); }); });
-    if (qv) qv.addEventListener('click', function () { var v = !entry().visited; var p = { visited: v }; if (v && !entry().date) p.date = new Date().toISOString().slice(0, 10); store(p); });
+    qvs.forEach(function (qv) { qv.addEventListener('click', function () { var v = !entry().visited; var p = { visited: v }; if (v && !entry().date) p.date = new Date().toISOString().slice(0, 10); store(p); }); });
     document.querySelectorAll('.tv-want').forEach(function (b) {
       b.addEventListener('click', function () {
         var w = (entry().want || []).slice(), i = w.indexOf(b.dataset.item);
@@ -281,4 +296,48 @@
   }
   document.addEventListener('click', function (e) { if (e.target.closest('.tv-mapreset')) { e.preventDefault(); setPref(''); } });
   paintPref();
+
+  // ---------- on-this-page: collapsed on phones, highlights where you are ----------
+  var toc = document.querySelector('details.tv-toc');
+  if (toc) {
+    if (window.innerWidth < 900) toc.removeAttribute('open');
+    toc.addEventListener('click', function (e) { if (e.target.closest('a') && window.innerWidth < 900) toc.removeAttribute('open'); });
+    var tl = {}; toc.querySelectorAll('a[href^="#"]').forEach(function (a) { tl[a.getAttribute('href').slice(1)] = a; });
+    if ('IntersectionObserver' in window) {
+      var spy = new IntersectionObserver(function (ents) {
+        ents.forEach(function (en) { if (en.isIntersecting && tl[en.target.id]) { Object.keys(tl).forEach(function (k) { tl[k].classList.remove('on'); }); tl[en.target.id].classList.add('on'); } });
+      }, { rootMargin: '-30% 0px -60% 0px' });
+      Object.keys(tl).forEach(function (id) { var el = document.getElementById(id); if (el) spy.observe(el); });
+    }
+  }
+
+  // ---------- long listing sections: show 8, then "Show all" ----------
+  document.querySelectorAll('.tv-sec-list').forEach(function (sec) {
+    var ls = sec.querySelectorAll('.tv-listing'); if (ls.length <= 10) return;
+    for (var i = 8; i < ls.length; i++) ls[i].classList.add('tv-hide');
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'tv-btn tv-ghost tv-more';
+    b.textContent = 'Show all ' + ls.length + ' in ' + (sec.querySelector('h2') ? sec.querySelector('h2').textContent : 'this section');
+    b.addEventListener('click', function () { sec.querySelectorAll('.tv-hide').forEach(function (x) { x.classList.remove('tv-hide'); }); b.remove(); });
+    sec.appendChild(b);
+  });
+  // a link to a hidden listing (e.g. from the map) reveals it
+  document.addEventListener('click', function (e) { var a = e.target.closest('a[href^="#"]'); if (!a) return; var t = document.getElementById(a.getAttribute('href').slice(1)); if (t && t.classList.contains('tv-hide')) t.classList.remove('tv-hide'); });
+
+  // ---------- home: this month's picks follow the visitor's own date ----------
+  var mg = document.querySelectorAll('.tv-mgrid');
+  if (mg.length) {
+    var mm = new Date().getMonth();
+    mg.forEach(function (g) { g.hidden = +g.dataset.m !== mm; });
+    var mn = document.querySelector('.tv-month'); if (mn) mn.textContent = new Date().toLocaleString('en-US', { month: 'long' });
+  }
+
+  // ---------- journal entries follow renamed places ----------
+  (function () {
+    var all = load(); if (!Object.keys(all).length) return;
+    fetch('/travel/assets/aliases.json').then(function (r) { return r.ok ? r.json() : {}; }).then(function (al) {
+      var cur = load(), moved = 0;
+      Object.keys(al).forEach(function (o) { if (cur[o] && !cur[al[o]]) { cur[al[o]] = cur[o]; delete cur[o]; moved++; } });
+      if (moved) save(cur);
+    }).catch(function () {});
+  })();
 })();

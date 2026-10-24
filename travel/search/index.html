@@ -9,11 +9,12 @@
 <meta name="theme-color" content="#f6f8fa" media="(prefers-color-scheme: light)">
 <meta property="og:title" content="Search places — Travel"><meta property="og:description" content="Search every place to visit in the USA."><link rel="canonical" href="https://travel.konnectingnots.com/travel/search/">
 <link rel="icon" type="image/svg+xml" href="/travel/assets/favicon.svg">
-<script>(function(){var t=null;try{t=localStorage.getItem('theme')}catch(e){}if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);})();</script>
+<script>(function(){var t=null;try{t=localStorage.getItem('theme')}catch(e){}if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);})();
+window.tvImgErr=function(im){if(!im.dataset.tried&&im.dataset.full){im.dataset.tried=1;im.src=im.dataset.full;return}var a=im.closest('.tv-lthumb');if(a){a.remove();return}im.style.visibility='hidden'};</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=Sora:wght@600;700&display=swap">
 <link rel="stylesheet" href="/style.css?v=6">
-<link rel="stylesheet" href="/travel/assets/travel.css?v=4">
+<link rel="stylesheet" href="/travel/assets/travel.css?v=5">
 
 </head>
 <body data-page="search">
@@ -39,11 +40,11 @@
 <form class="tv-bigsearch" style="margin:0 0 14px;max-width:none" onsubmit="return false"><input id="sq" type="search" placeholder="Search by name, state or region" aria-label="Search" autocomplete="off"></form>
 <div class="tv-chips" id="sty"><button class="tv-chip on" data-ty="">Everything</button><button class="tv-chip" data-ty="c">Cities & towns</button><button class="tv-chip" data-ty="p">Parks</button><button class="tv-chip" data-ty="r">Regions</button><button class="tv-chip" data-ty="d">Neighborhoods</button><button class="tv-chip" data-ty="u">Rural areas</button>
 <select id="sst" class="tv-chip" aria-label="State"><option value="">All states</option></select><button class="tv-chip" id="near" type="button">📍 Near me</button></div>
-<p class="tv-dim" id="scount"></p><div class="tv-results" id="sres"></div><p style="text-align:center"><button class="tv-btn tv-ghost" id="smore" hidden>Show more</button></p></div>
+<p class="tv-box" id="smissing" hidden>That page has moved or is no longer in the guide. Here are the closest matches.</p><p class="tv-dim" id="scount"></p><div class="tv-results" id="sres"></div><p style="text-align:center"><button class="tv-btn tv-ghost" id="smore" hidden>Show more</button></p></div>
 <script>
 document.addEventListener('DOMContentLoaded',function(){
 var P=new URLSearchParams(location.search),q=document.getElementById('sq'),res=document.getElementById('sres'),cnt=document.getElementById('scount'),more=document.getElementById('smore'),sst=document.getElementById('sst');
-var ty=P.get('ty')||'',st=P.get('st')||'',here=null,shown=60,list=[];q.value=P.get('q')||'';
+if(P.get('missing'))document.getElementById('smissing').hidden=false;var ty=P.get('ty')||'',st=P.get('st')||'',here=null,shown=60,list=[];q.value=P.get('q')||'';
 document.querySelectorAll('#sty [data-ty]').forEach(function(b){b.classList.toggle('on',b.dataset.ty===ty);b.addEventListener('click',function(){ty=b.dataset.ty;document.querySelectorAll('#sty [data-ty]').forEach(function(x){x.classList.toggle('on',x===b)});run()})});
 function d(a,b,c,e){var r=Math.PI/180,x=Math.sin((c-a)*r/2),y=Math.sin((e-b)*r/2);return 7918*Math.asin(Math.sqrt(x*x+Math.cos(a*r)*Math.cos(c*r)*y*y))}
 function cardh(r){var J=tvJournal.load()[r.s];return '<a class="tv-pc'+(J&&J.visited?' is-visited':'')+'" href="/travel/'+r.s+'/">'+(r.f?'<img class="tv-pc-img" loading="lazy" src="'+tvThumb(r.f,330)+'" alt="" onerror="this.style.visibility=\'hidden\'">':'<div class="tv-pc-ph"></div>')+'<div class="tv-pc-b"><h3>'+tvEsc(r.n)+'</h3><p>'+tvEsc(tvTypes[r.ty]||'')+' · '+tvEsc(list.states[r.st]||r.st)+(here&&r.la?' · '+Math.round(d(here[0],here[1],r.la,r.lo))+' mi':'')+'</p></div><span class="tv-pc-v">✓</span></a>'}
@@ -51,7 +52,7 @@ function run(){var v=q.value.trim(),out;
  if(v)out=tvSearch(v,list,5000);else out=list.slice().sort(function(a,b){return b.k-a.k});
  out=out.filter(function(r){return(!ty||r.ty===ty)&&(!st||r.st===st)});
  if(here)out=out.filter(function(r){return r.la!=null}).sort(function(a,b){return d(here[0],here[1],a.la,a.lo)-d(here[0],here[1],b.la,b.lo)});
- cnt.textContent=out.length.toLocaleString()+' places';res.innerHTML=out.slice(0,shown).map(cardh).join('');more.hidden=out.length<=shown;}
+ cnt.textContent=out.length.toLocaleString()+' places';res.innerHTML=out.length?out.slice(0,shown).map(cardh).join(''):'<div class="tv-noresults"><b>No places match.</b> Try a shorter name, check the spelling, or clear the filters. Countries other than the US are coming soon.</div>';more.hidden=out.length<=shown;}
 more.addEventListener('click',function(){shown+=60;run()});
 q.addEventListener('input',function(){shown=60;run()});
 sst.addEventListener('change',function(){st=sst.value;shown=60;run()});
@@ -72,6 +73,6 @@ tvIndex().then(function(l){list=l;Object.keys(l.states).sort(function(a,b){retur
   </div>
 </footer>
 <script src="/script.js?v=4" defer></script>
-<script src="/travel/assets/travel.js?v=4" defer></script>
+<script src="/travel/assets/travel.js?v=5" defer></script>
 
 </body></html>
