@@ -440,6 +440,86 @@
     document.addEventListener('tv-diet', paintFood);
     paintFood();
   }
+
+  // ---------- "from you": each visitor's own starting point ----------
+  var HKEY = 'tv-home';
+  function getHome() { try { return JSON.parse(localStorage.getItem(HKEY) || 'null'); } catch (e) { return null; } }
+  function setHome(h) { try { if (h) localStorage.setItem(HKEY, JSON.stringify(h)); else localStorage.removeItem(HKEY); } catch (e) {} paintHome(); }
+  function miles(a, b, c, d) { var r = Math.PI / 180, x = Math.sin((c - a) * r / 2), y = Math.sin((d - b) * r / 2); return 7918 * Math.asin(Math.sqrt(x * x + Math.cos(a * r) * Math.cos(c * r) * y * y)); }
+  function hrs(h) { if (h < 1) return 'under an hour'; var w = Math.floor(h), m = Math.round((h - w) * 2) * 30; if (m === 60) { w++; m = 0; } return w + ' h' + (m ? ' 30 min' : ''); }
+  function advice(home, lat, lon, st, air) {
+    var s = miles(home.lat, home.lon, lat, lon), road = s * 1.22, drive = road / 58, fly = s / 480 + 0.6;
+    var ap = (air || []).filter(function (a) { return a[3]; })[0] || (air || [])[0];
+    var apTxt = ap ? ap[1] + ' (' + ap[0] + ')' + (ap[2] > 3 ? ', ' + ap[2] + ' mi from here' : '') : 'the nearest airport';
+    var oceanic = (st === 'HI') !== (home.st === 'HI') || ((st === 'AK') !== (home.st === 'AK') && s > 600);
+    if (s < 15) return { short: 'You’re here', long: 'This is right where you are.' };
+    if (oceanic) return { short: 'Fly · about ' + hrs(fly), long: 'Fly: about ' + Math.round(s).toLocaleString() + ' miles, roughly ' + hrs(fly) + ' in the air to ' + apTxt + '.' };
+    if (road <= 300) return { short: hrs(drive) + ' drive · ' + Math.round(road) + ' mi', long: 'Drive: about ' + Math.round(road) + ' miles, roughly ' + hrs(drive) + ' without stops.' };
+    if (road <= 650) return { short: hrs(drive) + ' drive, or fly', long: 'About ' + Math.round(road) + ' miles: a long day’s drive (~' + hrs(drive) + '), or fly into ' + apTxt + ' — about ' + hrs(fly) + ' in the air.' };
+    return { short: 'Fly · about ' + hrs(fly), long: 'About ' + Math.round(s).toLocaleString() + ' miles away, so flying makes sense: about ' + hrs(fly) + ' in the air to ' + apTxt + '. Driving would take ~' + hrs(drive) + ' (' + Math.round(road).toLocaleString() + ' mi).' };
+  }
+  function paintHome() {
+    var h = getHome();
+    var fb = document.querySelector('.tv-facts-bar[data-lat]');
+    if (fb && fb.dataset.lat) {
+      var air = []; try { air = JSON.parse(fb.dataset.air || '[]'); } catch (e) {}
+      var adv = h ? advice(h, +fb.dataset.lat, +fb.dataset.lon, fb.dataset.st, air) : null;
+      var cell = fb.querySelector('.tv-from');
+      if (cell) cell.innerHTML = '<span>From ' + (h ? esc(h.n) : 'you') + '</span><b>' + (adv ? esc(adv.short) : '<button type="button" class="tv-link tv-sethome">Set starting point</button>') + '</b>';
+      var li = document.querySelector('.tv-from-li');
+      if (li) li.innerHTML = h ? '<b>From ' + esc(h.n) + ':</b> ' + esc(adv.long) + ' <button type="button" class="tv-link tv-sethome">Change</button>'
+        : '<b>From you:</b> <button type="button" class="tv-link tv-sethome">Set your starting point</button> to see whether to drive or fly, and how long it takes.';
+    }
+    var grid = document.getElementById('tv-near-grid');
+    if (grid) {
+      var lab = document.querySelector('.tv-home-label'), btn = document.querySelector('#near-you .tv-sethome');
+      if (!h) { grid.innerHTML = ''; if (lab) lab.textContent = 'Set where you start from and we’ll list trips under about 4½ hours by car.'; if (btn) btn.textContent = 'Set your starting point'; return; }
+      if (lab) lab.textContent = 'Under about 4½ hours by car from ' + h.n + '.'; if (btn) btn.textContent = 'Change';
+      getIndex().then(function (list) {
+        var J = load();
+        var rows = list.filter(function (r) { if (r.la == null || (r.ty !== 'c' && r.ty !== 'p')) return false; var m = miles(h.lat, h.lon, r.la, r.lo) * 1.22; return m > 40 && m < 260; })
+          .sort(function (a, b) { return b.k - a.k; }).slice(0, 12);
+        grid.innerHTML = rows.map(function (r) {
+          var m = Math.round(miles(h.lat, h.lon, r.la, r.lo) * 1.22);
+          return '<a class="tv-pc' + (J[r.s] && J[r.s].visited ? ' is-visited' : '') + '" href="/travel/' + r.s + '/">' + (r.f ? '<img class="tv-pc-img" loading="lazy" src="' + thumb(r.f, 330) + '" alt="" onerror="tvImgErr(this)">' : '<div class="tv-pc-ph"></div>') +
+            '<div class="tv-pc-b"><h3>' + esc(r.n) + '</h3><p>' + esc(TY[r.ty] || '') + ' · ' + hrs(m / 58) + ' · ' + m + ' mi</p></div><span class="tv-pc-v">✓</span></a>';
+        }).join('') || '<p class="tv-dim">Nothing in the guide within about 4½ hours. Try the map.</p>';
+      });
+    }
+  }
+  function openHomeDialog() {
+    var old = document.querySelector('.tv-homedlg'); if (old) old.remove();
+    var h = getHome(), dlg = document.createElement('div'); dlg.className = 'tv-mapback tv-homedlg';
+    dlg.innerHTML = '<div class="tv-mapmenu tv-homebox" role="dialog" aria-label="Set your starting point"><p>Where do you start from?</p>' +
+      '<input class="tv-field" type="search" placeholder="Type your home city" aria-label="Home city" autocomplete="off"><div class="tv-homeres"></div>' +
+      '<button type="button" class="tv-btn tv-ghost tv-btn-sm tv-hgeo">📍 Use my current location</button>' + (h ? ' <button type="button" class="tv-link tv-hclear">Clear</button>' : '') +
+      '<p class="tv-dim" style="text-transform:none;letter-spacing:0;font-weight:400">Saved only in this browser.</p></div>';
+    document.body.appendChild(dlg);
+    var box = dlg.querySelector('.tv-homebox'), inp = dlg.querySelector('input'), resBox = dlg.querySelector('.tv-homeres');
+    box.style.left = '50%'; box.style.top = '18%'; box.style.transform = 'translateX(-50%)'; box.style.width = 'min(420px, 92vw)';
+    inp.focus();
+    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.remove(); });
+    inp.addEventListener('input', function () {
+      if (inp.value.trim().length < 2) { resBox.innerHTML = ''; return; }
+      getIndex().then(function (list) {
+        var cities = search(inp.value, list, 40).filter(function (r) { return r.la != null && (r.ty === 'c' || r.ty === 'd'); }).slice(0, 6);
+        resBox.innerHTML = cities.map(function (r, i) { return '<a href="#" data-i="' + i + '">' + esc(r.n) + ' <small>' + esc(list.states[r.st] || '') + '</small></a>'; }).join('') || '<p class="tv-dim" style="text-transform:none">No city found. Try a nearby larger city.</p>';
+        resBox.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); var r = cities[+a.dataset.i]; setHome({ n: r.n, lat: r.la, lon: r.lo, st: r.st }); dlg.remove(); }); });
+      });
+    });
+    dlg.querySelector('.tv-hgeo').addEventListener('click', function () {
+      var b = this; b.textContent = 'Locating…';
+      navigator.geolocation.getCurrentPosition(function (p) {
+        getIndex().then(function (list) {
+          var best = null, bd = 1e9; list.forEach(function (r) { if (r.la == null || r.ty !== 'c') return; var m = miles(p.coords.latitude, p.coords.longitude, r.la, r.lo); if (m < bd) { bd = m; best = r; } });
+          setHome({ n: best && bd < 30 ? best.n : 'your location', lat: p.coords.latitude, lon: p.coords.longitude, st: best ? best.st : '' }); dlg.remove();
+        });
+      }, function () { b.textContent = 'Location blocked — type your city instead'; });
+    });
+    var c = dlg.querySelector('.tv-hclear'); if (c) c.addEventListener('click', function () { setHome(null); dlg.remove(); });
+  }
+  document.addEventListener('click', function (e) { if (e.target.closest('.tv-sethome')) { e.preventDefault(); openHomeDialog(); } });
+  paintHome();
 })();
 
   // ---------- food for every diet ----------
@@ -542,4 +622,84 @@
     document.addEventListener('tv-diet', paintFood);
     paintFood();
   }
+
+  // ---------- "from you": each visitor's own starting point ----------
+  var HKEY = 'tv-home';
+  function getHome() { try { return JSON.parse(localStorage.getItem(HKEY) || 'null'); } catch (e) { return null; } }
+  function setHome(h) { try { if (h) localStorage.setItem(HKEY, JSON.stringify(h)); else localStorage.removeItem(HKEY); } catch (e) {} paintHome(); }
+  function miles(a, b, c, d) { var r = Math.PI / 180, x = Math.sin((c - a) * r / 2), y = Math.sin((d - b) * r / 2); return 7918 * Math.asin(Math.sqrt(x * x + Math.cos(a * r) * Math.cos(c * r) * y * y)); }
+  function hrs(h) { if (h < 1) return 'under an hour'; var w = Math.floor(h), m = Math.round((h - w) * 2) * 30; if (m === 60) { w++; m = 0; } return w + ' h' + (m ? ' 30 min' : ''); }
+  function advice(home, lat, lon, st, air) {
+    var s = miles(home.lat, home.lon, lat, lon), road = s * 1.22, drive = road / 58, fly = s / 480 + 0.6;
+    var ap = (air || []).filter(function (a) { return a[3]; })[0] || (air || [])[0];
+    var apTxt = ap ? ap[1] + ' (' + ap[0] + ')' + (ap[2] > 3 ? ', ' + ap[2] + ' mi from here' : '') : 'the nearest airport';
+    var oceanic = (st === 'HI') !== (home.st === 'HI') || ((st === 'AK') !== (home.st === 'AK') && s > 600);
+    if (s < 15) return { short: 'You’re here', long: 'This is right where you are.' };
+    if (oceanic) return { short: 'Fly · about ' + hrs(fly), long: 'Fly: about ' + Math.round(s).toLocaleString() + ' miles, roughly ' + hrs(fly) + ' in the air to ' + apTxt + '.' };
+    if (road <= 300) return { short: hrs(drive) + ' drive · ' + Math.round(road) + ' mi', long: 'Drive: about ' + Math.round(road) + ' miles, roughly ' + hrs(drive) + ' without stops.' };
+    if (road <= 650) return { short: hrs(drive) + ' drive, or fly', long: 'About ' + Math.round(road) + ' miles: a long day’s drive (~' + hrs(drive) + '), or fly into ' + apTxt + ' — about ' + hrs(fly) + ' in the air.' };
+    return { short: 'Fly · about ' + hrs(fly), long: 'About ' + Math.round(s).toLocaleString() + ' miles away, so flying makes sense: about ' + hrs(fly) + ' in the air to ' + apTxt + '. Driving would take ~' + hrs(drive) + ' (' + Math.round(road).toLocaleString() + ' mi).' };
+  }
+  function paintHome() {
+    var h = getHome();
+    var fb = document.querySelector('.tv-facts-bar[data-lat]');
+    if (fb && fb.dataset.lat) {
+      var air = []; try { air = JSON.parse(fb.dataset.air || '[]'); } catch (e) {}
+      var adv = h ? advice(h, +fb.dataset.lat, +fb.dataset.lon, fb.dataset.st, air) : null;
+      var cell = fb.querySelector('.tv-from');
+      if (cell) cell.innerHTML = '<span>From ' + (h ? esc(h.n) : 'you') + '</span><b>' + (adv ? esc(adv.short) : '<button type="button" class="tv-link tv-sethome">Set starting point</button>') + '</b>';
+      var li = document.querySelector('.tv-from-li');
+      if (li) li.innerHTML = h ? '<b>From ' + esc(h.n) + ':</b> ' + esc(adv.long) + ' <button type="button" class="tv-link tv-sethome">Change</button>'
+        : '<b>From you:</b> <button type="button" class="tv-link tv-sethome">Set your starting point</button> to see whether to drive or fly, and how long it takes.';
+    }
+    var grid = document.getElementById('tv-near-grid');
+    if (grid) {
+      var lab = document.querySelector('.tv-home-label'), btn = document.querySelector('#near-you .tv-sethome');
+      if (!h) { grid.innerHTML = ''; if (lab) lab.textContent = 'Set where you start from and we’ll list trips under about 4½ hours by car.'; if (btn) btn.textContent = 'Set your starting point'; return; }
+      if (lab) lab.textContent = 'Under about 4½ hours by car from ' + h.n + '.'; if (btn) btn.textContent = 'Change';
+      getIndex().then(function (list) {
+        var J = load();
+        var rows = list.filter(function (r) { if (r.la == null || (r.ty !== 'c' && r.ty !== 'p')) return false; var m = miles(h.lat, h.lon, r.la, r.lo) * 1.22; return m > 40 && m < 260; })
+          .sort(function (a, b) { return b.k - a.k; }).slice(0, 12);
+        grid.innerHTML = rows.map(function (r) {
+          var m = Math.round(miles(h.lat, h.lon, r.la, r.lo) * 1.22);
+          return '<a class="tv-pc' + (J[r.s] && J[r.s].visited ? ' is-visited' : '') + '" href="/travel/' + r.s + '/">' + (r.f ? '<img class="tv-pc-img" loading="lazy" src="' + thumb(r.f, 330) + '" alt="" onerror="tvImgErr(this)">' : '<div class="tv-pc-ph"></div>') +
+            '<div class="tv-pc-b"><h3>' + esc(r.n) + '</h3><p>' + esc(TY[r.ty] || '') + ' · ' + hrs(m / 58) + ' · ' + m + ' mi</p></div><span class="tv-pc-v">✓</span></a>';
+        }).join('') || '<p class="tv-dim">Nothing in the guide within about 4½ hours. Try the map.</p>';
+      });
+    }
+  }
+  function openHomeDialog() {
+    var old = document.querySelector('.tv-homedlg'); if (old) old.remove();
+    var h = getHome(), dlg = document.createElement('div'); dlg.className = 'tv-mapback tv-homedlg';
+    dlg.innerHTML = '<div class="tv-mapmenu tv-homebox" role="dialog" aria-label="Set your starting point"><p>Where do you start from?</p>' +
+      '<input class="tv-field" type="search" placeholder="Type your home city" aria-label="Home city" autocomplete="off"><div class="tv-homeres"></div>' +
+      '<button type="button" class="tv-btn tv-ghost tv-btn-sm tv-hgeo">📍 Use my current location</button>' + (h ? ' <button type="button" class="tv-link tv-hclear">Clear</button>' : '') +
+      '<p class="tv-dim" style="text-transform:none;letter-spacing:0;font-weight:400">Saved only in this browser.</p></div>';
+    document.body.appendChild(dlg);
+    var box = dlg.querySelector('.tv-homebox'), inp = dlg.querySelector('input'), resBox = dlg.querySelector('.tv-homeres');
+    box.style.left = '50%'; box.style.top = '18%'; box.style.transform = 'translateX(-50%)'; box.style.width = 'min(420px, 92vw)';
+    inp.focus();
+    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.remove(); });
+    inp.addEventListener('input', function () {
+      if (inp.value.trim().length < 2) { resBox.innerHTML = ''; return; }
+      getIndex().then(function (list) {
+        var cities = search(inp.value, list, 40).filter(function (r) { return r.la != null && (r.ty === 'c' || r.ty === 'd'); }).slice(0, 6);
+        resBox.innerHTML = cities.map(function (r, i) { return '<a href="#" data-i="' + i + '">' + esc(r.n) + ' <small>' + esc(list.states[r.st] || '') + '</small></a>'; }).join('') || '<p class="tv-dim" style="text-transform:none">No city found. Try a nearby larger city.</p>';
+        resBox.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); var r = cities[+a.dataset.i]; setHome({ n: r.n, lat: r.la, lon: r.lo, st: r.st }); dlg.remove(); }); });
+      });
+    });
+    dlg.querySelector('.tv-hgeo').addEventListener('click', function () {
+      var b = this; b.textContent = 'Locating…';
+      navigator.geolocation.getCurrentPosition(function (p) {
+        getIndex().then(function (list) {
+          var best = null, bd = 1e9; list.forEach(function (r) { if (r.la == null || r.ty !== 'c') return; var m = miles(p.coords.latitude, p.coords.longitude, r.la, r.lo); if (m < bd) { bd = m; best = r; } });
+          setHome({ n: best && bd < 30 ? best.n : 'your location', lat: p.coords.latitude, lon: p.coords.longitude, st: best ? best.st : '' }); dlg.remove();
+        });
+      }, function () { b.textContent = 'Location blocked — type your city instead'; });
+    });
+    var c = dlg.querySelector('.tv-hclear'); if (c) c.addEventListener('click', function () { setHome(null); dlg.remove(); });
+  }
+  document.addEventListener('click', function (e) { if (e.target.closest('.tv-sethome')) { e.preventDefault(); openHomeDialog(); } });
+  paintHome();
 })();

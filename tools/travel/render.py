@@ -27,7 +27,7 @@ def nearby(t, a, k=8, maxmi=80):
         if tt in skip or '/' in tt and tt.split('/')[0] == t.split('/')[0]: continue
         out.append((tt, round(float(d[i]))))
     return out
-VER = '6'
+VER = '7'
 from saved import SAVED
 
 STATE_NAME = {'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California', 'CO': 'Colorado', 'CT': 'Connecticut',
@@ -179,12 +179,19 @@ FOOT = '''</main>
 </body></html>'''
 
 
+SITE = 'https://travel.konnectingnots.com'
+OG_DEFAULT = SITE + '/travel/assets/og-travel.jpg'
+
+
 def page(title, desc, body, page='', attr='', extra_head='', extra_foot='', og_img=None, canon=''):
-    og = ''
-    if og_img:
-        og = f'<meta property="og:image" content="{og_img}"><meta name="twitter:card" content="summary_large_image">'
-    og += f'<meta property="og:title" content="{esc(title)}"><meta property="og:description" content="{esc(desc)}">'
-    if canon: og += f'<link rel="canonical" href="https://travel.konnectingnots.com{canon}">'
+    img_ = og_img or OG_DEFAULT
+    og = (f'<meta property="og:type" content="website"><meta property="og:site_name" content="Travel">'
+          f'<meta property="og:title" content="{esc(title)}"><meta property="og:description" content="{esc(desc)}">'
+          f'<meta property="og:image" content="{img_}">'
+          + ('<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">' if not og_img else '')
+          + f'<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{esc(title)}">'
+          f'<meta name="twitter:description" content="{esc(desc)}"><meta name="twitter:image" content="{img_}">')
+    if canon: og += f'<meta property="og:url" content="{SITE}{canon}"><link rel="canonical" href="{SITE}{canon}">'
     return HEAD.format(title=esc(title), desc=esc(desc), og=og, ver=VER, extra=extra_head, page=page) + body + \
         FOOT.format(attr=attr, ver=VER, extra=extra_foot)
 
@@ -304,13 +311,8 @@ def plan_html(a):
                      f'<p class="tv-dim">Blue bars: average daily high and low (°F). Purple columns: average monthly rain and melted snow (inches).</p></section>')
     # getting there
     gt = []
-    if a.get('drive'):
-        d = a['drive']
-        if d.get('fly'): gt.append(f'<li><b>From Chicago:</b> fly — about {d["mi"]:,} miles away.</li>')
-        elif d['mi'] < 15: gt.append('<li><b>From Chicago:</b> you are in Chicago.</li>')
-        else:
-            h = d['hrs']; hs = f'{int(h)} h' + (' 30 min' if h % 1 else '') if h >= 1 else 'under an hour'
-            gt.append(f'<li><b>Drive from Chicago:</b> about {d["mi"]:,} miles, roughly {hs} without stops.' + (' Flying is usually faster.' if h > 10 else '') + '</li>')
+    if a.get('lat') is not None:
+        gt.append('<li class="tv-from-li"><b>From you:</b> <button type="button" class="tv-link tv-sethome">Set your starting point</button> to see whether to drive or fly, and how long it takes.</li>')
     for ap in a.get('air', []):
         gt.append(f'<li><b>{esc(ap["code"])}</b> {esc(ap["name"])}{", " + esc(ap["city"]) if ap.get("city") else ""} — {ap["mi"]} mi away{" (major hub)" if ap.get("big") else ""}. '
                   + maps_link(place_name(a['t']) + ', ' + STATE_NAME.get(a['st'], ''), None, 'Directions', 'tv-link', ap['name'] + ', ' + (ap.get('city') or '')) + '</li>')
@@ -436,9 +438,8 @@ def place_page(t, a):
     typ = TYPE_LABEL.get(a.get('type', ''), 'Place')
     facts = []
     if a.get('best'): facts.append(f'<div><span>Best time</span><b>{esc(a["best"])}</b></div>')
-    if a.get('drive'):
-        d = a['drive']
-        facts.append('<div><span>From Chicago</span><b>' + (f'Fly · {d["mi"]:,} mi' if d.get('fly') else ('You are here' if d['mi'] < 15 else f'{d["hrs"]:g} h drive · {d["mi"]:,} mi')) + '</b></div>')
+    if a.get('lat') is not None:
+        facts.append('<div class="tv-from"><span>From you</span><b><button type="button" class="tv-link tv-sethome">Set starting point</button></b></div>')
     if a.get('air'): facts.append(f'<div><span>Nearest airport</span><b>{esc(a["air"][0]["code"])} · {a["air"][0]["mi"]} mi</b></div>')
     if a.get('budget', {}).get('sleep'): facts.append(f'<div><span>Typical stay</span><b>${a["budget"]["sleep"]["mid"]}/night</b></div>')
     n = a.get('n', {})
@@ -454,7 +455,8 @@ def place_page(t, a):
 <a class="tv-btn tv-ghost" href="#journal">✎ Write about it</a>
 <button class="tv-btn tv-ghost tv-quickvisit" type="button" data-slug="{a['slug']}">✓ Mark visited</button></div>
 </div></section>'''
-    facts_html = f'<div class="tv-facts-bar tv-wrap">{"".join(facts)}</div>' if facts else ''
+    apj = esc(json.dumps([[ap['code'], ap['name'], ap['mi'], 1 if ap.get('big') else 0] for ap in a.get('air', [])]))
+    facts_html = (f'<div class="tv-facts-bar tv-wrap" data-lat="{a.get("lat") or ""}" data-lon="{a.get("lon") or ""}" data-st="{a["st"]}" data-air="{apj}">{"".join(facts)}</div>') if facts else ''
     toc = []
     secs = sorted([s for s in a['secs'] if s['h'] not in SKIP], key=lambda s: ORDER.index(s['h']) if s['h'] in ORDER else 50)
     for s in secs: toc.append(f'<a href="#{section_id(s["h"])}">{esc(s["h"])}</a>')
@@ -587,7 +589,6 @@ def month_blocks():
 def home_page():
     parks = by_score([t for t, a in P.items() if a.get('type') == 'park' and 'National Park' in t and '/' not in t])
     cities = by_score([t for t, a in P.items() if a.get('type') == 'city' and a.get('status') in ('star', 'guide')])
-    near = by_score([t for t, a in P.items() if a.get('type') in ('city', 'park') and a.get('drive') and not a['drive'].get('fly') and 40 < a['drive']['mi'] < 260])
     towns = by_score([t for t, a in P.items() if a.get('type') == 'city' and a.get('status') == 'usable' and len(a['photos']) >= 4])
     n_list = sum(sum(a.get('n', {}).values()) for a in P.values())
     body = f'''<section class="tv-home-hero tv-wrap">
@@ -606,14 +607,14 @@ def home_page():
 </div></section>
 <section class="tv-section"><h2>★ My saved places</h2><p class="tv-dim">From my Instagram saves.</p><div class="tv-grid">{"".join(card(t) for t in SAVED if t in P)}</div></section>
 <section class="tv-section" id="this-month"><h2>Where to go in <span class="tv-month">{MONTHS[datetime.date.today().month - 1]}</span></h2><p class="tv-dim">Places at their most comfortable this month, based on average weather.</p>{month_blocks()}</section>
-<section class="tv-section"><h2>Weekend trips from Chicago</h2><p class="tv-dim">Under about 4½ hours by car.</p><div class="tv-grid">{"".join(card(t) for t in near[:12])}</div></section>
+<section class="tv-section" id="near-you"><h2>Weekend trips near you</h2><p class="tv-dim"><span class="tv-home-label">Under about 4½ hours by car.</span> <button type="button" class="tv-link tv-sethome">Set your starting point</button></p><div class="tv-grid" id="tv-near-grid"></div></section>
 <section class="tv-section"><h2>National parks</h2><div class="tv-grid">{"".join(card(t) for t in parks[:24])}</div><p><a href="/travel/search/?ty=p">All parks →</a></p></section>
 <section class="tv-section"><h2>Great cities</h2><div class="tv-grid">{"".join(card(t) for t in cities[:24])}</div><p><a href="/travel/search/?ty=c">All cities and towns →</a></p></section>
 <section class="tv-section"><h2>Small towns worth the trip</h2><div class="tv-grid">{"".join(card(t) for t in towns[:16])}</div></section>
 <section class="tv-section" id="states"><h2>Browse by state</h2><div class="tv-states">{"".join(state_card(st) for st in sorted(STATE_T, key=lambda s: STATE_NAME[s]))}</div></section>
 </div>
 <script>document.addEventListener('DOMContentLoaded',function(){{var a=tvJournal.load(),v=0,s={{}};for(var k in a)if(a[k].visited){{v++;s[a[k].st]=1}}document.getElementById('tv-my-visited').textContent=v;document.getElementById('tv-my-states').textContent=Object.keys(s).length;}});</script>'''
-    return page('Travel — every place to visit in the USA, more countries coming soon', 'A travel guide to every US state, city, town and park: things to do, food, best time to visit, budget, itineraries, Google Maps links and a personal travel journal.', body, 'home', '<p class="tv-attr">Guides adapted from <a href="https://en.wikivoyage.org/" rel="noopener">Wikivoyage</a> (CC BY-SA 4.0); photos from Wikimedia Commons.</p>', canon='/travel/')
+    return page('Travel — every place to visit in the USA', 'A guide to 6,591 places in all 50 states: things to do, food for every diet, best time to go, budget, itineraries, maps and your own travel journal. More countries coming soon.', body, 'home', '<p class="tv-attr">Guides adapted from <a href="https://en.wikivoyage.org/" rel="noopener">Wikivoyage</a> (CC BY-SA 4.0); photos from Wikimedia Commons.</p>', canon='/travel/')
 
 
 def states_page():
