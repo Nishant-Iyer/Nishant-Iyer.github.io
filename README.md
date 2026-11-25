@@ -1,8 +1,8 @@
-# konnectingnots.com
+# nishant-iyer.github.io
 
 Personal portfolio of **Nishant Iyer**, Senior Associate at Capital One.
 
-**[Visit the live site](https://www.konnectingnots.com)**
+**[Visit the live site](https://nishant-iyer.github.io)**
 
 ![Preview of the portfolio](assets/og-image-v3.jpg)
 
@@ -15,7 +15,7 @@ Plain HTML, CSS and a little JavaScript. No build step, no framework, no depende
 
 ## Travel book (`travel/`)
 
-A guide to every place in the USA, served at **travel.konnectingnots.com** (and `/travel/`): 6,591 destinations from Wikivoyage with things to do, food, best time to visit, budget, itineraries, Google Maps links, photos from Wikimedia Commons, and a personal journal saved in the visitor's browser. The pages are generated; don't hand-edit them. Text is CC BY-SA 4.0 from Wikivoyage contributors (credited on every page).
+A guide to every place in the USA, served at **[nishant-iyer.github.io/travel/](https://nishant-iyer.github.io/travel/)**: 6,591 destinations from Wikivoyage with things to do, food, best time to visit, budget, itineraries, Google Maps links, photos from Wikimedia Commons, and a personal journal saved in the visitor's browser. The pages are generated; don't hand-edit them. Text is CC BY-SA 4.0 from Wikivoyage contributors (credited on every page).
 
 ## Editing
 
@@ -38,7 +38,7 @@ python3 -m http.server 8000
 
 ## Deploy
 
-Hosted on Cloudflare Workers (static assets). Every push to `main` deploys automatically to `konnectingnots.com` and `www.konnectingnots.com`. The repository is private; Cloudflare reads it through its GitHub app.
+Hosted on GitHub Pages. Every push to `main` deploys automatically to https://nishant-iyer.github.io/.
 
 ## License
 

@@ -1,4 +1,4 @@
-/* Travel USA — konnectingnots.com. Same tokens and fonts as the portfolio; dark by default. */
+/* Travel USA — nishant-iyer.github.io. Same tokens and fonts as the portfolio; dark by default. */
 :root{--gold:#f5c04a;--ok:#4ade80;--warn-bg:#2a1d0c;--warn-line:#7a5418;--r-lg:var(--radius-lg);--r-md:var(--radius-md);--r-sm:var(--radius-sm)}
 @media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--gold:#b07a00;--ok:#16a34a;--warn-bg:#fff6e5;--warn-line:#e7b45a}}
 :root[data-theme="light"]{--gold:#b07a00;--ok:#16a34a;--warn-bg:#fff6e5;--warn-line:#e7b45a}

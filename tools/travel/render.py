@@ -166,8 +166,8 @@ FOOT = '''</main>
   <div class="wrap footer-inner">
     <p>&copy; <span id="year">2026</span> Nishant Iyer · <a href="/travel/">Travel</a></p>
     <ul class="social">
-      <li><a href="https://www.konnectingnots.com/">Portfolio</a></li>
-      <li><a href="mailto:contact@konnectingnots.com">contact@konnectingnots.com</a></li>
+      <li><a href="https://nishant-iyer.github.io/">Portfolio</a></li>
+      <li><a href="mailto:itsnishantiyer+portfolio@gmail.com">itsnishantiyer+portfolio@gmail.com</a></li>
       <li><a href="https://linkedin.com/in/nishantiyer" target="_blank" rel="noopener">LinkedIn</a></li>
       <li><a href="https://github.com/Nishant-Iyer" target="_blank" rel="noopener">GitHub</a></li>
     </ul>
@@ -179,7 +179,7 @@ FOOT = '''</main>
 </body></html>'''
 
 
-SITE = 'https://travel.konnectingnots.com'
+SITE = 'https://nishant-iyer.github.io'
 OG_DEFAULT = SITE + '/travel/assets/og-travel.jpg'
 
 
@@ -713,9 +713,9 @@ LEAF_F = '<script src="/travel/assets/leaflet/leaflet.js" defer></script>'
 def build_redirects():
     for old, new in ALIASES.items():
         u = f'/travel/{new}/'
-        write(old + '/index.html', f'<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Moved</title><link rel="canonical" href="https://travel.konnectingnots.com{u}"><meta http-equiv="refresh" content="0; url={u}"><meta name="robots" content="noindex"></head><body><p>This page moved to <a href="{u}">{u}</a>.</p><script>location.replace("{u}"+location.hash)</script></body></html>')
+        write(old + '/index.html', f'<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Moved</title><link rel="canonical" href="https://nishant-iyer.github.io{u}"><meta http-equiv="refresh" content="0; url={u}"><meta name="robots" content="noindex"></head><body><p>This page moved to <a href="{u}">{u}</a>.</p><script>location.replace("{u}"+location.hash)</script></body></html>')
     open(os.path.join(OUT, 'assets', 'aliases.json'), 'w').write(json.dumps(ALIASES))
-    urls = ['https://travel.konnectingnots.com/travel/'] + [f'https://travel.konnectingnots.com/travel/{a["slug"]}/' for a in P.values()]
+    urls = ['https://nishant-iyer.github.io/travel/'] + [f'https://nishant-iyer.github.io/travel/{a["slug"]}/' for a in P.values()]
     open(os.path.join(OUT, 'sitemap.xml'), 'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
         + ''.join(f'<url><loc>{u}</loc><lastmod>{META["dump"]}</lastmod></url>\n' for u in urls) + '</urlset>\n')
 

@@ -4,7 +4,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 mkdir -p raw data state
-UA="konnectingnots-travel-book/1.0 (contact@konnectingnots.com)"
+UA="nishant-iyer-travel-book/1.0 (itsnishantiyer+portfolio@gmail.com)"
 
 # Latest finished monthly dump (Wikimedia publishes one on the 1st of each month)
 DUMP=""
