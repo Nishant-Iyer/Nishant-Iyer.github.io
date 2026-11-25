@@ -180,7 +180,7 @@ FOOT = '''</main>
 
 
 SITE = 'https://nishant-iyer.github.io'
-OG_DEFAULT = SITE + '/travel/assets/og-travel.jpg'
+OG_DEFAULT = SITE + '/travel/assets/og-travel-v2.jpg'
 
 
 def page(title, desc, body, page='', attr='', extra_head='', extra_foot='', og_img=None, canon=''):
