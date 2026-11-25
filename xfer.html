@@ -1,0 +1,7 @@
+<!DOCTYPE html><meta charset="utf-8"><meta name="robots" content="noindex"><title>xfer</title>
+<script>
+(async()=>{const names=(location.hash.slice(1)||'').split(',').filter(Boolean);const out=[];
+for(const n of names){const r=await fetch('/assets/social/'+n+'.jpg',{cache:'no-store'});out.push({name:n+'.jpg',type:'image/jpeg',buf:await r.arrayBuffer()});}
+if(window.opener){window.opener.postMessage({kind:'xfer-images',files:out},'https://www.linkedin.com');}
+document.body.textContent='sent '+out.length;})();
+</script>
